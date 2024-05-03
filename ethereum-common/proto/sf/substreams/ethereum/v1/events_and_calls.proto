@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package sf.substreams.ethereum.v1;
+
+import 'sf/substreams/v1/clock.proto';
+import 'sf/substreams/ethereum/v1/call.proto';
+import 'sf/substreams/ethereum/v1/event.proto';
+
+message EventsAndCalls {
+  sf.substreams.v1.Clock clock = 1;
+  repeated sf.substreams.ethereum.v1.Event events = 2;
+  repeated sf.substreams.ethereum.v1.Call calls = 3;
+}

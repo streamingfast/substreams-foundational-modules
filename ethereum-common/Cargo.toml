@@ -1,0 +1,35 @@
+[package]
+name = "ethereum-common"
+version = "0.1.0"
+description = "Foundational Substreams Modules for Ethereum"
+edition = "2021"
+repository = "https://github.com/streamingfast/substreams-foundational-modules/ethereum-common"
+license = "Apache 2.0"
+
+[lib]
+name = "substreams"
+crate-type = ["cdylib"]
+
+[dependencies]
+ethabi = "17"
+hex-literal = "0.3"
+num-bigint = "0.4"
+prost = "0.11"
+prost-types = "0.11"
+# Use latest from https://crates.io/crates/substreams
+substreams = "0.5"
+# Use latest from https://crates.io/crates/substreams-ethereum
+substreams-ethereum = "0.9"
+serde_qs = "0.12.0"
+serde = { version = "1.0", features = ["derive"] }
+anyhow = "1.0"
+regex = "1.10.4"
+
+# Required so that ethabi > ethereum-types build correctly under wasm32-unknown-unknown
+[target.wasm32-unknown-unknown.dependencies]
+getrandom = { version = "0.2", features = ["custom"] }
+
+[profile.release]
+lto = true
+opt-level = 's'
+strip = "debuginfo"

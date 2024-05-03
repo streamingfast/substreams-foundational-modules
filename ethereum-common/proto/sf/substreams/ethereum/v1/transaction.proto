@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package sf.substreams.ethereum.v1;
+
+import 'sf/ethereum/type/v2/type.proto';
+import 'sf/substreams/v1/clock.proto';
+
+message Transactions {
+  repeated Transaction transactions = 1;
+  sf.substreams.v1.Clock clock = 2;
+  DetailLevel detail_level = 3;
+}
+
+enum DetailLevel{
+  DETAILLEVEL_EXTENDED = 0;
+  // DETAILLEVEL_TRACE = 1; // TBD
+  DETAILLEVEL_BASE = 2;
+}
+
+message Transaction {
+  sf.ethereum.type.v2.TransactionTrace trace = 1;
+  string tx_hash = 2;
+}

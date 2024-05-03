@@ -1,0 +1,134 @@
+specVersion: v0.1.0
+package:
+  name: ethereum_common
+  version: v0.1.0
+  url: https://github.com/streamingfast/substreams-foundational-modules/ethereum-common
+  doc: |
+    common Ethereum substreams modules to extract events, calls, transactions with indexing
+
+protobuf:
+  files:
+    - sf/substreams/ethereum/v1/call.proto
+    - sf/substreams/ethereum/v1/event.proto
+    - sf/substreams/ethereum/v1/events_and_calls.proto
+    - sf/substreams/ethereum/v1/transaction.proto
+  importPaths:
+    - ./proto
+
+imports:
+  ethereum: https://github.com/streamingfast/firehose-ethereum/releases/download/v1.4.8/ethereum-v1.0.0.spkg
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+
+modules:
+  - name: index_call_and_events
+    kind: blockIndex
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+    doc: |
+      `index_call_and_events` sets the following keys on the block:
+       * Event signatures evt_sig:0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (signature in hex, prefixed by 0x)
+       * Event address    evt_addr:0x0123456789abcdef0123456789abcdef01234567 (address in hex, prefixed by 0x)
+       * Call contract    call_to:0x0123456789abcdef0123456789abcdef01234567 (contract address in hex, prefixed by 0x)
+       * Caller           call_from:0x0123456789abcdef0123456789abcdef01234567 (caller address in hex, prefixed by 0x)
+       * Call method      call_method:0x01234567 (4 bytes of method signature in hex, prefixed by 0x)
+
+  - name: all_events
+    kind: map
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output: 
+      type: proto:sf.substreams.ethereum.v1.Events
+    doc: |
+      `all_events` gives you all the events in a block, with basic block hash/number/timestamp and transaction hash 
+
+  - name: all_calls
+    kind: map
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output: 
+      type: proto:sf.substreams.ethereum.v1.Calls
+    doc: |
+      `all_calls` gives you all the calls in a block (including internal calls), with basic block hash/number/timestamp and transaction hash 
+
+  - name: filtered_events
+    kind: map
+    blockFilter:
+      module: index_call_and_events
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_events
+    output:
+      type: proto:sf.substreams.ethereum.v1.Events
+    doc: |
+      `filtered_events` reads from `all_events` and applies a filter on the event addresses and signatures.
+      Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
+      Addresses to match must be written as 0x-prefixed hexadecimal, lowercase, prefixed by `evt_addr:` and signatures by `evt_sig:`.
+      Example: `(evt_addr:0x1234 || evt_addr:0x5678) && evt_sig:0xdeadbeef`
+
+  - name: filtered_calls
+    kind: map
+    blockFilter:
+      module: index_call_and_events
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_calls
+    output:
+      type: proto:sf.substreams.ethereum.v1.Calls
+    doc: |
+      `filtered_calls` reads from `all_calls` and applies a filter on the called contract, the caller and the method 4-bytes signature
+      Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
+      Addresses to match must be written as 0x-prefixed hexadecimal, lowercase, prefixed by `call_to:` or `call_from:`, methods by `call_method:`.
+      Example: `(call_to:0x1234 || call_from:0x1234) && call_method:0xdeadbeef`
+
+  - name: filtered_transactions
+    kind: map
+    blockFilter:
+      module: index_call_and_events
+      query:
+        params: true
+    inputs:
+      - params: string
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:sf.substreams.ethereum.v1.Transactions
+    doc: |
+      `filtered_transactions` reads from ethereum blocks and applies a filter on the events (addresses and signatures) as well as calls (from, to and method).
+      Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
+      Addresses and signatures to match must be written as 0x-prefixed hexadecimal, lowercase, prefixed by `evt_addr:`, `evt_sig:`, `call_to:`, `call_from:` or `call_method:`.
+      Example: `((evt_addr:0x1234 || evt_addr:0x5678) && evt_sig:0xdeadbeef) || call_to:0x01010101`
+
+  - name: filtered_events_and_calls
+    kind: map
+    blockFilter:
+      module: index_call_and_events
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_events
+      - map: all_calls
+    output:
+      type: proto:sf.substreams.ethereum.v1.EventsAndCalls
+    doc: |
+      `filtered_events_and_calls` reads from `all_calls` and `all_events`, then applies a filter to extract the items that interest you, based on called contract, caller, call method, event address and event signature.
+      Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
+      Addresses to match must be written as 0x-prefixed hexadecimal, lowercase, prefixed by `evt_addr:`, `evt_sig:`, `call_to:` or `call_from:`, methods by `call_method:`.
+      Example: evt_sig:0x9bb8f83800000000000000000000000000000000000000000000000000000000 || (call_method:0xa9059cbb && call_to:0xdac17f958d2ee523a2206206994597c13d831ec7)
+
+
+
+params:
+  filtered_events: "evt_sig:0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31"
+  filtered_calls: "call_method:0xa9059cbb && call_to:0xdac17f958d2ee523a2206206994597c13d831ec7"
+  filtered_transactions: "evt_sig:0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31 || (call_method:0xa9059cbb && call_to:0xdac17f958d2ee523a2206206994597c13d831ec7)"
+  filtered_events_and_calls: "evt_sig:0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31 || (call_method:0xa9059cbb && call_to:0xdac17f958d2ee523a2206206994597c13d831ec7)"

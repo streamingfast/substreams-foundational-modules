@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package sf.substreams.ethereum.v1;
+
+import 'sf/ethereum/type/v2/type.proto';
+import 'sf/substreams/v1/clock.proto';
+
+message Calls {
+  sf.substreams.v1.Clock clock = 1;
+  repeated Call calls = 3;
+}
+
+message Call {
+  sf.ethereum.type.v2.Call call = 1;
+  string tx_hash = 2;
+}
