@@ -17,7 +17,7 @@ num-bigint = "0.4"
 prost = "0.11"
 prost-types = "0.11"
 # Use latest from https://crates.io/crates/substreams
-substreams = "0.5"
+substreams = "0.5.13"
 # Use latest from https://crates.io/crates/substreams-ethereum
 substreams-ethereum = "0.9"
 serde_qs = "0.12.0"
@@ -33,3 +33,6 @@ getrandom = { version = "0.2", features = ["custom"] }
 lto = true
 opt-level = 's'
 strip = "debuginfo"
+
+[patch.crates-io]
+substreams = { git = "https://github.com/streamingfast/substreams-rs/", branch = "feature/expr_parser", version = "0.5.13" }

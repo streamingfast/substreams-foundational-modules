@@ -4,11 +4,11 @@ use crate::pb::sf::substreams::ethereum::v1::{
 use crate::pb::sf::substreams::index::v1::Keys;
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
-use regex::Regex;
 use std::collections::HashMap;
 use substreams::errors::Error;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::{Block, Call as ethCall, Log};
+use substreams::parser::evaluate_expression;
 
 #[substreams::handlers::map]
 fn all_events(blk: Block) -> Result<Events, Error> {
@@ -122,24 +122,12 @@ fn index_call_and_events(blk: Block) -> Result<Keys, Error> {
 
 #[substreams::handlers::map]
 fn filtered_events(query: String, events: Events) -> Result<Events, Error> {
-    // TODO: implement full query parsing
-    // this currently does a simple match on any term, regardless of the parenthesis or && operators
-    // "(evt_addr:0xb0b || evt_addr:0xa11ce) && evt_sig:0xbeefbeef
-    // will be interpreted as "evt_addr:0xb0b || evt_addr:0xa11ce || evt_sig:0xbeefbeef"
-
-    let re = Regex::new(r"\bevt[\w]+:[\w]+\b").unwrap();
-
-    let tokens: HashMap<&str, bool> = re
-        .captures_iter(query.as_str())
-        .map(|c| (c.get(0).unwrap().as_str(), true))
-        .collect();
-
     let filtered: Vec<Event> = events
         .events
         .into_iter()
         .filter(|e| {
             if let Some(log) = &e.log {
-                evt_matches(log, &tokens)
+                evt_matches(log, &query)
             } else {
                 false
             }
@@ -152,51 +140,25 @@ fn filtered_events(query: String, events: Events) -> Result<Events, Error> {
     })
 }
 
-fn evt_matches(log: &substreams_ethereum::pb::eth::v2::Log, query: &HashMap<&str, bool>) -> bool {
-    let mut matched = false;
-    evt_keys(log).into_iter().for_each(|k| {
-        if let Some(_) = query.get(k.as_str()) {
-            matched = true;
-            return;
-        }
-    });
-    matched
+fn evt_matches(log: &substreams_ethereum::pb::eth::v2::Log, query: &str) -> bool {
+    evaluate_expression(evt_keys(log),query) 
 }
 
 fn call_matches(
     call: &substreams_ethereum::pb::eth::v2::Call,
-    query: &HashMap<&str, bool>,
+    query: &str,
 ) -> bool {
-    let mut matched = false;
-    call_keys(call).into_iter().for_each(|k| {
-        if let Some(_) = query.get(k.as_str()) {
-            matched = true;
-            return;
-        }
-    });
-    matched
+    evaluate_expression(call_keys(call),query)
 }
 
 #[substreams::handlers::map]
 fn filtered_calls(query: String, calls: Calls) -> Result<Calls, Error> {
-    // TODO: implement full query parsing
-    // this currently does a simple match on any term, regardless of the parenthesis or && operators
-    // "(call_from:0xb0b || call_from:0xa11ce) && call_method:0xbeefbeef
-    // will be interpreted as "call_from:0xb0b || call_from:0xa11ce || call_method:0xbeefbeef
-
-    let re = Regex::new(r"\bcall[\w]+:[\w]+\b").unwrap();
-
-    let tokens: HashMap<&str, bool> = re
-        .captures_iter(query.as_str())
-        .map(|c| (c.get(0).unwrap().as_str(), true))
-        .collect();
-
     let filtered: Vec<Call> = calls
         .calls
         .into_iter()
         .filter(|e| {
             if let Some(call) = &e.call {
-                call_matches(call, &tokens)
+                call_matches(call, &query)
             } else {
                 false
             }
@@ -211,30 +173,12 @@ fn filtered_calls(query: String, calls: Calls) -> Result<Calls, Error> {
 
 #[substreams::handlers::map]
 fn filtered_events_and_calls(query: String, events: Events, calls: Calls) -> Result<EventsAndCalls, Error> {
-    // TODO: implement full query parsing
-    // this currently does a simple match on any term, regardless of the parenthesis or && operators
-    // "(call_from:0xb0b || call_from:0xa11ce) && call_method:0xbeefbeef
-    // will be interpreted as "call_from:0xb0b || call_from:0xa11ce || call_method:0xbeefbeef
-
-    let evt_re = Regex::new(r"\bevt[\w]+:[\w]+\b").unwrap();
-    let call_re = Regex::new(r"\bcall[\w]+:[\w]+\b").unwrap();
-
-    let evt_tokens: HashMap<&str, bool> = evt_re
-        .captures_iter(query.as_str())
-        .map(|c| (c.get(0).unwrap().as_str(), true))
-        .collect();
-
-    let call_tokens: HashMap<&str, bool> = call_re
-        .captures_iter(query.as_str())
-        .map(|c| (c.get(0).unwrap().as_str(), true))
-        .collect();
-
     let filtered_calls: Vec<Call> = calls
         .calls
         .into_iter()
         .filter(|e| {
             if let Some(call) = &e.call {
-                call_matches(call, &call_tokens)
+                call_matches(call, &query)
             } else {
                 false
             }
@@ -246,7 +190,7 @@ fn filtered_events_and_calls(query: String, events: Events, calls: Calls) -> Res
         .into_iter()
         .filter(|e| {
             if let Some(log) = &e.log {
-                evt_matches(log, &evt_tokens)
+                evt_matches(log, &query)
             } else {
                 false
             }
@@ -264,22 +208,6 @@ fn filtered_events_and_calls(query: String, events: Events, calls: Calls) -> Res
 
 #[substreams::handlers::map]
 fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Error> {
-    // TODO: implement full query parsing
-    // this currently does a simple match on any term, regardless of the parenthesis or && operators
-
-    let evt_re = Regex::new(r"\bevt[\w]+:[\w]+\b").unwrap();
-    let call_re = Regex::new(r"\bcall[\w]+:[\w]+\b").unwrap();
-
-    let evt_tokens: HashMap<&str, bool> = evt_re
-        .captures_iter(query.as_str())
-        .map(|c| (c.get(0).unwrap().as_str(), true))
-        .collect();
-
-    let call_tokens: HashMap<&str, bool> = call_re
-        .captures_iter(query.as_str())
-        .map(|c| (c.get(0).unwrap().as_str(), true))
-        .collect();
-
     let mut events: HashMap<String, Vec<&Log>> = HashMap::new();
     block.logs().for_each(|log| {
         let k = Hex::encode(&log.receipt.transaction.hash);
@@ -301,7 +229,7 @@ fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Er
             let hash = Hex::encode(&tt.hash);
             if let Some(ev) = events.get(&hash) {
                 ev.iter().for_each(|log| {
-                    if evt_matches(&log, &evt_tokens) {
+                    if evt_matches(&log, &query) {
                         matched = true;
                         return;
                     }
@@ -309,7 +237,7 @@ fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Er
             };
             if let Some(ca) = calls.get(&hash) {
                 ca.iter().for_each(|call| {
-                    if call_matches(&call, &call_tokens) {
+                    if call_matches(&call, &query) {
                         matched = true;
                         return;
                     };
