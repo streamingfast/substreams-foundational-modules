@@ -3,7 +3,7 @@ use substreams::pb::sf::substreams::index::v1::Keys;
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use substreams::errors::Error;
-use substreams::parser::evaluate_expression;
+use substreams::matches_keys_in_parsed_expr;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::Block;
 
@@ -57,7 +57,7 @@ fn filtered_events(query: String, events: Events) -> Result<Events, Error> {
         .into_iter()
         .filter(|e| {
             if let Some(log) = &e.log {
-                evt_matches(log, &query)
+                evt_matches(log, &query).expect("matching calls from query")
             } else {
                 false
             }
@@ -84,6 +84,6 @@ pub fn evt_keys(log: &substreams_ethereum::pb::eth::v2::Log) -> Vec<String> {
     keys
 }
 
-pub fn evt_matches(log: &substreams_ethereum::pb::eth::v2::Log, query: &str) -> bool {
-    evaluate_expression(evt_keys(log), query)
+pub fn evt_matches(log: &substreams_ethereum::pb::eth::v2::Log, query: &str) -> Result<bool, Error> {
+    matches_keys_in_parsed_expr(&evt_keys(log), query)
 }

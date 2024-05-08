@@ -4,7 +4,6 @@ use crate::pb::sf::substreams::ethereum::v1::{
     Call, Calls, Event, Events, EventsAndCalls, Transaction, Transactions,
 };
 use substreams::pb::sf::substreams::index::v1::Keys;
-
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use std::collections::HashMap;
@@ -46,7 +45,7 @@ fn filtered_events_and_calls(
         .into_iter()
         .filter(|e| {
             if let Some(call) = &e.call {
-                call_matches(call, &query)
+                call_matches(call, &query).expect("matching calls from query")
             } else {
                 false
             }
@@ -58,7 +57,7 @@ fn filtered_events_and_calls(
         .into_iter()
         .filter(|e| {
             if let Some(log) = &e.log {
-                evt_matches(log, &query)
+                evt_matches(log, &query).expect("matching calls from query")
             } else {
                 false
             }
@@ -95,7 +94,7 @@ fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Er
             let hash = Hex::encode(&tt.hash);
             if let Some(ev) = events.get(&hash) {
                 ev.iter().for_each(|log| {
-                    if evt_matches(&log, &query) {
+                    if evt_matches(&log, &query).expect("matching calls from query") {
                         matched = true;
                         return;
                     }
@@ -103,7 +102,7 @@ fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Er
             };
             if let Some(ca) = calls.get(&hash) {
                 ca.iter().for_each(|call| {
-                    if call_matches(&call, &query) {
+                    if call_matches(&call, &query).expect("matching calls from query") {
                         matched = true;
                         return;
                     };

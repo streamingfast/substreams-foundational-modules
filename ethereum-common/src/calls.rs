@@ -3,7 +3,7 @@ use substreams::pb::sf::substreams::index::v1::Keys;
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use substreams::errors::Error;
-use substreams::parser::evaluate_expression;
+use substreams::matches_keys_in_parsed_expr;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::Block;
 
@@ -55,7 +55,7 @@ fn filtered_calls(query: String, calls: Calls) -> Result<Calls, Error> {
         .into_iter()
         .filter(|e| {
             if let Some(call) = &e.call {
-                call_matches(call, &query)
+                call_matches(call, &query).expect("matching calls from query")
             } else {
                 false
             }
@@ -68,8 +68,8 @@ fn filtered_calls(query: String, calls: Calls) -> Result<Calls, Error> {
     })
 }
 
-pub fn call_matches(call: &substreams_ethereum::pb::eth::v2::Call, query: &str) -> bool {
-    evaluate_expression(call_keys(call), query)
+pub fn call_matches(call: &substreams_ethereum::pb::eth::v2::Call, query: &str) -> Result<bool, Error> {
+    matches_keys_in_parsed_expr(&call_keys(call), query)
 }
 
 pub fn call_keys(call: &substreams_ethereum::pb::eth::v2::Call) -> Vec<String> {

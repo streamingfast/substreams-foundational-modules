@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use substreams::errors::Error;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::{Block, Call as ethCall, Log};
-use substreams::parser::evaluate_expression;
+use substreams::parser::matches_keys_in_parsed_expr;
 use substreams::pb::sf::substreams::index::v1::Keys;
 
 #[substreams::handlers::map]
@@ -141,14 +141,14 @@ fn filtered_events(query: String, events: Events) -> Result<Events, Error> {
 }
 
 fn evt_matches(log: &substreams_ethereum::pb::eth::v2::Log, query: &str) -> bool {
-    evaluate_expression(evt_keys(log),query) 
+    matches_keys_in_parsed_expr(evt_keys(log),query) 
 }
 
 fn call_matches(
     call: &substreams_ethereum::pb::eth::v2::Call,
     query: &str,
 ) -> bool {
-    evaluate_expression(call_keys(call),query)
+    matches_keys_in_parsed_expr(call_keys(call),query)
 }
 
 #[substreams::handlers::map]

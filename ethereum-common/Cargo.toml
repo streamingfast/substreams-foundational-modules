@@ -35,4 +35,4 @@ opt-level = 's'
 strip = "debuginfo"
 
 [patch.crates-io]
-substreams = { git = "https://github.com/streamingfast/substreams-rs/", branch = "feature/expr_parser", version = "0.5.13" }
+substreams = { path = "../../substreams-rs/substreams" }
