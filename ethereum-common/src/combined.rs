@@ -3,7 +3,8 @@ use crate::events::*;
 use crate::pb::sf::substreams::ethereum::v1::{
     Call, Calls, Event, Events, EventsAndCalls, Transaction, Transactions,
 };
-use crate::pb::sf::substreams::index::v1::Keys;
+use substreams::pb::sf::substreams::index::v1::Keys;
+
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use std::collections::HashMap;

@@ -1,5 +1,5 @@
 use crate::pb::sf::substreams::ethereum::v1::{Call, Calls};
-use crate::pb::sf::substreams::index::v1::Keys;
+use substreams::pb::sf::substreams::index::v1::Keys;
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use substreams::errors::Error;
