@@ -10,9 +10,17 @@ Therefore, creating and pre-caching "well-known" modules with commonly used sets
 Additionally, creating and pre-caching "index modules" can be used to further reduce the number of blocks that will be actually processed.
 
 Foundational modules can contain:
-1) mappers that extract the essential data from blocks ("log/events" in Ethereum, instructions in Solana )
-2) mappers that filter out unwanted data from blocks ("empty" or "spammy" transactions)
-3) block indexes that adds "labels" to blocks, ex: one label for each "account/actor" that generated an event, one label for each contract that executed code, etc.
+
+1) mappers that extract the essential data from blocks with minimal transformation, ex:
+  - "log/events" (with added trx hash) in Ethereum 
+  - "instructions" (with flattened addresses) in Solana
+2) mappers that filter out unwanted data from blocks ("empty" or "spammy" transactions), ex:
+  - removing the solana instructions that are only "votes"
+3) block indexes that adds "keys" to blocks, ex: one label for each "account/actor" that generated an event (ex: evt_from:0x01234, call_addr:0x9876, etc.)
+4) mappers that help with the use of the block indexes by accepting a `param` and also using it as a `blockFilter.queryString`, like this:
+  i. read the output from the "ethereum events" mapper
+  ii. use the blockFilter attribute to only process the blocks that match a few keys (ex: `evt_from:0xb0b || evt_from:0xa11ce`) 
+  iii. from all the events that come from those blocks, apply the same filtering logic (by extracting the same keys and applying the query from the params), only outputting the events that match the `param`.
 
 # Current implementations
 
