@@ -1,3 +1,4 @@
+// @generated
 pub mod sf {
     pub mod cosmos {
         pub mod r#type {

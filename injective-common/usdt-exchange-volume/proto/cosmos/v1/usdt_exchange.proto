@@ -4,7 +4,7 @@ syntax = "proto3";
 package sf.substreams.cosmos.v1;
 
 message USDTExchange {
-    int32 amount = 1;
+    string amount = 1;
 }
 
 message USDTExchangeList {

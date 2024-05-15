@@ -17,7 +17,7 @@ const USDT_ADDRESS: &str = "peggy0xdAC17F958D2ee523a2206206994597C13D831ec7";
 pub fn map_usdt_exchanges(block: Block) -> Result<UsdtExchangeList, Error> {
     // Mutable list to add the output of the Substreams
     let mut usdt_exchanges: Vec<UsdtExchange> = Vec::new();
-    substreams::log::println("1");
+
     if block.txs.len() != block.tx_results.len() {
         return Err(anyhow!("Transaction list and result list do not match"));
     }
@@ -29,13 +29,12 @@ pub fn map_usdt_exchanges(block: Block) -> Result<UsdtExchangeList, Error> {
         if let Ok(transaction) = Tx::from_bytes(tx) {
             for message in transaction.body.messages {
                 if let Some(usdt_exchange) = handle_msg_execute_contract(&message, &tx_result) {
-                    substreams::log::println(usdt_exchange.amount.to_string());
                     usdt_exchanges.push(usdt_exchange)
                 }
             }
         }
     }
-   
+
     Ok(UsdtExchangeList {
         exchanges: usdt_exchanges,
     })
@@ -71,9 +70,9 @@ fn is_dojo_smart_contract(tx_result: &TxResults) -> bool {
 
 fn extract_data_from_event(event: &Event) -> Option<UsdtExchange> {
     let mut offer_asset = &String::new();
-    let mut offer_amount = 0;
+    let mut offer_amount = &String::new();
     let mut ask_asset = &String::new();
-    let mut ask_amount = 0;
+    let mut ask_amount = &String::new();
 
     event.attributes.iter().for_each(|att| {
         if att.key == "offer_asset" {
@@ -81,26 +80,28 @@ fn extract_data_from_event(event: &Event) -> Option<UsdtExchange> {
         }
 
         if att.key == "offer_amount" {
-            offer_amount = att.value.parse().unwrap();
+            offer_amount = &att.value;
         }
 
         if att.key == "ask_asset" {
             ask_asset = &att.value;
         }
 
-        if att.key == "ask_amount" {
-            ask_amount = att.value.parse().unwrap();
+        if att.key == "ask_amount" || att.key == "return_amount" {
+            ask_amount = &att.value;
         }
     });
 
-    if ask_asset == USDT_ADDRESS {
-        substreams::log::println(ask_amount.to_string());
-        return Some(UsdtExchange { amount: ask_amount });
+    if ask_asset == USDT_ADDRESS && !ask_amount.is_empty() {
+        return Some(UsdtExchange {
+            amount: ask_amount.to_string(),
+        });
     }
 
-    if offer_asset == USDT_ADDRESS {
-        substreams::log::println(offer_amount.to_string());
-        return Some(UsdtExchange { amount: offer_amount });
+    if offer_asset == USDT_ADDRESS && !offer_amount.is_empty() {
+        return Some(UsdtExchange {
+            amount: offer_amount.to_string(),
+        });
     }
 
     return None;
