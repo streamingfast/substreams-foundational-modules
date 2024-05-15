@@ -1,0 +1,12 @@
+
+syntax = "proto3";
+
+package sf.substreams.cosmos.v1;
+
+message USDTExchange {
+    string amount = 1;
+}
+
+message USDTExchangeList {
+    repeated USDTExchange exchanges = 1;
+}
