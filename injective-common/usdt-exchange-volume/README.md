@@ -26,5 +26,5 @@ make build
 
 ### Run Substreams
 ```bash
-substreams run substreams.yaml map_usdt_exchanges -e mainnet.injective.streamingfast.io:443 --start-block=69746551 --stop-block=+20
+substreams run substreams.yaml map_usdt_exchanges -e mainnet.injective.streamingfast.io:443 --start-block=55507159--stop-block=+200
 ```
