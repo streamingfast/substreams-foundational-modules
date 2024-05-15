@@ -3,8 +3,8 @@ syntax = "proto3";
 
 package sf.substreams.cosmos.v1;
 
-import "buf.build/cosmos/cosmos-sdk/main:cosmos/tx/v1beta1/tx.proto";
+import "cosmos/tx/v1beta1/tx.proto";
 
 message TxList {
-    repeated Tx exchanges = 1;
+    repeated cosmos.tx.v1beta1.Tx transactions = 1;
 }
