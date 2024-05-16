@@ -6,7 +6,7 @@ package:
 network: cosmos
 
 imports:
-  cosmos: https://github.com/streamingfast/substreams-cosmos/releases/download/v0.1.1/cosmos-v0.1.0.spkg
+  cosmos: https://github.com/streamingfast/substreams-cosmos/releases/download/v0.1.5/cosmos-v0.1.5.spkg
 
 protobuf:
   files:
@@ -22,7 +22,7 @@ binaries:
 modules:
   - name: map_usdt_exchanges
     kind: map
-    initialBlock: 64987400
+    initialBlock: 59693701
     inputs:
       - source: sf.cosmos.type.v2.Block
     output:
