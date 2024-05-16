@@ -1,6 +1,6 @@
 .PHONY: protogen
 protogen:
-	substreams protogen --exclude-paths="sf/substreams/rpc,sf/substreams/sink,google"
+	substreams protogen --exclude-paths="sf/substreams/antelope,sf/antelope,sf/substreams/rpc,sf/substreams/sink,google"
 
 .PHONY: build
 build:
