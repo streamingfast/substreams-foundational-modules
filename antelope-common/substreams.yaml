@@ -14,6 +14,7 @@ package:
 protobuf:
   files:
     - sf/substreams/antelope/v1/transaction.proto
+    - sf/substreams/antelope/v1/action.proto
   importPaths:
     - ./proto
 
@@ -34,10 +35,29 @@ modules:
       type: proto:sf.substreams.index.v1.Keys
     doc: |
       `index_actions` sets the following keys on the block:
-       * Authorized by      auth:account
-       * Receiver           recv:account
-       * Contract account   code:account
-       * Action
+       * Authorized by      auth:{account}[@{permission}]
+       * Receiver           recv:{account}
+       * Contract account   code:{account}
+       * Action             action:{action}
+
+
+  - name: all_transactions
+    kind: map
+    inputs:
+      - source: sf.antelope.type.v1.Block
+    output:
+      type: proto:sf.substreams.antelope.v1.Transactions
+    doc: |
+      `all_transactions` reads from antelope blocks and extracts all executed transactions
+
+  - name: all_actions
+    kind: map
+    inputs:
+      - map: all_transactions
+    output:
+      type: proto:sf.substreams.antelope.v1.Actions
+    doc: |
+      `all_actions` reads from all_transactions and extracts all executed actions
 
   - name: filtered_transactions
     kind: map
@@ -47,14 +67,31 @@ modules:
         params: true
     inputs:
       - params: string
-      - source: sf.antelope.type.v1.Block
+      - map: all_transactions
     output:
       type: proto:sf.substreams.antelope.v1.Transactions
     doc: |
-      `filtered_transactions` reads from antelope blocks and applies a filter on the transactions
+      `filtered_transactions` reads from all_transactions and applies a filter on the transactions
+      Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
+      Example: `auth:hackerdarwin && code:eosio.token`
+
+  - name: filtered_actions
+    kind: map
+    blockFilter:
+      module: index_actions
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_actions
+    output:
+      type: proto:sf.substreams.antelope.v1.Actions
+    doc: |
+      `filtered_actions` reads from all_actions and applies a filter on the actions
       Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
       Example: `auth:hackerdarwin && code:eosio.token`
 
 params:
   # filtered_transactions: "recv:hackerdarwin && code:eosio.token"
   filtered_transactions: "code:stats.sx && action:tradelog"
+  filtered_actions: "code:stats.sx && action:tradelog"

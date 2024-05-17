@@ -1,6 +1,6 @@
 use substreams_antelope::pb::{ActionTrace, PermissionLevel};
 
-// https://docs.dfuse.eosnation.io/eosio/public-apis/reference/search/terms/
+// i.e. https://docs.dfuse.eosnation.io/eosio/public-apis/reference/search/terms/
 pub fn action_keys(action: &ActionTrace) -> Vec<String> {
     let receiver = &action.receiver;
     let action = action.action.as_ref().unwrap();
