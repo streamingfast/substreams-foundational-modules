@@ -2,10 +2,9 @@ use serde_json::Value;
 use substreams_antelope::pb::{ActionTrace, PermissionLevel};
 
 // i.e. https://docs.dfuse.eosnation.io/eosio/public-apis/reference/search/terms/
-pub fn action_keys(action: &ActionTrace) -> Vec<String> {
-    let receiver = &action.receiver;
-    let action = action.action.as_ref().unwrap();
-    let mut keys = Vec::with_capacity(action.authorization.len() * 2 + 3);
+pub fn action_keys(trace: &ActionTrace) -> Vec<String> {
+    let action = trace.action.as_ref().unwrap();
+    let mut keys = Vec::with_capacity(action.authorization.len() * 2 + 5 + 3);
     let json_data: Value = match serde_json::from_str(&action.json_data) {
         Ok(data) => data,
         Err(_) => Value::Object(Default::default()),
@@ -13,7 +12,7 @@ pub fn action_keys(action: &ActionTrace) -> Vec<String> {
 
     keys.extend(vec![
         format!("code:{}", action.account),
-        format!("receiver:{}", receiver),
+        format!("receiver:{}", trace.receiver),
         format!("action:{}", action.name),
     ]);
 
@@ -41,6 +40,10 @@ pub fn action_keys(action: &ActionTrace) -> Vec<String> {
                 ]
             }),
     );
+
+    if trace.creator_action_ordinal == 0 {
+        keys.push("input:true".to_string());
+    }
 
     keys
 }
