@@ -13,8 +13,6 @@ package:
 
 protobuf:
   files:
-    - sf/substreams/antelope/v1/transaction.proto
-    - sf/substreams/antelope/v1/action.proto
   importPaths:
     - ./proto
 
@@ -46,7 +44,7 @@ modules:
     inputs:
       - source: sf.antelope.type.v1.Block
     output:
-      type: proto:sf.substreams.antelope.v1.Transactions
+      type: proto:sf.antelope.type.v1.TransactionTraces
     doc: |
       `all_transactions` reads from antelope blocks and extracts all executed transactions
 
@@ -55,7 +53,7 @@ modules:
     inputs:
       - map: all_transactions
     output:
-      type: proto:sf.substreams.antelope.v1.Actions
+      type: proto:sf.antelope.type.v1.ActionTraces
     doc: |
       `all_actions` reads from all_transactions and extracts all executed actions
 
@@ -69,7 +67,7 @@ modules:
       - params: string
       - map: all_transactions
     output:
-      type: proto:sf.substreams.antelope.v1.Transactions
+      type: proto:sf.antelope.type.v1.TransactionTraces
     doc: |
       `filtered_transactions` reads from all_transactions and applies a filter on the transactions
       Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
@@ -85,7 +83,7 @@ modules:
       - params: string
       - map: all_actions
     output:
-      type: proto:sf.substreams.antelope.v1.Actions
+      type: proto:sf.antelope.type.v1.ActionTraces
     doc: |
       `filtered_actions` reads from all_actions and applies a filter on the actions
       Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`

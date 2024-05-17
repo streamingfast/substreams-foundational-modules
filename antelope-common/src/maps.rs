@@ -1,52 +1,40 @@
 use std::collections::BTreeSet;
 
-use crate::{
-    actions::action_keys,
-    pb::sf::substreams::antelope::v1::{Action, Actions, Transaction, Transactions},
-};
+use crate::actions::action_keys;
 use substreams::matches_keys_in_parsed_expr;
-use substreams_antelope::Block;
+use substreams_antelope::{
+    pb::{ActionTraces, TransactionTraces},
+    Block,
+};
 
 #[substreams::handlers::map]
-fn all_transactions(block: Block) -> Result<Transactions, substreams::errors::Error> {
-    let all = block
-        .into_transaction_traces()
-        .map(|trx| Transaction {
-            tx_hash: trx.id.clone(),
-            trace: Some(trx),
-        })
-        .collect();
-
-    Ok(Transactions { transactions: all })
+fn all_transactions(block: Block) -> Result<TransactionTraces, substreams::errors::Error> {
+    Ok(TransactionTraces {
+        transaction_traces: block.into_transaction_traces().collect(),
+    })
 }
 
 #[substreams::handlers::map]
-fn all_actions(transactions: Transactions) -> Result<Actions, substreams::errors::Error> {
-    let all = transactions
-        .transactions
+fn all_actions(transactions: TransactionTraces) -> Result<ActionTraces, substreams::errors::Error> {
+    let action_traces = transactions
+        .transaction_traces
         .into_iter()
-        .flat_map(|trx| {
-            trx.trace
-                .unwrap()
-                .action_traces
-                .into_iter()
-                .map(move |action| Action {
-                    tx_hash: trx.tx_hash.clone(),
-                    trace: Some(action),
-                })
-        })
-        .collect();
+        .flat_map(|trx| trx.action_traces)
+        .collect::<Vec<_>>();
 
-    Ok(Actions { actions: all })
+    Ok(ActionTraces { action_traces })
 }
 
 #[substreams::handlers::map]
-fn filtered_actions(query: String, actions: Actions) -> Result<Actions, substreams::errors::Error> {
-    let filtered = actions
-        .actions
+fn filtered_actions(
+    query: String,
+    actions: ActionTraces,
+) -> Result<ActionTraces, substreams::errors::Error> {
+    let action_traces = actions
+        .action_traces
         .into_iter()
         .filter(|action| {
-            let keys = action_keys(action.trace.as_ref().unwrap())
+            let keys = action_keys(action)
                 .into_iter()
                 .collect::<BTreeSet<_>>()
                 .into_iter()
@@ -57,22 +45,19 @@ fn filtered_actions(query: String, actions: Actions) -> Result<Actions, substrea
         })
         .collect();
 
-    Ok(Actions { actions: filtered })
+    Ok(ActionTraces { action_traces })
 }
 
 #[substreams::handlers::map]
 fn filtered_transactions(
     query: String,
-    transactions: Transactions,
-) -> Result<Transactions, substreams::errors::Error> {
-    let filtered = transactions
-        .transactions
+    transactions: TransactionTraces,
+) -> Result<TransactionTraces, substreams::errors::Error> {
+    let transaction_traces = transactions
+        .transaction_traces
         .into_iter()
         .filter(|trx| {
             let keys = trx
-                .trace
-                .as_ref()
-                .unwrap()
                 .action_traces
                 .iter()
                 .flat_map(|action| action_keys(&action))
@@ -85,7 +70,5 @@ fn filtered_transactions(
         })
         .collect();
 
-    Ok(Transactions {
-        transactions: filtered,
-    })
+    Ok(TransactionTraces { transaction_traces })
 }
