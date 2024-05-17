@@ -1,15 +1,16 @@
 specVersion: v0.1.0
 package:
   name: antelope_common
-  version: v0.3.0
+  version: v0.1.0
   url: https://github.com/streamingfast/substreams-foundational-modules/antelope-common
   doc: |
     common Antelope substreams modules to extract transactions with indexing
 
     Use one of those optimized modules with a query string as a parameter:
     * filtered_transactions
+    * filtered_actions
 
-    The query string will be used for the blockfilter as well as the actual filtering of the transactions
+    The query string will be used for the blockfilter as well as the actual filtering of actions/transactions
 
 protobuf:
   files:
@@ -37,6 +38,7 @@ modules:
        * Receiver           recv:{account}
        * Contract account   code:{account}
        * Action             action:{action}
+       * Action params      data.{param}:{value}
 
 
   - name: all_transactions
@@ -71,7 +73,7 @@ modules:
     doc: |
       `filtered_transactions` reads from all_transactions and applies a filter on the transactions
       Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
-      Example: `auth:hackerdarwin && code:eosio.token`
+      Example: `code:eosio.token && action:transfer && (data.to:myaccount || data.from:myaccount)`
 
   - name: filtered_actions
     kind: map
@@ -87,9 +89,8 @@ modules:
     doc: |
       `filtered_actions` reads from all_actions and applies a filter on the actions
       Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
-      Example: `auth:hackerdarwin && code:eosio.token`
+      Example: `code:eosio.token && action:transfer && (data.to:myaccount || data.from:myaccount)`
 
 params:
-  # filtered_transactions: "recv:hackerdarwin && code:eosio.token"
-  filtered_transactions: "code:stats.sx && action:tradelog"
-  filtered_actions: "code:stats.sx && action:tradelog"
+  filtered_transactions: "code:eosio.token && action:transfer"
+  filtered_actions: "code:eosio.token && action:transfer"

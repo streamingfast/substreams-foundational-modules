@@ -15,6 +15,7 @@ dependencies = [
 name = "antelope-common"
 version = "0.1.0"
 dependencies = [
+ "serde_json",
  "substreams",
  "substreams-antelope",
 ]
