@@ -1,4 +1,3 @@
-
 syntax = "proto3";
 
 package sf.substreams.cosmos.v1;
@@ -6,5 +5,5 @@ package sf.substreams.cosmos.v1;
 import "cosmos/tx/v1beta1/tx.proto";
 
 message TxList {
-    repeated cosmos.tx.v1beta1.Tx transactions = 1;
+  repeated .cosmos.tx.v1beta1.Tx transactions = 1;
 }

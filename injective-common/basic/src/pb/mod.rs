@@ -1,5 +1,9 @@
 // @generated
 // @@protoc_insertion_point(attribute:amino)
+pub mod amino {
+    include!("amino.rs");
+    // @@protoc_insertion_point(amino)
+}
 pub mod cosmos {
     pub mod base {
         // @@protoc_insertion_point(attribute:cosmos.base.v1beta1)
@@ -33,7 +37,22 @@ pub mod cosmos {
     }
 }
 // @@protoc_insertion_point(attribute:cosmos_proto)
+pub mod cosmos_proto {
+    include!("cosmos_proto.rs");
+    // @@protoc_insertion_point(cosmos_proto)
+}
 // @@protoc_insertion_point(attribute:gogoproto)
+pub mod gogoproto {
+    include!("gogoproto.rs");
+    // @@protoc_insertion_point(gogoproto)
+}
+pub mod google {
+    // @@protoc_insertion_point(attribute:google.protobuf)
+    pub mod protobuf {
+        include!("google.protobuf.rs");
+        // @@protoc_insertion_point(google.protobuf)
+    }
+}
 pub mod sf {
     pub mod cosmos {
         pub mod r#type {

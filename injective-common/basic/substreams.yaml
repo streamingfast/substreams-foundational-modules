@@ -6,15 +6,15 @@ package:
 network: cosmos
 
 imports:
-  cosmos: https://github.com/streamingfast/substreams-cosmos/releases/download/v0.1.1/cosmos-v0.1.0.spkg
+  cosmos: https://spkg.io/streamingfast/cosmos-v0.1.5.spkg
 
 protobuf:
-  files:
-    - cosmos/v1/tx_list.proto
   descriptorSets:
     - module: buf.build/cosmos/cosmos-sdk
       symbols:
         - cosmos.tx.v1beta1.Tx
+  files:
+    - cosmos/v1/tx_list.proto
   importPaths:
     - ./proto
 
