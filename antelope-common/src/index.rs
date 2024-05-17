@@ -1,22 +1,21 @@
-use std::collections::HashSet;
+use std::collections::BTreeSet;
 
-use substreams::{errors::Error, log};
+use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams_antelope::pb::Block;
 
-use crate::pb::sf::substreams::index::v1::Keys;
+use crate::actions::action_keys;
 
 #[substreams::handlers::map]
-fn index_stuff(block: Block) -> Result<Keys, Error> {
+fn index_actions(block: Block) -> Result<Keys, substreams::errors::Error> {
     let keys = block
         .into_transaction_traces()
         .flat_map(|trx| {
             trx.action_traces
                 .into_iter()
-                .flat_map(|_action| vec!["asdf".to_string(), "qwer".to_string()])
+                .flat_map(|action| action_keys(&action))
         })
-        .collect::<HashSet<_>>();
+        .collect::<BTreeSet<_>>();
 
-    log::info!("keys: {:?}", keys);
     Ok(Keys {
         keys: keys.into_iter().collect(),
     })

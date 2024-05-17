@@ -7,7 +7,7 @@ import 'sf/substreams/v1/clock.proto';
 
 message Transactions {
   repeated Transaction transactions = 1;
-  sf.substreams.v1.Clock clock = 2;
+  // sf.substreams.v1.Clock clock = 2;
 }
 
 message Transaction {

@@ -5,7 +5,7 @@ plugins:
   out: src/pb
   opt:
     - file_descriptor_set=false
-    # - extern_path=.sf.antelope.type.v1=::substreams_antelope::pb::eth::v1
+    - extern_path=.sf.antelope.type.v1=::substreams_antelope::pb
 
 - plugin: buf.build/community/neoeinstein-prost-crate:v0.3.1
   out: src/pb

@@ -26,7 +26,7 @@ binaries:
     file: ./target/wasm32-unknown-unknown/release/substreams.wasm
 
 modules:
-  - name: index_stuff
+  - name: index_actions
     kind: blockIndex
     inputs:
       - source: sf.antelope.type.v1.Block
@@ -37,11 +37,12 @@ modules:
        * Authorized by      auth:account
        * Receiver           recv:account
        * Contract account   code:account
+       * Action
 
   - name: filtered_transactions
     kind: map
     blockFilter:
-      module: index_stuff
+      module: index_actions
       query:
         params: true
     inputs:
@@ -55,4 +56,5 @@ modules:
       Example: `auth:hackerdarwin && code:eosio.token`
 
 params:
-  filtered_transactions: "receiver:hackerdarwin"
+  # filtered_transactions: "recv:hackerdarwin && code:eosio.token"
+  filtered_transactions: "code:stats.sx && action:tradelog"
