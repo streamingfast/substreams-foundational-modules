@@ -32,6 +32,8 @@ pub fn map_usdt_exchanges(block: Block) -> Result<UsdtExchangeList, Error> {
         let tx_result = block.tx_results.get(i).unwrap();
         //Block::decode(tx);
 
+        // TODO: do the decoding of `tx_as_u8`, and populate this package's Tx struct
+
         /*if let Ok(transaction) = Tx::(tx) {
             
         }*/
