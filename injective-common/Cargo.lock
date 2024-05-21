@@ -509,7 +509,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "injective_usdt_volume"
+name = "injective_common"
 version = "0.1.0"
 dependencies = [
  "anyhow",

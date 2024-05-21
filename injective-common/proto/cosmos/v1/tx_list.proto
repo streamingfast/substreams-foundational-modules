@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package spkg.cosmos.v1;
+
+import "cosmos/tx/v1beta1/tx.proto";
+import "cosmos/authz/v1beta1/tx.proto";
+import "cosmos/bank/v1beta1/tx.proto";
+import "cosmos/crisis/v1beta1/tx.proto";
+import "cosmos/distribution/v1beta1/tx.proto";
+import "cosmos/evidence/v1beta1/tx.proto";
+import "cosmos/gov/v1beta1/tx.proto";
+import "cosmos/slashing/v1beta1/tx.proto";
+import "sf/cosmos/type/v2/block.proto";
+import "google/protobuf/any.proto";
+
+message TransactionList {
+  repeated Transaction transactions = 1;
+}
+
+message Transaction {
+  // from the firehose Block as `bytes`
+  bytes raw_tx = 1;
+
+  // from TxBody
+  string memo = 2;
+  uint64 timeout_height = 3;
+  repeated Message messages = 5;
+  repeated google.protobuf.Any extension_options = 1023;
+  repeated google.protobuf.Any non_critical_extension_options = 2047;
+
+  // from TxResult
+  uint32 result_code = 21;
+  bytes result_data = 22;
+  string result_log = 23;
+  string result_info = 24;
+  int64 result_gas_wanted = 25;
+  int64 result_gas_used = 26;
+  repeated .sf.cosmos.type.v2.Event result_events = 27;
+  string result_codespace = 28;
+
+  .cosmos.tx.v1beta1.AuthInfo auth_info = 32;
+  repeated bytes signatures = 33;
+
+  message Message {
+    oneof value {
+      google.protobuf.Any other = 100;
+      .cosmos.authz.v1beta1.MsgExec msg_exec = 101;
+      .cosmos.bank.v1beta1.MsgSend msg_send = 102;
+      .cosmos.bank.v1beta1.MsgMultiSend msg_multi_send = 103;
+      .cosmos.crisis.v1beta1.MsgVerifyInvariant msg_verify_invariant = 104;
+      .cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward msg_withdraw_delegator_reward = 105;
+      .cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission msg_withdraw_validator_commission = 106;
+      .cosmos.distribution.v1beta1.MsgSetWithdrawAddress msg_set_withdraw_address = 107;
+      .cosmos.distribution.v1beta1.MsgFundCommunityPool msg_fund_community_pool = 108;
+      .cosmos.evidence.v1beta1.MsgSubmitEvidence msg_submit_evidence = 109;
+      .cosmos.gov.v1beta1.MsgSubmitProposal msg_submit_proposal = 110;
+      .cosmos.gov.v1beta1.MsgVote msg_vote = 111;
+      .cosmos.gov.v1beta1.MsgDeposit msg_deposit = 112;
+      .cosmos.slashing.v1beta1.MsgUnjail msg_unjail = 113;
+    }
+  }
+}

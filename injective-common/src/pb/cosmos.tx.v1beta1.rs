@@ -18,8 +18,6 @@ pub struct TxBody {
     pub memo: ::prost::alloc::string::String,
     #[prost(uint64, tag="3")]
     pub timeout_height: u64,
-    #[prost(bool, tag="4")]
-    pub unordered: bool,
     #[prost(message, repeated, tag="1023")]
     pub extension_options: ::prost::alloc::vec::Vec<::prost_types::Any>,
     #[prost(message, repeated, tag="2047")]
