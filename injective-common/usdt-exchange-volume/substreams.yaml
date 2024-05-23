@@ -7,6 +7,7 @@ network: cosmos
 
 imports:
   cosmos: https://github.com/streamingfast/substreams-cosmos/releases/download/v0.1.5/cosmos-v0.1.5.spkg
+  common: ./injective-common-v0.1.0.spkg
 
 protobuf:
   files:
@@ -22,8 +23,7 @@ binaries:
 modules:
   - name: map_usdt_exchanges
     kind: map
-    initialBlock: 59693701
     inputs:
-      - source: sf.cosmos.type.v2.Block
+      - map: common:map_transactions
     output:
       type: proto:sf.substreams.cosmos.v1.USDTExchangeList
