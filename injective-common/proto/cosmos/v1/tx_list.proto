@@ -13,6 +13,14 @@ import "cosmos/slashing/v1beta1/tx.proto";
 import "sf/cosmos/type/v2/block.proto";
 import "google/protobuf/any.proto";
 
+import "injective/auction/v1beta1/tx.proto";
+import "injective/crypto/v1beta1/ethsecp256k1/keys.proto";
+import "injective/exchange/v1beta1/tx.proto";
+import "injective/peggy/v1/msgs.proto";
+import "injective/wasmx/v1/tx.proto";
+
+import "cosmwasm/wasm/v1/tx.proto";
+
 message TransactionList {
   repeated Transaction transactions = 1;
 }
@@ -57,6 +65,17 @@ message Transaction {
       .cosmos.gov.v1beta1.MsgVote msg_vote = 111;
       .cosmos.gov.v1beta1.MsgDeposit msg_deposit = 112;
       .cosmos.slashing.v1beta1.MsgUnjail msg_unjail = 113;
+
+      .injective.auction.v1beta1.MsgBid msg_bid = 114;
+      .injective.crypto.v1beta1.ethsecp256k1.PubKey pub_key = 115;
+      .injective.crypto.v1beta1.ethsecp256k1.PrivKey priv_key = 116;
+      .injective.exchange.v1beta1.MsgDeposit inj_msg_deposit = 117;
+      .injective.peggy.v1.MsgRequestBatch msg_request_batch = 118;
+      .injective.wasmx.v1.MsgRegisterContract msg_register_contract = 119;
+      .injective.wasmx.v1.MsgExecuteContractCompat msg_execute_contract_compat = 120;
+
+      .cosmwasm.wasm.v1.MsgExecuteContract msg_execute_contract = 121;
+
     }
   }
 }

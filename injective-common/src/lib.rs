@@ -1,17 +1,17 @@
 mod pb;
 
 use crate::pb::cosmos::authz::v1beta1::MsgExec;
-use crate::pb::cosmos::bank::v1beta1::MsgSend;
 use crate::pb::cosmos::bank::v1beta1::MsgMultiSend;
+use crate::pb::cosmos::bank::v1beta1::MsgSend;
 use crate::pb::cosmos::crisis::v1beta1::MsgVerifyInvariant;
+use crate::pb::cosmos::distribution::v1beta1::MsgFundCommunityPool;
+use crate::pb::cosmos::distribution::v1beta1::MsgSetWithdrawAddress;
 use crate::pb::cosmos::distribution::v1beta1::MsgWithdrawDelegatorReward;
 use crate::pb::cosmos::distribution::v1beta1::MsgWithdrawValidatorCommission;
-use crate::pb::cosmos::distribution::v1beta1::MsgSetWithdrawAddress;
-use crate::pb::cosmos::distribution::v1beta1::MsgFundCommunityPool;
 use crate::pb::cosmos::evidence::v1beta1::MsgSubmitEvidence;
+use crate::pb::cosmos::gov::v1beta1::MsgDeposit;
 use crate::pb::cosmos::gov::v1beta1::MsgSubmitProposal;
 use crate::pb::cosmos::gov::v1beta1::MsgVote;
-use crate::pb::cosmos::gov::v1beta1::MsgDeposit;
 use crate::pb::cosmos::slashing::v1beta1::MsgUnjail;
 use crate::pb::cosmos::tx::v1beta1::Tx;
 use crate::pb::sf::cosmos::r#type::v2::Block;
@@ -37,6 +37,7 @@ pub fn map_transactions(block: Block) -> Result<TransactionList, Error> {
         let tx_as_u8 = &tx_as_bytes[..];
 
         let tx_result = block.tx_results.get(i).unwrap();
+        substreams::log::println("00-----------------");
 
         if let Ok(tx) = <Tx as prost::Message>::decode(tx_as_u8) {
             if let Some(body) = tx.body {
@@ -44,11 +45,16 @@ pub fn map_transactions(block: Block) -> Result<TransactionList, Error> {
                 let transaction_timeout_height = body.timeout_height;
                 let transaction_extension_options = body.extension_options;
                 let transaction_non_critical_extension_options = body.non_critical_extension_options;
+                substreams::log::println("A-----------------");
+
+                let messages = extract_messages(body.messages);
+                substreams::log::println("I-----------------");
+                substreams::log::println(messages.len().to_string());
 
                 let transaction = Transaction {
                     raw_tx: tx_as_bytes.to_vec(),
                     memo: transaction_memo,
-                    messages: extract_messages(body.messages),
+                    messages: messages,
                     timeout_height: transaction_timeout_height,
                     extension_options: transaction_extension_options,
                     non_critical_extension_options: transaction_non_critical_extension_options,
@@ -99,12 +105,16 @@ fn extract_messages(messages: Vec<Any>) -> Vec<Message> {
                 }
             }
             if message.type_url == "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward" {
-                if let Ok(msg_withdraw_delegator_reward) = <MsgWithdrawDelegatorReward as prost::Message>::decode(message_as_u8) {
+                if let Ok(msg_withdraw_delegator_reward) =
+                    <MsgWithdrawDelegatorReward as prost::Message>::decode(message_as_u8)
+                {
                     return build_message(Value::MsgWithdrawDelegatorReward(msg_withdraw_delegator_reward));
                 }
             }
             if message.type_url == "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission" {
-                if let Ok(msg_withdraw_validator_commission) = <MsgWithdrawValidatorCommission as prost::Message>::decode(message_as_u8) {
+                if let Ok(msg_withdraw_validator_commission) =
+                    <MsgWithdrawValidatorCommission as prost::Message>::decode(message_as_u8)
+                {
                     return build_message(Value::MsgWithdrawValidatorCommission(msg_withdraw_validator_commission));
                 }
             }
