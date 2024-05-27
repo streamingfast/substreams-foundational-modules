@@ -60,7 +60,7 @@ fn filtered_transactions(
             let keys = trx
                 .action_traces
                 .iter()
-                .flat_map(|action| action_keys(&action))
+                .flat_map(action_keys)
                 .collect::<BTreeSet<_>>()
                 .into_iter()
                 .collect::<Vec<_>>();
