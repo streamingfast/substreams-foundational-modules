@@ -23,7 +23,7 @@ Common use cases:
 Let's say you want to receive all AtomicAssets NFT create collection events starting from block 370,000,000.
 Send a substreams request with the desired query as parameter. You can use a gRPC client, substreams sink, or substreams CLI:
 ```bash
-> substreams gui <spkg_url> -s 370000000 filtered_actions -p filtered_actions="code:atomicassets && action:createcol" --production-mode
+> substreams gui -e eos.substreams.pinax.network:443 https://spkg.io/pinax-network/antelope-common-v0.1.0.spkg filtered_actions -s 370000000 -p filtered_actions="code:atomicassets && action:createcol" --production-mode
 ```
 If the request with this query hasn't been run before, substreams backend will start the indexing process and you should start seeing new events. If the request has been run before, you should start seeing sale actions right away jumping over any empty chunks of blocks when there were no sales.
 Note, we used `--production-mode` flag - this ensures backend writes indexes on disk so they can be re-used in the future. 
