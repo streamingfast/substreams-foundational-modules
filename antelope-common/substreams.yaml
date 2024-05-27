@@ -1,6 +1,7 @@
 specVersion: v0.1.0
 package:
   name: antelope_common
+  image: ./antelope.png
   version: v0.1.0
   url: https://github.com/streamingfast/substreams-foundational-modules/antelope-common
   doc: |
