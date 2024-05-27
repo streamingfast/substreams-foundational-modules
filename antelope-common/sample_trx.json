@@ -1,0 +1,765 @@
+{
+  "id": "1cdf667813e90925afedea94b138b94de3af7f55ff3a835e73a42861cf83fe3a",
+  "blockNum": "373365059",
+  "blockTime": "2024-05-16T22:00:06Z",
+  "producerBlockId": "16411943f2e94032652094f47ff408e55e208f6fbfa87f88626b4a2c7a198845",
+  "receipt": {
+    "status": "TRANSACTIONSTATUS_EXECUTED",
+    "cpuUsageMicroSeconds": 441,
+    "netUsageWords": 16
+  },
+  "elapsed": "894",
+  "netUsage": "128",
+  "actionTraces": [
+    {
+      "receipt": {
+        "receiver": "swap.defi",
+        "digest": "f5cc3d253d295f49ac652e135d0b1165171d012cb25ab13a8f95c8d0fe7f0cf1",
+        "globalSequence": "360742743463",
+        "authSequence": [
+          {
+            "accountName": "admin.defi",
+            "sequence": "216815533"
+          },
+          {
+            "accountName": "cpu.defi",
+            "sequence": "354579153"
+          }
+        ],
+        "recvSequence": "105824723",
+        "codeSequence": "40",
+        "abiSequence": "26"
+      },
+      "action": {
+        "account": "swap.defi",
+        "name": "sellrex",
+        "authorization": [
+          {
+            "actor": "cpu.defi",
+            "permission": "active"
+          },
+          {
+            "actor": "admin.defi",
+            "permission": "active"
+          }
+        ]
+      },
+      "elapsed": "189",
+      "transactionId": "1cdf667813e90925afedea94b138b94de3af7f55ff3a835e73a42861cf83fe3a",
+      "blockNum": "373365059",
+      "producerBlockId": "16411943f2e94032652094f47ff408e55e208f6fbfa87f88626b4a2c7a198845",
+      "blockTime": "2024-05-16T22:00:06Z",
+      "receiver": "swap.defi",
+      "actionOrdinal": 1
+    },
+    {
+      "receipt": {
+        "receiver": "eosio",
+        "digest": "df04454bdf2ddfd146a17e35760087e684e0d1b4218fa4878d24464000536f38",
+        "globalSequence": "360742743464",
+        "authSequence": [
+          {
+            "accountName": "swap.defi",
+            "sequence": "211676441"
+          }
+        ],
+        "recvSequence": "467333795",
+        "codeSequence": "19",
+        "abiSequence": "20"
+      },
+      "action": {
+        "account": "eosio",
+        "name": "sellrex",
+        "authorization": [
+          {
+            "actor": "swap.defi",
+            "permission": "active"
+          }
+        ],
+        "jsonData": "{\"from\":\"swap.defi\",\"rex\":\"239780.2456 REX\"}",
+        "rawData": "AABwSyVQDcfYj+uOAAAAAARSRVgAAAAA"
+      },
+      "elapsed": "251",
+      "transactionId": "1cdf667813e90925afedea94b138b94de3af7f55ff3a835e73a42861cf83fe3a",
+      "blockNum": "373365059",
+      "producerBlockId": "16411943f2e94032652094f47ff408e55e208f6fbfa87f88626b4a2c7a198845",
+      "blockTime": "2024-05-16T22:00:06Z",
+      "receiver": "eosio",
+      "actionOrdinal": 2,
+      "creatorActionOrdinal": 1,
+      "closestUnnotifiedAncestorActionOrdinal": 1,
+      "executionIndex": 1
+    },
+    {
+      "receipt": {
+        "receiver": "eosio.rex",
+        "digest": "d77dd5b019e5ed39278b21788a8ffb7bb08212996dac57d49eb110fd66c38fbe",
+        "globalSequence": "360742743465",
+        "recvSequence": "17582940",
+        "abiSequence": "1"
+      },
+      "action": {
+        "account": "eosio.rex",
+        "name": "sellresult",
+        "jsonData": "{\"proceeds\":\"24.6809 EOS\"}",
+        "rawData": "GcQDAAAAAAAERU9TAAAAAA=="
+      },
+      "elapsed": "3",
+      "transactionId": "1cdf667813e90925afedea94b138b94de3af7f55ff3a835e73a42861cf83fe3a",
+      "blockNum": "373365059",
+      "producerBlockId": "16411943f2e94032652094f47ff408e55e208f6fbfa87f88626b4a2c7a198845",
+      "blockTime": "2024-05-16T22:00:06Z",
+      "receiver": "eosio.rex",
+      "actionOrdinal": 6,
+      "creatorActionOrdinal": 2,
+      "closestUnnotifiedAncestorActionOrdinal": 2,
+      "executionIndex": 2
+    },
+    {
+      "receipt": {
+        "receiver": "eosio",
+        "digest": "52ee71b5b5057de93554fada81c37d0fc54fc128da6bd286b3210be7c8dc2d25",
+        "globalSequence": "360742743466",
+        "authSequence": [
+          {
+            "accountName": "swap.defi",
+            "sequence": "211676442"
+          }
+        ],
+        "recvSequence": "467333796",
+        "codeSequence": "19",
+        "abiSequence": "20"
+      },
+      "action": {
+        "account": "eosio",
+        "name": "withdraw",
+        "authorization": [
+          {
+            "actor": "swap.defi",
+            "permission": "active"
+          }
+        ],
+        "jsonData": "{\"amount\":\"24.6809 EOS\",\"owner\":\"swap.defi\"}",
+        "rawData": "AABwSyVQDccZxAMAAAAAAARFT1MAAAAA"
+      },
+      "elapsed": "123",
+      "transactionId": "1cdf667813e90925afedea94b138b94de3af7f55ff3a835e73a42861cf83fe3a",
+      "blockNum": "373365059",
+      "producerBlockId": "16411943f2e94032652094f47ff408e55e208f6fbfa87f88626b4a2c7a198845",
+      "blockTime": "2024-05-16T22:00:06Z",
+      "receiver": "eosio",
+      "actionOrdinal": 3,
+      "creatorActionOrdinal": 1,
+      "closestUnnotifiedAncestorActionOrdinal": 1,
+      "executionIndex": 3
+    },
+    {
+      "receipt": {
+        "receiver": "eosio.token",
+        "digest": "193c6608b253c6736a317433596993a0c3faa0dd90f035d72ba7cc12d5736ba5",
+        "globalSequence": "360742743467",
+        "authSequence": [
+          {
+            "accountName": "eosio.rex",
+            "sequence": "924362"
+          }
+        ],
+        "recvSequence": "86176773533",
+        "codeSequence": "4",
+        "abiSequence": "4"
+      },
+      "action": {
+        "account": "eosio.token",
+        "name": "transfer",
+        "authorization": [
+          {
+            "actor": "eosio.rex",
+            "permission": "active"
+          }
+        ],
+        "jsonData": "{\"from\":\"eosio.rex\",\"to\":\"swap.defi\",\"quantity\":\"24.6809 EOS\",\"memo\":\"withdraw from REX fund\"}",
+        "rawData": "AADo6gLqMFUAAHBLJVANxxnEAwAAAAAABEVPUwAAAAAWd2l0aGRyYXcgZnJvbSBSRVggZnVuZA=="
+      },
+      "elapsed": "75",
+      "transactionId": "1cdf667813e90925afedea94b138b94de3af7f55ff3a835e73a42861cf83fe3a",
+      "blockNum": "373365059",
+      "producerBlockId": "16411943f2e94032652094f47ff408e55e208f6fbfa87f88626b4a2c7a198845",
+      "blockTime": "2024-05-16T22:00:06Z",
+      "receiver": "eosio.token",
+      "actionOrdinal": 7,
+      "creatorActionOrdinal": 3,
+      "closestUnnotifiedAncestorActionOrdinal": 3,
+      "executionIndex": 4
+    },
+    {
+      "receipt": {
+        "receiver": "eosio.rex",
+        "digest": "193c6608b253c6736a317433596993a0c3faa0dd90f035d72ba7cc12d5736ba5",
+        "globalSequence": "360742743468",
+        "authSequence": [
+          {
+            "accountName": "eosio.rex",
+            "sequence": "924363"
+          }
+        ],
+        "recvSequence": "17582941",
+        "codeSequence": "4",
+        "abiSequence": "4"
+      },
+      "action": {
+        "account": "eosio.token",
+        "name": "transfer",
+        "authorization": [
+          {
+            "actor": "eosio.rex",
+            "permission": "active"
+          }
+        ],
+        "jsonData": "{\"from\":\"eosio.rex\",\"to\":\"swap.defi\",\"quantity\":\"24.6809 EOS\",\"memo\":\"withdraw from REX fund\"}",
+        "rawData": "AADo6gLqMFUAAHBLJVANxxnEAwAAAAAABEVPUwAAAAAWd2l0aGRyYXcgZnJvbSBSRVggZnVuZA=="
+      },
+      "elapsed": "2",
+      "transactionId": "1cdf667813e90925afedea94b138b94de3af7f55ff3a835e73a42861cf83fe3a",
+      "blockNum": "373365059",
+      "producerBlockId": "16411943f2e94032652094f47ff408e55e208f6fbfa87f88626b4a2c7a198845",
+      "blockTime": "2024-05-16T22:00:06Z",
+      "receiver": "eosio.rex",
+      "actionOrdinal": 8,
+      "creatorActionOrdinal": 7,
+      "closestUnnotifiedAncestorActionOrdinal": 7,
+      "executionIndex": 5
+    },
+    {
+      "receipt": {
+        "receiver": "swap.defi",
+        "digest": "193c6608b253c6736a317433596993a0c3faa0dd90f035d72ba7cc12d5736ba5",
+        "globalSequence": "360742743469",
+        "authSequence": [
+          {
+            "accountName": "eosio.rex",
+            "sequence": "924364"
+          }
+        ],
+        "recvSequence": "105824724",
+        "codeSequence": "4",
+        "abiSequence": "4"
+      },
+      "action": {
+        "account": "eosio.token",
+        "name": "transfer",
+        "authorization": [
+          {
+            "actor": "eosio.rex",
+            "permission": "active"
+          }
+        ],
+        "jsonData": "{\"from\":\"eosio.rex\",\"to\":\"swap.defi\",\"quantity\":\"24.6809 EOS\",\"memo\":\"withdraw from REX fund\"}",
+        "rawData": "AADo6gLqMFUAAHBLJVANxxnEAwAAAAAABEVPUwAAAAAWd2l0aGRyYXcgZnJvbSBSRVggZnVuZA=="
+      },
+      "elapsed": "14",
+      "transactionId": "1cdf667813e90925afedea94b138b94de3af7f55ff3a835e73a42861cf83fe3a",
+      "blockNum": "373365059",
+      "producerBlockId": "16411943f2e94032652094f47ff408e55e208f6fbfa87f88626b4a2c7a198845",
+      "blockTime": "2024-05-16T22:00:06Z",
+      "receiver": "swap.defi",
+      "actionOrdinal": 9,
+      "creatorActionOrdinal": 7,
+      "closestUnnotifiedAncestorActionOrdinal": 7,
+      "executionIndex": 6
+    },
+    {
+      "receipt": {
+        "receiver": "swap.defi",
+        "digest": "b0832364d8ca454dd926d1be5dbc1cda79c423f99448a62d1cff475bb75a259f",
+        "globalSequence": "360742743470",
+        "authSequence": [
+          {
+            "accountName": "swap.defi",
+            "sequence": "211676443"
+          }
+        ],
+        "recvSequence": "105824725",
+        "codeSequence": "40",
+        "abiSequence": "26"
+      },
+      "action": {
+        "account": "swap.defi",
+        "name": "sellrexlog",
+        "authorization": [
+          {
+            "actor": "swap.defi",
+            "permission": "active"
+          }
+        ],
+        "jsonData": "{\"quantity\":\"24.6809 EOS\",\"rex_value\":\"239780.2456 REX\",\"user\":\"income.defi\"}",
+        "rawData": "ANxSCShJ0XQZxAMAAAAAAARFT1MAAAAA2I/rjgAAAAAEUkVYAAAAAA=="
+      },
+      "elapsed": "7",
+      "transactionId": "1cdf667813e90925afedea94b138b94de3af7f55ff3a835e73a42861cf83fe3a",
+      "blockNum": "373365059",
+      "producerBlockId": "16411943f2e94032652094f47ff408e55e208f6fbfa87f88626b4a2c7a198845",
+      "blockTime": "2024-05-16T22:00:06Z",
+      "receiver": "swap.defi",
+      "actionOrdinal": 4,
+      "creatorActionOrdinal": 1,
+      "closestUnnotifiedAncestorActionOrdinal": 1,
+      "executionIndex": 7
+    },
+    {
+      "receipt": {
+        "receiver": "swap.defi",
+        "digest": "7c365d54726a5036c5008309d472cc1bbeaabac8bf9b7ff7ae6ef1e18ef57e73",
+        "globalSequence": "360742743471",
+        "authSequence": [
+          {
+            "accountName": "swap.defi",
+            "sequence": "211676444"
+          }
+        ],
+        "recvSequence": "105824726",
+        "codeSequence": "40",
+        "abiSequence": "26"
+      },
+      "action": {
+        "account": "swap.defi",
+        "name": "sellnext",
+        "authorization": [
+          {
+            "actor": "swap.defi",
+            "permission": "active"
+          }
+        ],
+        "jsonData": "{\"memo\":\"REX reward\",\"owner\":\"income.defi\",\"quantity\":\"24.6809 EOS\",\"total_quantity\":\"0.0000 EOS\"}",
+        "rawData": "ANxSCShJ0XQZxAMAAAAAAARFT1MAAAAAAAAAAAAAAAAERU9TAAAAAApSRVggcmV3YXJk"
+      },
+      "elapsed": "69",
+      "transactionId": "1cdf667813e90925afedea94b138b94de3af7f55ff3a835e73a42861cf83fe3a",
+      "blockNum": "373365059",
+      "producerBlockId": "16411943f2e94032652094f47ff408e55e208f6fbfa87f88626b4a2c7a198845",
+      "blockTime": "2024-05-16T22:00:06Z",
+      "receiver": "swap.defi",
+      "actionOrdinal": 5,
+      "creatorActionOrdinal": 1,
+      "closestUnnotifiedAncestorActionOrdinal": 1,
+      "executionIndex": 8
+    },
+    {
+      "receipt": {
+        "receiver": "eosio.token",
+        "digest": "ce1e0eb3d15d562750e7f6f5c652df03d073a31bac60d714111c4a96908cb200",
+        "globalSequence": "360742743472",
+        "authSequence": [
+          {
+            "accountName": "swap.defi",
+            "sequence": "211676445"
+          }
+        ],
+        "recvSequence": "86176773534",
+        "codeSequence": "4",
+        "abiSequence": "4"
+      },
+      "action": {
+        "account": "eosio.token",
+        "name": "transfer",
+        "authorization": [
+          {
+            "actor": "swap.defi",
+            "permission": "active"
+          }
+        ],
+        "jsonData": "{\"from\":\"swap.defi\",\"to\":\"income.defi\",\"quantity\":\"24.6809 EOS\",\"memo\":\"EOS reward\"}",
+        "rawData": "AABwSyVQDccA3FIJKEnRdBnEAwAAAAAABEVPUwAAAAAKRU9TIHJld2FyZA=="
+      },
+      "elapsed": "72",
+      "transactionId": "1cdf667813e90925afedea94b138b94de3af7f55ff3a835e73a42861cf83fe3a",
+      "blockNum": "373365059",
+      "producerBlockId": "16411943f2e94032652094f47ff408e55e208f6fbfa87f88626b4a2c7a198845",
+      "blockTime": "2024-05-16T22:00:06Z",
+      "receiver": "eosio.token",
+      "actionOrdinal": 10,
+      "creatorActionOrdinal": 5,
+      "closestUnnotifiedAncestorActionOrdinal": 5,
+      "executionIndex": 9
+    },
+    {
+      "receipt": {
+        "receiver": "swap.defi",
+        "digest": "ce1e0eb3d15d562750e7f6f5c652df03d073a31bac60d714111c4a96908cb200",
+        "globalSequence": "360742743473",
+        "authSequence": [
+          {
+            "accountName": "swap.defi",
+            "sequence": "211676446"
+          }
+        ],
+        "recvSequence": "105824727",
+        "codeSequence": "4",
+        "abiSequence": "4"
+      },
+      "action": {
+        "account": "eosio.token",
+        "name": "transfer",
+        "authorization": [
+          {
+            "actor": "swap.defi",
+            "permission": "active"
+          }
+        ],
+        "jsonData": "{\"from\":\"swap.defi\",\"to\":\"income.defi\",\"quantity\":\"24.6809 EOS\",\"memo\":\"EOS reward\"}",
+        "rawData": "AABwSyVQDccA3FIJKEnRdBnEAwAAAAAABEVPUwAAAAAKRU9TIHJld2FyZA=="
+      },
+      "elapsed": "7",
+      "transactionId": "1cdf667813e90925afedea94b138b94de3af7f55ff3a835e73a42861cf83fe3a",
+      "blockNum": "373365059",
+      "producerBlockId": "16411943f2e94032652094f47ff408e55e208f6fbfa87f88626b4a2c7a198845",
+      "blockTime": "2024-05-16T22:00:06Z",
+      "receiver": "swap.defi",
+      "actionOrdinal": 11,
+      "creatorActionOrdinal": 10,
+      "closestUnnotifiedAncestorActionOrdinal": 10,
+      "executionIndex": 10
+    },
+    {
+      "receipt": {
+        "receiver": "income.defi",
+        "digest": "ce1e0eb3d15d562750e7f6f5c652df03d073a31bac60d714111c4a96908cb200",
+        "globalSequence": "360742743474",
+        "authSequence": [
+          {
+            "accountName": "swap.defi",
+            "sequence": "211676447"
+          }
+        ],
+        "recvSequence": "470677",
+        "codeSequence": "4",
+        "abiSequence": "4"
+      },
+      "action": {
+        "account": "eosio.token",
+        "name": "transfer",
+        "authorization": [
+          {
+            "actor": "swap.defi",
+            "permission": "active"
+          }
+        ],
+        "jsonData": "{\"from\":\"swap.defi\",\"to\":\"income.defi\",\"quantity\":\"24.6809 EOS\",\"memo\":\"EOS reward\"}",
+        "rawData": "AABwSyVQDccA3FIJKEnRdBnEAwAAAAAABEVPUwAAAAAKRU9TIHJld2FyZA=="
+      },
+      "elapsed": "7",
+      "transactionId": "1cdf667813e90925afedea94b138b94de3af7f55ff3a835e73a42861cf83fe3a",
+      "blockNum": "373365059",
+      "producerBlockId": "16411943f2e94032652094f47ff408e55e208f6fbfa87f88626b4a2c7a198845",
+      "blockTime": "2024-05-16T22:00:06Z",
+      "receiver": "income.defi",
+      "actionOrdinal": 12,
+      "creatorActionOrdinal": 10,
+      "closestUnnotifiedAncestorActionOrdinal": 10,
+      "executionIndex": 11
+    }
+  ],
+  "dbOps": [
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 1,
+      "code": "eosio",
+      "scope": "eosio",
+      "tableName": "rexbal",
+      "primaryKey": "swap.defi",
+      "oldPayer": "swap.defi",
+      "newPayer": "swap.defi",
+      "oldData": "AAAAcEslUA3HWiag4QQAAAAERU9TAAAAAJlSv7o/uQAABFJFWAAAAACZUr+6P7kAAAA=",
+      "newData": "AAAAcEslUA3HWiag4QQAAAAERU9TAAAAAJlSv7o/uQAABFJFWAAAAACZUr+6P7kAAAA=",
+      "oldDataJson": "{\"matured_rex\":\"203683367178905\",\"owner\":\"swap.defi\",\"rex_balance\":\"20368336717.8905 REX\",\"rex_maturities\":[],\"version\":0,\"vote_stake\":\"2096523.8362 EOS\"}",
+      "newDataJson": "{\"matured_rex\":\"203683367178905\",\"owner\":\"swap.defi\",\"rex_balance\":\"20368336717.8905 REX\",\"rex_maturities\":[],\"version\":0,\"vote_stake\":\"2096523.8362 EOS\"}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 1,
+      "code": "eosio",
+      "scope": "eosio",
+      "tableName": "rexpool",
+      "oldPayer": "eosio",
+      "newPayer": "eosio",
+      "oldData": "AOepTbIJAAAABEVPUwAAAADzpOW+dQAAAARFT1MAAAAAZzkfAgAAAAAERU9TAAAAANpOM3F/AAAABEVPUwAAAACk+7k6a+QSAARSRVgAAAAAAAAAAAAAAAAERU9TAAAAAIixBwAAAAAA",
+      "newData": "AOepTbIJAAAABEVPUwAAAADa4OG+dQAAAARFT1MAAAAAZzkfAgAAAAAERU9TAAAAAMGKL3F/AAAABEVPUwAAAADMa86rauQSAARSRVgAAAAAAAAAAAAAAAAERU9TAAAAAIixBwAAAAAA",
+      "oldDataJson": "{\"loan_num\":504200,\"namebid_proceeds\":\"0.0000 EOS\",\"total_lendable\":\"54736003.4522 EOS\",\"total_lent\":\"4164613.9879 EOS\",\"total_rent\":\"3560.0743 EOS\",\"total_rex\":\"531769877869.2516 REX\",\"total_unlent\":\"50571389.4643 EOS\",\"version\":0}",
+      "newDataJson": "{\"loan_num\":504200,\"namebid_proceeds\":\"0.0000 EOS\",\"total_lendable\":\"54735978.7713 EOS\",\"total_lent\":\"4164613.9879 EOS\",\"total_rent\":\"3560.0743 EOS\",\"total_rex\":\"531769638089.0060 REX\",\"total_unlent\":\"50571364.7834 EOS\",\"version\":0}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 1,
+      "code": "eosio",
+      "scope": "eosio",
+      "tableName": "rexbal",
+      "primaryKey": "swap.defi",
+      "oldPayer": "swap.defi",
+      "newPayer": "swap.defi",
+      "oldData": "AAAAcEslUA3HWiag4QQAAAAERU9TAAAAAJlSv7o/uQAABFJFWAAAAACZUr+6P7kAAAA=",
+      "newData": "AAAAcEslUA3HWiag4QQAAAAERU9TAAAAAMHC0ys/uQAABFJFWAAAAADBwtMrP7kAAAA=",
+      "oldDataJson": "{\"matured_rex\":\"203683367178905\",\"owner\":\"swap.defi\",\"rex_balance\":\"20368336717.8905 REX\",\"rex_maturities\":[],\"version\":0,\"vote_stake\":\"2096523.8362 EOS\"}",
+      "newDataJson": "{\"matured_rex\":\"203680969376449\",\"owner\":\"swap.defi\",\"rex_balance\":\"20368096937.6449 REX\",\"rex_maturities\":[],\"version\":0,\"vote_stake\":\"2096523.8362 EOS\"}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 1,
+      "code": "eosio",
+      "scope": "eosio",
+      "tableName": "rexfund",
+      "primaryKey": "swap.defi",
+      "oldPayer": "swap.defi",
+      "newPayer": "swap.defi",
+      "oldData": "AAAAcEslUA3HiAwAAAAAAAAERU9TAAAAAA==",
+      "newData": "AAAAcEslUA3HodADAAAAAAAERU9TAAAAAA==",
+      "oldDataJson": "{\"balance\":\"0.3208 EOS\",\"owner\":\"swap.defi\",\"version\":0}",
+      "newDataJson": "{\"balance\":\"25.0017 EOS\",\"owner\":\"swap.defi\",\"version\":0}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 1,
+      "code": "eosio",
+      "scope": "eosio",
+      "tableName": "global",
+      "primaryKey": "global",
+      "oldPayer": "eosio",
+      "newPayer": "eosio",
+      "oldData": "AAAQAAAAAAAQJwAAAAAIAAwAAAD0AQAAFAAAAGQAAABADQMACgAAAPBJAgBkAAAAEA4AAFgCAACAUzsA//8HAAoACgAAHBiLYQAAAOFr7aFUAAAAtq0FwE0AAACGfLJboB63WZkYBgC6nBkPAAAAAHm5eQIAAAAAs1sBAB2lJZ2KBQAAAOFf1xNvBQAVAFJHTbwbtUhE6N6wWw==",
+      "newData": "AAAQAAAAAAAQJwAAAAAIAAwAAAD0AQAAFAAAAGQAAABADQMACgAAAPBJAgBkAAAAEA4AAFgCAACAUzsA//8HAAoACgAAHBiLYQAAAOFr7aFUAAAAtq0FwE0AAACGfLJboB63WZkYBgC6nBkPAAAAAHm5eQIAAAAAs1sBAB2lJZ2KBQAAAOFf1xNvBQAVAFJHTbwbtUhE6N6wWw==",
+      "oldDataJson": "{\"base_per_transaction_net_usage\":12,\"context_free_discount_net_usage_den\":100,\"context_free_discount_net_usage_num\":20,\"deferred_trx_expiration_window\":600,\"last_name_close\":\"2024-05-16T07:17:08\",\"last_pervote_bucket_fill\":\"2024-05-16T21:59:34.500\",\"last_producer_schedule_size\":21,\"last_producer_schedule_update\":\"2024-05-16T21:59:31\",\"max_authority_depth\":10,\"max_block_cpu_usage\":200000,\"max_block_net_usage\":1048576,\"max_inline_action_depth\":10,\"max_inline_action_size\":524287,\"max_ram_size\":\"418945440768\",\"max_transaction_cpu_usage\":150000,\"max_transaction_delay\":3888000,\"max_transaction_lifetime\":3600,\"max_transaction_net_usage\":524288,\"min_transaction_cpu_usage\":100,\"net_usage_leeway\":500,\"perblock_bucket\":41531769,\"pervote_bucket\":253336762,\"target_block_cpu_usage_pct\":10,\"target_block_net_usage_pct\":10000,\"thresh_activated_stake_time\":\"2018-06-20T14:44:52.000\",\"total_activated_stake\":\"6092900115741\",\"total_producer_vote_weight\":\"911544178308720885760.00000000000000000\",\"total_ram_bytes_reserved\":\"363493944289\",\"total_ram_stake\":\"333934079414\",\"total_unpaid_blocks\":89011}",
+      "newDataJson": "{\"base_per_transaction_net_usage\":12,\"context_free_discount_net_usage_den\":100,\"context_free_discount_net_usage_num\":20,\"deferred_trx_expiration_window\":600,\"last_name_close\":\"2024-05-16T07:17:08\",\"last_pervote_bucket_fill\":\"2024-05-16T21:59:34.500\",\"last_producer_schedule_size\":21,\"last_producer_schedule_update\":\"2024-05-16T21:59:31\",\"max_authority_depth\":10,\"max_block_cpu_usage\":200000,\"max_block_net_usage\":1048576,\"max_inline_action_depth\":10,\"max_inline_action_size\":524287,\"max_ram_size\":\"418945440768\",\"max_transaction_cpu_usage\":150000,\"max_transaction_delay\":3888000,\"max_transaction_lifetime\":3600,\"max_transaction_net_usage\":524288,\"min_transaction_cpu_usage\":100,\"net_usage_leeway\":500,\"perblock_bucket\":41531769,\"pervote_bucket\":253336762,\"target_block_cpu_usage_pct\":10,\"target_block_net_usage_pct\":10000,\"thresh_activated_stake_time\":\"2018-06-20T14:44:52.000\",\"total_activated_stake\":\"6092900115741\",\"total_producer_vote_weight\":\"911544178308720885760.00000000000000000\",\"total_ram_bytes_reserved\":\"363493944289\",\"total_ram_stake\":\"333934079414\",\"total_unpaid_blocks\":89011}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 1,
+      "code": "eosio",
+      "scope": "eosio",
+      "tableName": "global2",
+      "primaryKey": "global2",
+      "oldPayer": "eosio",
+      "newPayer": "eosio",
+      "oldData": "AABMe7Jby3yyWxGpfvICIEdFAA==",
+      "newData": "AABMe7Jby3yyWxGpfvICIEdFAA==",
+      "oldDataJson": "{\"last_block_num\":\"2024-05-16T22:00:05\",\"last_ram_increase\":\"2024-05-16T21:56:54\",\"new_ram_per_block\":0,\"revision\":0,\"total_producer_votepay_share\":\"55912927891331883615649792.00000000000000000\"}",
+      "newDataJson": "{\"last_block_num\":\"2024-05-16T22:00:05\",\"last_ram_increase\":\"2024-05-16T21:56:54\",\"new_ram_per_block\":0,\"revision\":0,\"total_producer_votepay_share\":\"55912927891331883615649792.00000000000000000\"}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 1,
+      "code": "eosio",
+      "scope": "eosio",
+      "tableName": "global3",
+      "primaryKey": "global3",
+      "oldPayer": "eosio",
+      "newPayer": "eosio",
+      "oldData": "INlDW5kYBgANeJjXZ9FHRA==",
+      "newData": "INlDW5kYBgANeJjXZ9FHRA==",
+      "oldDataJson": "{\"last_vpay_state_update\":\"2024-05-16T22:00:00.500\",\"total_vpay_share_change_rate\":\"878728759643393884160.00000000000000000\"}",
+      "newDataJson": "{\"last_vpay_state_update\":\"2024-05-16T22:00:00.500\",\"total_vpay_share_change_rate\":\"878728759643393884160.00000000000000000\"}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 1,
+      "code": "eosio",
+      "scope": "eosio",
+      "tableName": "global4",
+      "primaryKey": "global4",
+      "oldPayer": "eosio",
+      "newPayer": "eosio",
+      "oldData": "Y9a+o6lEnj8wdQAAAAAAAECcAAAAAAAA",
+      "newData": "Y9a+o6lEnj8wdQAAAAAAAECcAAAAAAAA",
+      "oldDataJson": "{\"continuous_rate\":\"0.02955880224154440\",\"inflation_pay_factor\":30000,\"votepay_factor\":40000}",
+      "newDataJson": "{\"continuous_rate\":\"0.02955880224154440\",\"inflation_pay_factor\":30000,\"votepay_factor\":40000}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 3,
+      "code": "eosio",
+      "scope": "eosio",
+      "tableName": "rexfund",
+      "primaryKey": "swap.defi",
+      "oldPayer": "swap.defi",
+      "newPayer": "swap.defi",
+      "oldData": "AAAAcEslUA3HodADAAAAAAAERU9TAAAAAA==",
+      "newData": "AAAAcEslUA3HiAwAAAAAAAAERU9TAAAAAA==",
+      "oldDataJson": "{\"balance\":\"25.0017 EOS\",\"owner\":\"swap.defi\",\"version\":0}",
+      "newDataJson": "{\"balance\":\"0.3208 EOS\",\"owner\":\"swap.defi\",\"version\":0}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 3,
+      "code": "eosio",
+      "scope": "eosio",
+      "tableName": "global",
+      "primaryKey": "global",
+      "oldPayer": "eosio",
+      "newPayer": "eosio",
+      "oldData": "AAAQAAAAAAAQJwAAAAAIAAwAAAD0AQAAFAAAAGQAAABADQMACgAAAPBJAgBkAAAAEA4AAFgCAACAUzsA//8HAAoACgAAHBiLYQAAAOFr7aFUAAAAtq0FwE0AAACGfLJboB63WZkYBgC6nBkPAAAAAHm5eQIAAAAAs1sBAB2lJZ2KBQAAAOFf1xNvBQAVAFJHTbwbtUhE6N6wWw==",
+      "newData": "AAAQAAAAAAAQJwAAAAAIAAwAAAD0AQAAFAAAAGQAAABADQMACgAAAPBJAgBkAAAAEA4AAFgCAACAUzsA//8HAAoACgAAHBiLYQAAAOFr7aFUAAAAtq0FwE0AAACGfLJboB63WZkYBgC6nBkPAAAAAHm5eQIAAAAAs1sBAB2lJZ2KBQAAAOFf1xNvBQAVAFJHTbwbtUhE6N6wWw==",
+      "oldDataJson": "{\"base_per_transaction_net_usage\":12,\"context_free_discount_net_usage_den\":100,\"context_free_discount_net_usage_num\":20,\"deferred_trx_expiration_window\":600,\"last_name_close\":\"2024-05-16T07:17:08\",\"last_pervote_bucket_fill\":\"2024-05-16T21:59:34.500\",\"last_producer_schedule_size\":21,\"last_producer_schedule_update\":\"2024-05-16T21:59:31\",\"max_authority_depth\":10,\"max_block_cpu_usage\":200000,\"max_block_net_usage\":1048576,\"max_inline_action_depth\":10,\"max_inline_action_size\":524287,\"max_ram_size\":\"418945440768\",\"max_transaction_cpu_usage\":150000,\"max_transaction_delay\":3888000,\"max_transaction_lifetime\":3600,\"max_transaction_net_usage\":524288,\"min_transaction_cpu_usage\":100,\"net_usage_leeway\":500,\"perblock_bucket\":41531769,\"pervote_bucket\":253336762,\"target_block_cpu_usage_pct\":10,\"target_block_net_usage_pct\":10000,\"thresh_activated_stake_time\":\"2018-06-20T14:44:52.000\",\"total_activated_stake\":\"6092900115741\",\"total_producer_vote_weight\":\"911544178308720885760.00000000000000000\",\"total_ram_bytes_reserved\":\"363493944289\",\"total_ram_stake\":\"333934079414\",\"total_unpaid_blocks\":89011}",
+      "newDataJson": "{\"base_per_transaction_net_usage\":12,\"context_free_discount_net_usage_den\":100,\"context_free_discount_net_usage_num\":20,\"deferred_trx_expiration_window\":600,\"last_name_close\":\"2024-05-16T07:17:08\",\"last_pervote_bucket_fill\":\"2024-05-16T21:59:34.500\",\"last_producer_schedule_size\":21,\"last_producer_schedule_update\":\"2024-05-16T21:59:31\",\"max_authority_depth\":10,\"max_block_cpu_usage\":200000,\"max_block_net_usage\":1048576,\"max_inline_action_depth\":10,\"max_inline_action_size\":524287,\"max_ram_size\":\"418945440768\",\"max_transaction_cpu_usage\":150000,\"max_transaction_delay\":3888000,\"max_transaction_lifetime\":3600,\"max_transaction_net_usage\":524288,\"min_transaction_cpu_usage\":100,\"net_usage_leeway\":500,\"perblock_bucket\":41531769,\"pervote_bucket\":253336762,\"target_block_cpu_usage_pct\":10,\"target_block_net_usage_pct\":10000,\"thresh_activated_stake_time\":\"2018-06-20T14:44:52.000\",\"total_activated_stake\":\"6092900115741\",\"total_producer_vote_weight\":\"911544178308720885760.00000000000000000\",\"total_ram_bytes_reserved\":\"363493944289\",\"total_ram_stake\":\"333934079414\",\"total_unpaid_blocks\":89011}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 3,
+      "code": "eosio",
+      "scope": "eosio",
+      "tableName": "global2",
+      "primaryKey": "global2",
+      "oldPayer": "eosio",
+      "newPayer": "eosio",
+      "oldData": "AABMe7Jby3yyWxGpfvICIEdFAA==",
+      "newData": "AABMe7Jby3yyWxGpfvICIEdFAA==",
+      "oldDataJson": "{\"last_block_num\":\"2024-05-16T22:00:05\",\"last_ram_increase\":\"2024-05-16T21:56:54\",\"new_ram_per_block\":0,\"revision\":0,\"total_producer_votepay_share\":\"55912927891331883615649792.00000000000000000\"}",
+      "newDataJson": "{\"last_block_num\":\"2024-05-16T22:00:05\",\"last_ram_increase\":\"2024-05-16T21:56:54\",\"new_ram_per_block\":0,\"revision\":0,\"total_producer_votepay_share\":\"55912927891331883615649792.00000000000000000\"}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 3,
+      "code": "eosio",
+      "scope": "eosio",
+      "tableName": "global3",
+      "primaryKey": "global3",
+      "oldPayer": "eosio",
+      "newPayer": "eosio",
+      "oldData": "INlDW5kYBgANeJjXZ9FHRA==",
+      "newData": "INlDW5kYBgANeJjXZ9FHRA==",
+      "oldDataJson": "{\"last_vpay_state_update\":\"2024-05-16T22:00:00.500\",\"total_vpay_share_change_rate\":\"878728759643393884160.00000000000000000\"}",
+      "newDataJson": "{\"last_vpay_state_update\":\"2024-05-16T22:00:00.500\",\"total_vpay_share_change_rate\":\"878728759643393884160.00000000000000000\"}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 3,
+      "code": "eosio",
+      "scope": "eosio",
+      "tableName": "global4",
+      "primaryKey": "global4",
+      "oldPayer": "eosio",
+      "newPayer": "eosio",
+      "oldData": "Y9a+o6lEnj8wdQAAAAAAAECcAAAAAAAA",
+      "newData": "Y9a+o6lEnj8wdQAAAAAAAECcAAAAAAAA",
+      "oldDataJson": "{\"continuous_rate\":\"0.02955880224154440\",\"inflation_pay_factor\":30000,\"votepay_factor\":40000}",
+      "newDataJson": "{\"continuous_rate\":\"0.02955880224154440\",\"inflation_pay_factor\":30000,\"votepay_factor\":40000}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 4,
+      "code": "eosio.token",
+      "scope": "eosio.rex",
+      "tableName": "accounts",
+      "primaryKey": "........ehbo5",
+      "oldPayer": "eosio.rex",
+      "newPayer": "eosio.rex",
+      "oldData": "GcWSX4AAAAAERU9TAAAAAA==",
+      "newData": "AAGPX4AAAAAERU9TAAAAAA==",
+      "oldDataJson": "{\"balance\":\"55135926.8121 EOS\"}",
+      "newDataJson": "{\"balance\":\"55135902.1312 EOS\"}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 4,
+      "code": "eosio.token",
+      "scope": "swap.defi",
+      "tableName": "accounts",
+      "primaryKey": "........ehbo5",
+      "oldPayer": "swap.defi",
+      "newPayer": "swap.defi",
+      "oldData": "4ce3AAIAAAAERU9TAAAAAA==",
+      "newData": "+ou7AAIAAAAERU9TAAAAAA==",
+      "oldDataJson": "{\"balance\":\"860197.8849 EOS\"}",
+      "newDataJson": "{\"balance\":\"860222.5658 EOS\"}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 9,
+      "code": "eosio.token",
+      "scope": "swap.defi",
+      "tableName": "accounts",
+      "primaryKey": "........ehbo5",
+      "oldPayer": "swap.defi",
+      "newPayer": "swap.defi",
+      "oldData": "+ou7AAIAAAAERU9TAAAAAA==",
+      "newData": "4ce3AAIAAAAERU9TAAAAAA==",
+      "oldDataJson": "{\"balance\":\"860222.5658 EOS\"}",
+      "newDataJson": "{\"balance\":\"860197.8849 EOS\"}"
+    },
+    {
+      "operation": "OPERATION_UPDATE",
+      "actionIndex": 9,
+      "code": "eosio.token",
+      "scope": "income.defi",
+      "tableName": "accounts",
+      "primaryKey": "........ehbo5",
+      "oldPayer": "income.defi",
+      "newPayer": "income.defi",
+      "oldData": "Fy7qAAAAAAAERU9TAAAAAA==",
+      "newData": "MPLtAAAAAAAERU9TAAAAAA==",
+      "oldDataJson": "{\"balance\":\"1534.7223 EOS\"}",
+      "newDataJson": "{\"balance\":\"1559.4032 EOS\"}"
+    }
+  ],
+  "rlimitOps": [
+    {
+      "operation": "OPERATION_UPDATE",
+      "accountUsage": {
+        "owner": "cpu.defi",
+        "netUsage": {
+          "lastOrdinal": 1538424012,
+          "valueEx": "176286327",
+          "consumed": "817"
+        },
+        "cpuUsage": {
+          "lastOrdinal": 1538424012,
+          "valueEx": "221773183",
+          "consumed": "6331"
+        },
+        "ramUsage": "2996"
+      }
+    }
+  ],
+  "creationTree": [
+    {
+      "creatorActionIndex": -1
+    },
+    {
+      "executionActionIndex": 1
+    },
+    {
+      "creatorActionIndex": 1,
+      "executionActionIndex": 2
+    },
+    {
+      "executionActionIndex": 3
+    },
+    {
+      "creatorActionIndex": 3,
+      "executionActionIndex": 4
+    },
+    {
+      "creatorActionIndex": 4,
+      "executionActionIndex": 5
+    },
+    {
+      "creatorActionIndex": 4,
+      "executionActionIndex": 6
+    },
+    {
+      "executionActionIndex": 7
+    },
+    {
+      "executionActionIndex": 8
+    },
+    {
+      "creatorActionIndex": 8,
+      "executionActionIndex": 9
+    },
+    {
+      "creatorActionIndex": 9,
+      "executionActionIndex": 10
+    },
+    {
+      "creatorActionIndex": 9,
+      "executionActionIndex": 11
+    }
+  ],
+  "index": "14"
+}
