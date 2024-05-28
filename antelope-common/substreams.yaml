@@ -1,7 +1,8 @@
 specVersion: v0.1.0
 package:
   name: antelope_common
-  version: v0.1.0
+  image: ./antelope.png
+  version: v0.2.0
   url: https://github.com/streamingfast/substreams-foundational-modules/antelope-common
   doc: |
     common Antelope substreams modules to extract transactions with indexing
@@ -29,13 +30,13 @@ modules:
   - name: index_actions
     kind: blockIndex
     inputs:
-      - source: sf.antelope.type.v1.Block
+      - map: all_actions
     output:
       type: proto:sf.substreams.index.v1.Keys
     doc: |
       `index_actions` sets the following keys on the block:
        * Authorized by      auth:{account}[@{permission}]
-       * Receiver           recv:{account}
+       * Receiver           receiver:{account}
        * Contract account   code:{account}
        * Action             action:{action}
        * Action params      data.{param}:{value}
