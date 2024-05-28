@@ -2,13 +2,15 @@
 
 Foundational modules let developers build substreams modules on top, to minimize bytes billed and improve performance by filtering out non-relevant parts of blocks and by skipping irrelevant chunks of blocks from the stream.
 
-There are two types of foundational modules:
+There are three types of foundational modules:
 - `all-*` - modules with outputs that include certain messages in a block only, such as `Actions`,  `Transactions`, minimizing bytes billed
 - `filtered-*` - modules with outputs defined by a query. When indexed, will skip large chunks of empty blocks improving performance
+- `index-*` - index modules that index blocks with related keys
 
 Antelope foundational modules include:
 - `all_transactions` - all transactions in a block
 - `all_actions` - all flattened actions in a block
+- `index_actions` - index blocks with relevant action-related keys
 - `filtered_actions` - flattened actions in a block filtered based on the query
 - `filtered_transactions` - transactions in a block filtered based on the query
 
@@ -23,7 +25,7 @@ Common use cases:
 Let's say you want to receive all AtomicAssets NFT create collection events starting from block 370,000,000.
 Send a substreams request with the desired query as parameter. You can use a gRPC client, substreams sink, or substreams CLI:
 ```bash
-> substreams gui -e eos.substreams.pinax.network:443 https://spkg.io/pinax-network/antelope-common-v0.1.0.spkg filtered_actions -s 370000000 -p filtered_actions="code:atomicassets && action:createcol" --production-mode
+> substreams gui -e eos.substreams.pinax.network:443 https://spkg.io/pinax-network/antelope-common-v0.2.0.spkg filtered_actions -s 370000000 -p filtered_actions="code:atomicassets && action:createcol" --production-mode
 ```
 If the request with this query hasn't been run before, substreams backend will start the indexing process and you should start seeing new events. If the request has been run before, you should start seeing sale actions right away jumping over any empty chunks of blocks when there were no sales.
 Note, we used `--production-mode` flag - this ensures backend writes indexes on disk so they can be re-used in the future. 
