@@ -49,7 +49,7 @@ pub mod transaction {
     #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Message {
-        #[prost(oneof="message::Value", tags="100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113")]
+        #[prost(oneof="message::Value", tags="100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121")]
         pub value: ::core::option::Option<message::Value>,
     }
     /// Nested message and enum types in `Message`.
@@ -85,6 +85,22 @@ pub mod transaction {
             MsgDeposit(super::super::super::super::super::cosmos::gov::v1beta1::MsgDeposit),
             #[prost(message, tag="113")]
             MsgUnjail(super::super::super::super::super::cosmos::slashing::v1beta1::MsgUnjail),
+            #[prost(message, tag="114")]
+            MsgBid(super::super::super::super::super::injective::auction::v1beta1::MsgBid),
+            #[prost(message, tag="115")]
+            PubKey(super::super::super::super::super::injective::crypto::v1beta1::ethsecp256k1::PubKey),
+            #[prost(message, tag="116")]
+            PrivKey(super::super::super::super::super::injective::crypto::v1beta1::ethsecp256k1::PrivKey),
+            #[prost(message, tag="117")]
+            InjMsgDeposit(super::super::super::super::super::injective::exchange::v1beta1::MsgDeposit),
+            #[prost(message, tag="118")]
+            MsgRequestBatch(super::super::super::super::super::injective::peggy::v1::MsgRequestBatch),
+            #[prost(message, tag="119")]
+            MsgRegisterContract(super::super::super::super::super::injective::wasmx::v1::MsgRegisterContract),
+            #[prost(message, tag="120")]
+            MsgExecuteContractCompat(super::super::super::super::super::injective::wasmx::v1::MsgExecuteContractCompat),
+            #[prost(message, tag="121")]
+            MsgExecuteContract(super::super::super::super::super::cosmwasm::wasm::v1::MsgExecuteContract),
         }
     }
 }

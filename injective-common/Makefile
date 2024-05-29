@@ -4,7 +4,7 @@ build:
 
 .PHONY: protogen
 protogen:
-	substreams protogen ./substreams.yaml --exclude-paths="sf/substreams"
+	buf build --as-file-descriptor-set -o /tmp/injectivecommon.binpb && buf generate /tmp/injectivecommon.binpb#format=bin
 
 .PHONY: package
 package: build
