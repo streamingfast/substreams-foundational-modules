@@ -1,5 +1,4 @@
 // @generated
-// @@protoc_insertion_point(attribute:amino)
 pub mod cosmos {
     pub mod authz {
         // @@protoc_insertion_point(attribute:cosmos.authz.v1beta1)
@@ -158,13 +157,18 @@ pub mod sf {
             }
         }
     }
-}
-pub mod spkg {
-    pub mod cosmos {
-        // @@protoc_insertion_point(attribute:spkg.cosmos.v1)
+    pub mod substreams {
+        pub mod cosmos {
+            // @@protoc_insertion_point(attribute:sf.substreams.cosmos.v1)
+            pub mod v1 {
+                include!("sf.substreams.cosmos.v1.rs");
+                // @@protoc_insertion_point(sf.substreams.cosmos.v1)
+            }
+        }
+        // @@protoc_insertion_point(attribute:sf.substreams.v1)
         pub mod v1 {
-            include!("spkg.cosmos.v1.rs");
-            // @@protoc_insertion_point(spkg.cosmos.v1)
+            include!("sf.substreams.v1.rs");
+            // @@protoc_insertion_point(sf.substreams.v1)
         }
     }
 }

@@ -22,7 +22,7 @@ modules:
     inputs:
       - source: sf.cosmos.type.v2.Block
     output:
-      type: proto:spkg.cosmos.v1.TransactionList
+      type: proto:sf.substreams.cosmos.v1.TransactionList
 
   - name: map_events
     kind: map
@@ -30,4 +30,4 @@ modules:
     inputs:
       - source: sf.cosmos.type.v2.Block
     output:
-      type: proto:spkg.cosmos.v1.TransactionList
+      type: proto:sf.substreams.cosmos.v1.EventList

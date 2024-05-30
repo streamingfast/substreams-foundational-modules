@@ -15,13 +15,14 @@ use crate::pb::cosmos::gov::v1beta1::MsgVote;
 use crate::pb::cosmos::slashing::v1beta1::MsgUnjail;
 use crate::pb::cosmos::tx::v1beta1::Tx;
 use crate::pb::sf::cosmos::r#type::v2::Block;
-use crate::pb::spkg::cosmos::v1::transaction::Message;
 use anyhow::anyhow;
-use pb::spkg::cosmos::v1::transaction::message::Value;
-use pb::spkg::cosmos::v1::Transaction;
-use pb::spkg::cosmos::v1::TransactionList;
+use pb::sf::substreams::cosmos::v1::transaction::Message;
+use pb::sf::substreams::cosmos::v1::transaction::message::Value;
+use pb::sf::substreams::cosmos::v1::*;
+use pb::sf::substreams::v1::Clock;
 use prost_types::Any;
 use substreams::errors::Error;
+use sha2::{Sha256, Digest};
 
 #[substreams::handlers::map]
 pub fn map_transactions(block: Block) -> Result<TransactionList, Error> {
@@ -75,7 +76,14 @@ pub fn map_transactions(block: Block) -> Result<TransactionList, Error> {
         }
     }
 
-    Ok(TransactionList { transactions })
+    Ok(TransactionList { 
+        transactions: transactions, 
+        clock: Some(Clock{
+            id: hex::encode(block.hash),
+            number: block.height as u64,
+            timestamp: block.time,
+        }),
+     })
 }
 
 fn extract_messages(messages: Vec<Any>) -> Vec<Message> {
@@ -161,4 +169,43 @@ fn extract_messages(messages: Vec<Any>) -> Vec<Message> {
 
 fn build_message(value: Value) -> Message {
     return Message { value: Some(value) };
+}
+
+
+#[substreams::handlers::map]
+pub fn map_events(block: Block) -> Result<EventList, Error> {
+    // Mutable list to add the output of the Substreams
+    let mut events: Vec<Event> = Vec::new();
+
+    if block.txs.len() != block.tx_results.len() {
+        return Err(anyhow!("Transaction list and result list do not match"));
+    }
+
+    for (i, tx_result) in block.tx_results.into_iter().enumerate() {
+        let tx_as_bytes = block.txs.get(i).unwrap();
+        let mut hasher = Sha256::new();
+        hasher.update(tx_as_bytes);
+        let tx_hash = hasher.finalize();
+
+        let block_events: Vec<Event> = tx_result.events
+        .into_iter()
+        .map(|event| {
+            return Event {
+                event: Some(event),
+                transaction_hash: hex::encode(tx_hash),
+            };
+        })
+        .collect();
+
+        events.extend(block_events);
+    }
+
+    Ok(EventList { 
+        events: events, 
+        clock: Some(Clock{
+            id: hex::encode(block.hash),
+            number: block.height as u64,
+            timestamp: block.time,
+        }),
+     })
 }
