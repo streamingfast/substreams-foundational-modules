@@ -6,3 +6,4 @@ deps:
   - buf.build/cosmwasm/wasmd
   - buf.build/enoldev/injective-core
   - buf.build/streamingfast/firehose-cosmos
+  - buf.build/streamingfast/substreams

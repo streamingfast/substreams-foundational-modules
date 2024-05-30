@@ -80,3 +80,9 @@ make build
 ```bash
 substreams run substreams.yaml map_transactions -e mainnet.injective.streamingfast.io:443 --start-block=69746551 --stop-block=+1
 ```
+
+### Package as .spkg
+
+```bash
+make package
+```

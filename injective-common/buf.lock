@@ -42,6 +42,11 @@ deps:
     commit: 453eb75cabe64abcb4a559f47bcb7e9a
     digest: shake256:5ca802bb6fdbce62931c518215c4c746864e8255ca5ea10b90d178c5f6a53d406e990a3f7a2bd37ec1522c75d083442275ee0c9ae5ecfb71cec52a261effe124
   - remote: buf.build
+    owner: streamingfast
+    repository: substreams
+    commit: f1da31258a494c59a88d8923f7c6fa32
+    digest: shake256:3d08fca046b008786b4dadf8adb45fb6ead4a7aede3716775432d705d2e4b505bdc90b88d926f65ff7c42c6d56e0cf933eef279a61ed27665ede092e7960a339
+  - remote: buf.build
     owner: tendermint
     repository: tendermint
     commit: 33ed361a90514289beabf3189e1d7665

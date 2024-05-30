@@ -1,3 +1,4 @@
+# requires substreams v1.7.1 and above
 specVersion: v0.1.0
 package:
   name: injective_common
@@ -5,46 +6,9 @@ package:
 
 network: cosmos
 
-imports:
-  cosmos: https://github.com/streamingfast/substreams-cosmos/releases/download/v0.1.5/cosmos-v0.1.5.spkg
-
 protobuf:
   descriptorSets:
-    - module: buf.build/cosmos/cosmos-sdk
-      version: v0.50.0
-      symbols:
-        - cosmos.tx.v1beta1.Tx
-        - cosmos.authz.v1beta1.MsgExec
-        - cosmos.bank.v1beta1.MsgSend
-        - cosmos.bank.v1beta1.MsgMultiSend
-        - cosmos.crisis.v1beta1.MsgVerifyInvariant
-        - cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward
-        - cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission
-        - cosmos.distribution.v1beta1.MsgSetWithdrawAddress
-        - cosmos.distribution.v1beta1.MsgFundCommunityPool
-        - cosmos.evidence.v1beta1.MsgSubmitEvidence
-        - cosmos.gov.v1beta1.MsgSubmitProposal
-        - cosmos.gov.v1beta1.MsgVote
-        - cosmos.gov.v1beta1.MsgDeposit
-        - cosmos.slashing.v1beta1.MsgUnjail
-    - module: buf.build/enoldev/injective-core
-      symbols:
-        - injective.auction.v1beta1.MsgBid
-        - injective.crypto.v1beta1.ethsecp256k1.PubKey
-        - injective.crypto.v1beta1.ethsecp256k1.PrivKey
-        - injective.exchange.v1beta1.MsgDeposit
-        - injective.peggy.v1.MsgRequestBatch
-        - injective.wasmx.v1.MsgRegisterContract
-        - injective.wasmx.v1.MsgExecuteContractCompat
-    - module: buf.build/cosmwasm/wasmd
-      symbols:
-        - cosmwasm.wasm.v1.MsgExecuteContract
-    #- module: buf.build/streamingfast/firehose-cosmos
-    
-  files:
-    - cosmos/v1/tx_list.proto
-  importPaths:
-    - ./proto
+  - localPath: generated-buf-build.binpb
 
 binaries:
   default:
@@ -54,7 +18,15 @@ binaries:
 modules:
   - name: map_transactions
     kind: map
-    initialBlock: 64987400
+    initialBlock: 0
+    inputs:
+      - source: sf.cosmos.type.v2.Block
+    output:
+      type: proto:spkg.cosmos.v1.TransactionList
+
+  - name: map_events
+    kind: map
+    initialBlock: 0
     inputs:
       - source: sf.cosmos.type.v2.Block
     output:
