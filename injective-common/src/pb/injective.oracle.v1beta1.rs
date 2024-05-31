@@ -342,4 +342,120 @@ impl OracleType {
         }
     }
 }
+/// MsgRelayProviderPrice defines a SDK message for setting a price through the
+/// provider oracle.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgRelayProviderPrices {
+    #[prost(string, tag="1")]
+    pub sender: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub provider: ::prost::alloc::string::String,
+    #[prost(string, repeated, tag="3")]
+    pub symbols: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(string, repeated, tag="4")]
+    pub prices: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgRelayProviderPricesResponse {
+}
+/// MsgRelayPriceFeedPrice defines a SDK message for setting a price through the
+/// pricefeed oracle.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgRelayPriceFeedPrice {
+    #[prost(string, tag="1")]
+    pub sender: ::prost::alloc::string::String,
+    #[prost(string, repeated, tag="2")]
+    pub base: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(string, repeated, tag="3")]
+    pub quote: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// price defines the price of the oracle base and quote
+    #[prost(string, repeated, tag="4")]
+    pub price: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgRelayPriceFeedPriceResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgRelayBandRates {
+    #[prost(string, tag="1")]
+    pub relayer: ::prost::alloc::string::String,
+    #[prost(string, repeated, tag="2")]
+    pub symbols: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(uint64, repeated, tag="3")]
+    pub rates: ::prost::alloc::vec::Vec<u64>,
+    #[prost(uint64, repeated, tag="4")]
+    pub resolve_times: ::prost::alloc::vec::Vec<u64>,
+    #[prost(uint64, repeated, tag="5")]
+    pub request_i_ds: ::prost::alloc::vec::Vec<u64>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgRelayBandRatesResponse {
+}
+/// MsgRelayCoinbaseMessages defines a SDK message for relaying price messages
+/// from Coinbase API.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgRelayCoinbaseMessages {
+    #[prost(string, tag="1")]
+    pub sender: ::prost::alloc::string::String,
+    #[prost(bytes="vec", repeated, tag="2")]
+    pub messages: ::prost::alloc::vec::Vec<::prost::alloc::vec::Vec<u8>>,
+    #[prost(bytes="vec", repeated, tag="3")]
+    pub signatures: ::prost::alloc::vec::Vec<::prost::alloc::vec::Vec<u8>>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgRelayCoinbaseMessagesResponse {
+}
+/// MsgRequestBandIBCRates defines a SDK message for requesting data from
+/// BandChain using IBC.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgRequestBandIbcRates {
+    #[prost(string, tag="1")]
+    pub sender: ::prost::alloc::string::String,
+    #[prost(uint64, tag="2")]
+    pub request_id: u64,
+}
+/// MsgRequestDataResponse defines the Msg/RequestBandIBCRates response type.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgRequestBandIbcRatesResponse {
+}
+/// MsgRelayPythPrices defines a SDK message for updating Pyth prices
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgRelayPythPrices {
+    #[prost(string, tag="1")]
+    pub sender: ::prost::alloc::string::String,
+    #[prost(message, repeated, tag="2")]
+    pub price_attestations: ::prost::alloc::vec::Vec<PriceAttestation>,
+}
+/// MsgRelayPythPricesResponse defines the Msg/RelayPythPrices response type.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgRelayPythPricesResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgUpdateParams {
+    /// authority is the address of the governance account.
+    #[prost(string, tag="1")]
+    pub authority: ::prost::alloc::string::String,
+    /// params defines the oracle parameters to update.
+    ///
+    /// NOTE: All parameters must be supplied.
+    #[prost(message, optional, tag="2")]
+    pub params: ::core::option::Option<Params>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MsgUpdateParamsResponse {
+}
 // @@protoc_insertion_point(module)

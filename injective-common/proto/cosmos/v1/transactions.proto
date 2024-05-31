@@ -20,8 +20,11 @@ import "injective/crypto/v1beta1/ethsecp256k1/keys.proto";
 import "injective/exchange/v1beta1/tx.proto";
 import "injective/peggy/v1/msgs.proto";
 import "injective/wasmx/v1/tx.proto";
+import "injective/oracle/v1beta1/tx.proto";
 
 import "cosmwasm/wasm/v1/tx.proto";
+import "ibc/core/client/v1/tx.proto";
+import "ibc/core/channel/v1/tx.proto";
 
 message TransactionList {
   repeated Transaction transactions = 1;
@@ -78,8 +81,12 @@ message Transaction {
       .injective.peggy.v1.MsgRequestBatch msg_request_batch = 118;
       .injective.wasmx.v1.MsgRegisterContract msg_register_contract = 119;
       .injective.wasmx.v1.MsgExecuteContractCompat msg_execute_contract_compat = 120;
+      .injective.exchange.v1beta1.MsgBatchUpdateOrders msg_batch_update_orders = 121;
+      .ibc.core.client.v1.MsgUpdateClient msg_update_client = 122;
+      .ibc.core.channel.v1.MsgAcknowledgement msg_acknowledgement = 123;
+      .injective.oracle.v1beta1.MsgRelayProviderPrices msg_relay_provider_prices = 124;
 
-      .cosmwasm.wasm.v1.MsgExecuteContract msg_execute_contract = 121;
+      .cosmwasm.wasm.v1.MsgExecuteContract msg_execute_contract = 150;
     }
   }
 }

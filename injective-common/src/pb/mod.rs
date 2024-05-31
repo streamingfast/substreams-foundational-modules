@@ -79,6 +79,13 @@ pub mod cosmos {
             // @@protoc_insertion_point(cosmos.tx.v1beta1)
         }
     }
+    pub mod upgrade {
+        // @@protoc_insertion_point(attribute:cosmos.upgrade.v1beta1)
+        pub mod v1beta1 {
+            include!("cosmos.upgrade.v1beta1.rs");
+            // @@protoc_insertion_point(cosmos.upgrade.v1beta1)
+        }
+    }
 }
 // @@protoc_insertion_point(attribute:cosmos_proto)
 pub mod cosmos_proto {
@@ -99,6 +106,24 @@ pub mod google {
     pub mod api {
         include!("google.api.rs");
         // @@protoc_insertion_point(google.api)
+    }
+}
+pub mod ibc {
+    pub mod core {
+        pub mod channel {
+            // @@protoc_insertion_point(attribute:ibc.core.channel.v1)
+            pub mod v1 {
+                include!("ibc.core.channel.v1.rs");
+                // @@protoc_insertion_point(ibc.core.channel.v1)
+            }
+        }
+        pub mod client {
+            // @@protoc_insertion_point(attribute:ibc.core.client.v1)
+            pub mod v1 {
+                include!("ibc.core.client.v1.rs");
+                // @@protoc_insertion_point(ibc.core.client.v1)
+            }
+        }
     }
 }
 pub mod injective {

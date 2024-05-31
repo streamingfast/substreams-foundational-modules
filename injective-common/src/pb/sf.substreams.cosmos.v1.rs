@@ -71,7 +71,7 @@ pub mod transaction {
     pub struct Message {
         #[prost(uint32, tag="1")]
         pub index: u32,
-        #[prost(oneof="message::Value", tags="100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121")]
+        #[prost(oneof="message::Value", tags="100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 150")]
         pub value: ::core::option::Option<message::Value>,
     }
     /// Nested message and enum types in `Message`.
@@ -122,6 +122,14 @@ pub mod transaction {
             #[prost(message, tag="120")]
             MsgExecuteContractCompat(super::super::super::super::super::super::injective::wasmx::v1::MsgExecuteContractCompat),
             #[prost(message, tag="121")]
+            MsgBatchUpdateOrders(super::super::super::super::super::super::injective::exchange::v1beta1::MsgBatchUpdateOrders),
+            #[prost(message, tag="122")]
+            MsgUpdateClient(super::super::super::super::super::super::ibc::core::client::v1::MsgUpdateClient),
+            #[prost(message, tag="123")]
+            MsgAcknowledgement(super::super::super::super::super::super::ibc::core::channel::v1::MsgAcknowledgement),
+            #[prost(message, tag="124")]
+            MsgRelayProviderPrices(super::super::super::super::super::super::injective::oracle::v1beta1::MsgRelayProviderPrices),
+            #[prost(message, tag="150")]
             MsgExecuteContract(super::super::super::super::super::super::cosmwasm::wasm::v1::MsgExecuteContract),
         }
     }

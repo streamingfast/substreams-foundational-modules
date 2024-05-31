@@ -2,74 +2,42 @@
 
 The Injective Foundational modules are Substreams modules extracting common data from the Injective blockchain.
 
+
+
 ## Modules
 
-### map_transactions
+### all_events
 
-The `map_transactions` module extracts all the transactions from the Injective blockchain, providing useful information, such as _messages_, _signatures_ or _events_.
+The `all_events` module extracts only the events and provides them, along with the transaction hash and block at which it they are found.
 
-In the Injective data model, _messages_ are Protobufs that can be decoded if you have the corresponding Protobuf model. In this Substreams, some of the most common Protobufs are provided in the `substreams.yaml`:
+### filtered_events
 
-```yaml
-protobuf:
-  descriptorSets:
-    - module: buf.build/cosmos/cosmos-sdk
-      version: v0.50.0
-      symbols:
-        - cosmos.tx.v1beta1.Tx
-        - cosmos.authz.v1beta1.MsgExec
-        - cosmos.bank.v1beta1.MsgSend
-        - cosmos.bank.v1beta1.MsgMultiSend
-        - cosmos.crisis.v1beta1.MsgVerifyInvariant
-        - cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward
-        - cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission
-        - cosmos.distribution.v1beta1.MsgSetWithdrawAddress
-        - cosmos.distribution.v1beta1.MsgFundCommunityPool
-        - cosmos.evidence.v1beta1.MsgSubmitEvidence
-        - cosmos.gov.v1beta1.MsgSubmitProposal
-        - cosmos.gov.v1beta1.MsgVote
-        - cosmos.gov.v1beta1.MsgDeposit
-        - cosmos.slashing.v1beta1.MsgUnjail
-```
+The `filtered_events` module allows a reduction of the `all_events` output, only matching the events that match the requested type.
 
-Using the `substreams protogen` command you can generate the corresponding Rust code, and decode the _message_ data of the transaction:
+Use with the parameter, ex: `substreams run [...] -p filtered_events="message || injective.peggy.v1.EventDepositClaim"
 
-```rust
-fn extract_messages(messages: Vec<Any>) -> Vec<Message> {
-    return messages
-        .iter()
-        .map(|message| {
-            let message_as_u8 = &message.value[..];
+### all_transactions (work in progress)
 
-            if message.type_url == "cosmos.authz.v1beta1.MsgExec" {
-                if let Ok(msg_exec) = <MsgExec as prost::Message>::decode(message_as_u8) {
-                    return build_message(Value::MsgExec(msg_exec));
-                }
-            }
-            if message.type_url == "cosmos.bank.v1beta1.MsgSend" {
-                if let Ok(msg_send) = <MsgSend as prost::Message>::decode(message_as_u8) {
-                    return build_message(Value::MsgSend(msg_send));
-                }
-            }
-            if message.type_url == "cosmos.bank.v1beta1.MsgMultiSend" {
-                if let Ok(msg_multi_send) = <MsgMultiSend as prost::Message>::decode(message_as_u8) {
-                    return build_message(Value::MsgMultiSend(msg_multi_send));
-                }
-            }
-            // ...output omitted...
-        });
-}
-```
+The `all_transactions` module extracts all the transactions from the Injective blockchain, providing useful information, such as _messages_, _signatures_ or _events_.
+
+Some message types are parsed from their "Any" type into the the corresponding type of an enum. See ./proto/cosmos/v1/transactions.proto to see the ones that are supported.
+The other types will still be shown as protobuf "Any" type.
 
 ## Getting Started
 
-### Generate Protobufs
+### Gather protobuf definitions in generated-buf-build.binpb 
+
+The required protobuf modules are referenced in `buf.yaml`. 
+You need a (free) API token to access https://buf.build and resolve the dependencies into a single file, generated-buf-build.binpb.
+That file is then used to generate the rust protobuf bindings or to bundle the definitions in the .spkg. (it is referenced in the substreams.yaml)
+
+### Generate rust protobuf bindings
 
 ```bash
 make protogen
 ```
 
-### Build Substreams
+### Build Substreams modules
 
 ```bash
 make build
@@ -77,8 +45,12 @@ make build
 
 ### Run Substreams
 
+You will need an API key to access the streamingfast servers, see https://substreams.streamingfast.io
+
+This example query only fetches the events of type 'injective.peggy.v1.EventDepositClaim'
+
 ```bash
-substreams run substreams.yaml map_transactions -e mainnet.injective.streamingfast.io:443 --start-block=69746551 --stop-block=+1
+substreams run -e mainnet.injective.streamingfast.io:443 substreams.yaml filtered_events -p filtered_events='injective.peggy.v1.EventDepositClaim' -s 9600 -t 9700
 ```
 
 ### Package as .spkg

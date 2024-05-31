@@ -18,6 +18,16 @@ use crate::pb::cosmos::slashing::v1beta1::MsgUnjail;
 use crate::pb::cosmos::tx::v1beta1::Tx;
 use crate::pb::sf::cosmos::r#type::v2::Block;
 use anyhow::anyhow;
+use pb::cosmwasm::wasm::v1::MsgExecuteContract;
+use pb::ibc::core::channel::v1::MsgAcknowledgement;
+use pb::ibc::core::client::v1::MsgUpdateClient;
+use pb::injective::auction::v1beta1::MsgBid;
+use pb::injective::exchange::v1beta1::MsgBatchUpdateOrders;
+use pb::injective::exchange::v1beta1::MsgDeposit as InjMsgDeposit;
+use pb::injective::oracle::v1beta1::MsgRelayProviderPrices;
+use pb::injective::peggy::v1::MsgRequestBatch;
+use pb::injective::wasmx::v1::MsgExecuteContractCompat;
+use pb::injective::wasmx::v1::MsgRegisterContract;
 use pb::sf::substreams::cosmos::v1::transaction::message::Value;
 use pb::sf::substreams::cosmos::v1::transaction::Message;
 use pb::sf::substreams::cosmos::v1::*;
@@ -25,11 +35,12 @@ use pb::sf::substreams::v1::Clock;
 use prost_types::Any;
 use sha2::{Digest, Sha256};
 use substreams::errors::Error;
+use substreams::log;
 use substreams::matches_keys_in_parsed_expr;
 use substreams::pb::sf::substreams::index::v1::Keys;
 
 #[substreams::handlers::map]
-pub fn map_transactions(block: Block) -> Result<TransactionList, Error> {
+pub fn all_transactions(block: Block) -> Result<TransactionList, Error> {
     // Mutable list to add the output of the Substreams
     let mut transactions: Vec<Transaction> = Vec::new();
 
@@ -105,25 +116,21 @@ fn extract_messages(messages: Vec<Any>) -> Vec<Message> {
                         return build_message(Value::MsgExec(msg_exec), i);
                     }
                 }
-
                 "/cosmos.bank.v1beta1.MsgSend" => {
                     if let Ok(msg_send) = <MsgSend as prost::Message>::decode(message_as_u8) {
                         return build_message(Value::MsgSend(msg_send), i);
                     }
                 }
-
                 "/cosmos.bank.v1beta1.MsgMultiSend" => {
                     if let Ok(msg_multi_send) = <MsgMultiSend as prost::Message>::decode(message_as_u8) {
                         return build_message(Value::MsgMultiSend(msg_multi_send), i);
                     }
                 }
-
                 "/cosmos.crisis.v1beta1.MsgVerifyInvariant" => {
                     if let Ok(msg_verify_invariant) = <MsgVerifyInvariant as prost::Message>::decode(message_as_u8) {
                         return build_message(Value::MsgVerifyInvariant(msg_verify_invariant), i);
                     }
                 }
-
                 "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward" => {
                     if let Ok(msg_withdraw_delegator_reward) =
                         <MsgWithdrawDelegatorReward as prost::Message>::decode(message_as_u8)
@@ -141,7 +148,6 @@ fn extract_messages(messages: Vec<Any>) -> Vec<Message> {
                         );
                     }
                 }
-
                 "/cosmos.distribution.v1beta1.MsgSetWithdrawAddress" => {
                     if let Ok(msg_set_withdraw_address) =
                         <MsgSetWithdrawAddress as prost::Message>::decode(message_as_u8)
@@ -155,7 +161,6 @@ fn extract_messages(messages: Vec<Any>) -> Vec<Message> {
                         return build_message(Value::MsgFundCommunityPool(msg_fund_community_pool), i);
                     }
                 }
-
                 "/cosmos.evidence.v1beta1.MsgSubmitEvidence" => {
                     if let Ok(msg_submit_evidence) = <MsgSubmitEvidence as prost::Message>::decode(message_as_u8) {
                         return build_message(Value::MsgSubmitEvidence(msg_submit_evidence), i);
@@ -166,7 +171,6 @@ fn extract_messages(messages: Vec<Any>) -> Vec<Message> {
                         return build_message(Value::MsgSubmitProposal(msg_submit_proposal), i);
                     }
                 }
-
                 "/cosmos.gov.v1beta1.MsgVote" => {
                     if let Ok(msg_vote) = <MsgVote as prost::Message>::decode(message_as_u8) {
                         return build_message(Value::MsgVote(msg_vote), i);
@@ -182,13 +186,64 @@ fn extract_messages(messages: Vec<Any>) -> Vec<Message> {
                         return build_message(Value::MsgUnjail(msg_unjail), i);
                     }
                 }
+                "/injective.exchange.v1beta1.MsgBatchUpdateOrders" => {
+                    if let Ok(msg) = <MsgBatchUpdateOrders as prost::Message>::decode(message_as_u8) {
+                        return build_message(Value::MsgBatchUpdateOrders(msg), i);
+                    }
+                }
+                "/injective.wasmx.v1.MsgExecuteContractCompat" => {
+                    if let Ok(msg) = <MsgExecuteContractCompat as prost::Message>::decode(message_as_u8) {
+                        return build_message(Value::MsgExecuteContractCompat(msg), i);
+                    }
+                }
+                "/injective.auction.v1beta1.MsgBid" => {
+                    if let Ok(msg) = <MsgBid as prost::Message>::decode(message_as_u8) {
+                        return build_message(Value::MsgBid(msg), i);
+                    }
+                }
+                "/injective.exchange.v1beta.MsgDeposit" => {
+                    if let Ok(msg) = <InjMsgDeposit as prost::Message>::decode(message_as_u8) {
+                        return build_message(Value::InjMsgDeposit(msg), i);
+                    }
+                }
+                "/injective.peggy.v1.MsgRequestBatch" => {
+                    if let Ok(msg) = <MsgRequestBatch as prost::Message>::decode(message_as_u8) {
+                        return build_message(Value::MsgRequestBatch(msg), i);
+                    }
+                }
+                "/injective.wasmx.v1.MsgRegisterContract" => {
+                    if let Ok(msg) = <MsgRegisterContract as prost::Message>::decode(message_as_u8) {
+                        return build_message(Value::MsgRegisterContract(msg), i);
+                    }
+                }
+
+                "/cosmwasm.wasm.v1.MsgExecuteContract" => {
+                    if let Ok(msg) = <MsgExecuteContract as prost::Message>::decode(message_as_u8) {
+                        return build_message(Value::MsgExecuteContract(msg), i);
+                    }
+                }
+                "/ibc.core.client.v1.MsgUpdateClient" => {
+                    if let Ok(msg) = <MsgUpdateClient as prost::Message>::decode(message_as_u8) {
+                        return build_message(Value::MsgUpdateClient(msg), i);
+                    }
+                }
+                "/ibc.core.channel.v1.MsgAcknowledgement" => {
+                    if let Ok(msg) = <MsgAcknowledgement as prost::Message>::decode(message_as_u8) {
+                        return build_message(Value::MsgAcknowledgement(msg), i);
+                    }
+                }
+                "/injective.oracle.v1beta1.MsgRelayProviderPrices" => {
+                    if let Ok(msg) = <MsgRelayProviderPrices as prost::Message>::decode(message_as_u8) {
+                        return build_message(Value::MsgRelayProviderPrices(msg), i);
+                    }
+                }
                 _ => {
+                    log::println(format!("Unsupported message type: {}", message.type_url.as_str()));
                     return build_message(Value::Other(message.clone()), i);
                 }
             }
 
             panic!("Could not decode message type {}", message.type_url.as_str());
-
         })
         .collect();
 }
