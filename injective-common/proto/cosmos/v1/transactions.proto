@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package sf.substreams.cosmos.v1;
+
+import "sf/substreams/v1/clock.proto";
+
+import "cosmos/tx/v1beta1/tx.proto";
+import "cosmos/authz/v1beta1/tx.proto";
+import "cosmos/bank/v1beta1/tx.proto";
+import "cosmos/crisis/v1beta1/tx.proto";
+import "cosmos/distribution/v1beta1/tx.proto";
+import "cosmos/evidence/v1beta1/tx.proto";
+import "cosmos/gov/v1beta1/tx.proto";
+import "cosmos/slashing/v1beta1/tx.proto";
+import "sf/cosmos/type/v2/block.proto";
+import "google/protobuf/any.proto";
+
+import "injective/auction/v1beta1/tx.proto";
+import "injective/crypto/v1beta1/ethsecp256k1/keys.proto";
+import "injective/exchange/v1beta1/tx.proto";
+import "injective/peggy/v1/msgs.proto";
+import "injective/wasmx/v1/tx.proto";
+import "injective/oracle/v1beta1/tx.proto";
+
+import "cosmwasm/wasm/v1/tx.proto";
+import "ibc/core/client/v1/tx.proto";
+import "ibc/core/channel/v1/tx.proto";
+
+message TransactionList {
+  repeated Transaction transactions = 1;
+  sf.substreams.v1.Clock clock = 2;
+}
+
+message Transaction {
+  // from the firehose Block as `bytes`
+  string hash = 1;
+  bytes raw_tx = 2;
+
+  // from TxBody
+  string memo = 3;
+  uint64 timeout_height = 4;
+  repeated Message messages = 5;
+  repeated google.protobuf.Any extension_options = 1023;
+  repeated google.protobuf.Any non_critical_extension_options = 2047;
+
+  // from TxResult
+  uint32 result_code = 21;
+  bytes result_data = 22;
+  string result_log = 23;
+  string result_info = 24;
+  int64 result_gas_wanted = 25;
+  int64 result_gas_used = 26;
+  repeated .sf.cosmos.type.v2.Event result_events = 27;
+  string result_codespace = 28;
+
+  .cosmos.tx.v1beta1.AuthInfo auth_info = 32;
+  repeated bytes signatures = 33;
+
+  message Message {
+    uint32 index = 1;
+    oneof value {
+      google.protobuf.Any other = 100;
+      .cosmos.authz.v1beta1.MsgExec msg_exec = 101;
+      .cosmos.bank.v1beta1.MsgSend msg_send = 102;
+      .cosmos.bank.v1beta1.MsgMultiSend msg_multi_send = 103;
+      .cosmos.crisis.v1beta1.MsgVerifyInvariant msg_verify_invariant = 104;
+      .cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward msg_withdraw_delegator_reward = 105;
+      .cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission msg_withdraw_validator_commission = 106;
+      .cosmos.distribution.v1beta1.MsgSetWithdrawAddress msg_set_withdraw_address = 107;
+      .cosmos.distribution.v1beta1.MsgFundCommunityPool msg_fund_community_pool = 108;
+      .cosmos.evidence.v1beta1.MsgSubmitEvidence msg_submit_evidence = 109;
+      .cosmos.gov.v1beta1.MsgSubmitProposal msg_submit_proposal = 110;
+      .cosmos.gov.v1beta1.MsgVote msg_vote = 111;
+      .cosmos.gov.v1beta1.MsgDeposit msg_deposit = 112;
+      .cosmos.slashing.v1beta1.MsgUnjail msg_unjail = 113;
+
+      .injective.auction.v1beta1.MsgBid msg_bid = 114;
+      .injective.crypto.v1beta1.ethsecp256k1.PubKey pub_key = 115;
+      .injective.crypto.v1beta1.ethsecp256k1.PrivKey priv_key = 116;
+      .injective.exchange.v1beta1.MsgDeposit inj_msg_deposit = 117;
+      .injective.peggy.v1.MsgRequestBatch msg_request_batch = 118;
+      .injective.wasmx.v1.MsgRegisterContract msg_register_contract = 119;
+      .injective.wasmx.v1.MsgExecuteContractCompat msg_execute_contract_compat = 120;
+      .injective.exchange.v1beta1.MsgBatchUpdateOrders msg_batch_update_orders = 121;
+      .ibc.core.client.v1.MsgUpdateClient msg_update_client = 122;
+      .ibc.core.channel.v1.MsgAcknowledgement msg_acknowledgement = 123;
+      .injective.oracle.v1beta1.MsgRelayProviderPrices msg_relay_provider_prices = 124;
+
+      .cosmwasm.wasm.v1.MsgExecuteContract msg_execute_contract = 150;
+    }
+  }
+}
