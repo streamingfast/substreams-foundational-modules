@@ -27,12 +27,14 @@ pub struct TransactionList {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Transaction {
     /// from the firehose Block as `bytes`
-    #[prost(bytes="vec", tag="1")]
+    #[prost(string, tag="1")]
+    pub hash: ::prost::alloc::string::String,
+    #[prost(bytes="vec", tag="2")]
     pub raw_tx: ::prost::alloc::vec::Vec<u8>,
     /// from TxBody
-    #[prost(string, tag="2")]
+    #[prost(string, tag="3")]
     pub memo: ::prost::alloc::string::String,
-    #[prost(uint64, tag="3")]
+    #[prost(uint64, tag="4")]
     pub timeout_height: u64,
     #[prost(message, repeated, tag="5")]
     pub messages: ::prost::alloc::vec::Vec<transaction::Message>,
@@ -67,6 +69,8 @@ pub mod transaction {
     #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Message {
+        #[prost(uint32, tag="1")]
+        pub index: u32,
         #[prost(oneof="message::Value", tags="100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121")]
         pub value: ::core::option::Option<message::Value>,
     }

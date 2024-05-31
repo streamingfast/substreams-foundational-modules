@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package sf.substreams.cosmos.v1;
 
-import 'sf/substreams/v1/clock.proto';
+import "sf/substreams/v1/clock.proto";
 
 import "cosmos/tx/v1beta1/tx.proto";
 import "cosmos/authz/v1beta1/tx.proto";
@@ -23,16 +23,6 @@ import "injective/wasmx/v1/tx.proto";
 
 import "cosmwasm/wasm/v1/tx.proto";
 
-message EventList {
-  sf.substreams.v1.Clock clock = 1;
-  repeated Event events = 2;
-}
-
-message Event {
-  string transaction_hash = 1;
-  .sf.cosmos.type.v2.Event event = 2;
-}
-
 message TransactionList {
   repeated Transaction transactions = 1;
   sf.substreams.v1.Clock clock = 2;
@@ -40,11 +30,12 @@ message TransactionList {
 
 message Transaction {
   // from the firehose Block as `bytes`
-  bytes raw_tx = 1;
+  string hash = 1;
+  bytes raw_tx = 2;
 
   // from TxBody
-  string memo = 2;
-  uint64 timeout_height = 3;
+  string memo = 3;
+  uint64 timeout_height = 4;
   repeated Message messages = 5;
   repeated google.protobuf.Any extension_options = 1023;
   repeated google.protobuf.Any non_critical_extension_options = 2047;
@@ -63,6 +54,7 @@ message Transaction {
   repeated bytes signatures = 33;
 
   message Message {
+    uint32 index = 1;
     oneof value {
       google.protobuf.Any other = 100;
       .cosmos.authz.v1beta1.MsgExec msg_exec = 101;
@@ -88,7 +80,6 @@ message Transaction {
       .injective.wasmx.v1.MsgExecuteContractCompat msg_execute_contract_compat = 120;
 
       .cosmwasm.wasm.v1.MsgExecuteContract msg_execute_contract = 121;
-
     }
   }
 }
