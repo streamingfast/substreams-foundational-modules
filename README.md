@@ -25,3 +25,4 @@ Foundational modules can contain:
 # Current implementations
 
 * ethereum-common
+* antelope-common

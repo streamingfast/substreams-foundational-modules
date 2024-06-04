@@ -1,0 +1,97 @@
+specVersion: v0.1.0
+package:
+  name: antelope_common
+  image: ./antelope.png
+  version: v0.3.0
+  url: https://github.com/streamingfast/substreams-foundational-modules/antelope-common
+  doc: |
+    common Antelope substreams modules to extract transactions with indexing
+
+    Use one of those optimized modules with a query string as a parameter:
+    * filtered_transactions
+    * filtered_actions
+
+    The query string will be used for the blockfilter as well as the actual filtering of actions/transactions
+
+protobuf:
+  files:
+  importPaths:
+    - ./proto
+
+imports:
+  antelope: https://github.com/pinax-network/firehose-antelope/releases/download/v0.0.5/antelope-v0.0.5.spkg
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+
+modules:
+  - name: index_actions
+    kind: blockIndex
+    inputs:
+      - map: all_actions
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+    doc: |
+      `index_actions` sets the following keys on the block:
+       * Authorized by      auth:{account}[@{permission}]
+       * Receiver           receiver:{account}
+       * Contract account   code:{account}
+       * Action             action:{action}
+       * Action params      data.{param}:{value}
+
+
+  - name: all_transactions
+    kind: map
+    inputs:
+      - source: sf.antelope.type.v1.Block
+    output:
+      type: proto:sf.antelope.type.v1.TransactionTraces
+    doc: |
+      `all_transactions` reads from antelope blocks and extracts all executed transactions
+
+  - name: all_actions
+    kind: map
+    inputs:
+      - map: all_transactions
+    output:
+      type: proto:sf.antelope.type.v1.ActionTraces
+    doc: |
+      `all_actions` reads from all_transactions and extracts all executed actions
+
+  - name: filtered_transactions
+    kind: map
+    blockFilter:
+      module: index_actions
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_transactions
+    output:
+      type: proto:sf.antelope.type.v1.TransactionTraces
+    doc: |
+      `filtered_transactions` reads from all_transactions and applies a filter on the transactions
+      Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
+      Example: `code:eosio.token && action:transfer && (data.to:myaccount || data.from:myaccount)`
+
+  - name: filtered_actions
+    kind: map
+    blockFilter:
+      module: index_actions
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_actions
+    output:
+      type: proto:sf.antelope.type.v1.ActionTraces
+    doc: |
+      `filtered_actions` reads from all_actions and applies a filter on the actions
+      Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
+      Example: `code:eosio.token && action:transfer && (data.to:myaccount || data.from:myaccount)`
+
+params:
+  filtered_transactions: "code:eosio.token && action:transfer"
+  filtered_actions: "code:eosio.token && action:transfer"
