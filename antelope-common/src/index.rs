@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::HashSet;
 
 use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams_antelope::pb::ActionTraces;
@@ -11,9 +11,9 @@ fn index_actions(actions: ActionTraces) -> Result<Keys, substreams::errors::Erro
         .action_traces
         .into_iter()
         .flat_map(|action| action_keys(&action))
-        .collect::<BTreeSet<_>>();
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect();
 
-    Ok(Keys {
-        keys: keys.into_iter().collect(),
-    })
+    Ok(Keys { keys })
 }
