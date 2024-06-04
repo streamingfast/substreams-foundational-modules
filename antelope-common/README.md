@@ -53,6 +53,14 @@ These are the expressions that can be used in queries:
 Queries can include `&&` and `||` logical operands, as well as `(` and `)` parenthesis.
 
 
+### Release
+v0.3.0: https://substreams.dev/pinax-network/antelope-common/v0.3.0
+
+
+### Usage
+```bash
+substreams gui -e eos.substreams.pinax.network:443 https://spkg.io/pinax-network/antelope-common-v0.2.0.spkg filtered_actions -s -10000 -p filtered_actions="code:tethertether && data.to:swap.defi" --production-mode
+```
 
 ### Known issues
 - Your query needs to be normalized, i.e `code:eosio.token` and `(code:eosio.token)` are different queries and will trigger re-indexing
