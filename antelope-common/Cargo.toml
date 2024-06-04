@@ -1,6 +1,6 @@
 [package]
 name = "antelope-common"
-version = "0.1.0"
+version = "0.3.0"
 description = "Foundational Substreams Modules for Antelope Chains"
 edition = "2021"
 repository = "https://github.com/streamingfast/substreams-foundational-modules/antelope-common"

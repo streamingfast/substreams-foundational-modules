@@ -1,0 +1,10 @@
+version: v1
+deps:
+  - buf.build/cosmos/cosmos-sdk
+  - buf.build/cosmos/cosmos-proto
+  - buf.build/cosmos/gogo-proto
+  - buf.build/cosmos/ibc
+  - buf.build/cosmwasm/wasmd
+  - buf.build/enoldev/injective-core
+  - buf.build/streamingfast/firehose-cosmos
+  - buf.build/streamingfast/substreams

@@ -1,0 +1,61 @@
+# requires substreams v1.7.1 and above
+specVersion: v0.1.0
+package:
+  name: injective_common
+  version: v0.1.0
+
+network: cosmos
+
+protobuf:
+  descriptorSets:
+  - localPath: generated-buf-build.binpb
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: target/wasm32-unknown-unknown/release/injective_common.wasm
+
+modules:
+  - name: all_transactions
+    kind: map
+    initialBlock: 0
+    inputs:
+      - source: sf.cosmos.type.v2.Block
+    output:
+      type: proto:sf.substreams.cosmos.v1.TransactionList
+
+  - name: all_events
+    kind: map
+    initialBlock: 0
+    inputs:
+      - source: sf.cosmos.type.v2.Block
+    output:
+      type: proto:sf.substreams.cosmos.v1.EventList
+
+  - name: index_events
+    kind: blockIndex
+    inputs:
+      - map: all_events
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+    doc: |
+      `index_events` sets the keys corresponding to every event 'type' 
+      ex: `coin_received`, `message` or `injective.peggy.v1.EventDepositClaim`
+
+  - name: filtered_events
+    kind: map
+    blockFilter:
+      module: index_events
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_events
+    output:
+      type: proto:sf.substreams.cosmos.v1.EventList
+    doc: |
+      `filtered_events` reads from `all_events` and applies a filter on the event types, only outputing the events that match the filter. 
+      The only operator that you should need to use this filter is the logical or `||`, because each event can only match one type.
+
+params:
+  filtered_events: "message"

@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::HashSet;
 
 use crate::actions::action_keys;
 use substreams::matches_keys_in_parsed_expr;
@@ -34,11 +34,7 @@ fn filtered_actions(
         .action_traces
         .into_iter()
         .filter(|action| {
-            let keys = action_keys(action)
-                .into_iter()
-                .collect::<BTreeSet<_>>()
-                .into_iter()
-                .collect::<Vec<_>>();
+            let keys = action_keys(action);
 
             // will panic if the query is invalid
             matches_keys_in_parsed_expr(&keys, &query).unwrap()
@@ -61,7 +57,7 @@ fn filtered_transactions(
                 .action_traces
                 .iter()
                 .flat_map(action_keys)
-                .collect::<BTreeSet<_>>()
+                .collect::<HashSet<_>>()
                 .into_iter()
                 .collect::<Vec<_>>();
 

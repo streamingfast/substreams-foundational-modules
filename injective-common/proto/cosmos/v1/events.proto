@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package sf.substreams.cosmos.v1;
+
+import "sf/substreams/v1/clock.proto";
+import "cosmwasm/wasm/v1/tx.proto";
+import "sf/cosmos/type/v2/block.proto";
+
+message EventList {
+  sf.substreams.v1.Clock clock = 1;
+  repeated Event events = 2;
+}
+
+message Event {
+  string transaction_hash = 1;
+  .sf.cosmos.type.v2.Event event = 2;
+}
