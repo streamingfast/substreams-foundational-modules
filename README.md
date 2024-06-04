@@ -26,3 +26,4 @@ Foundational modules can contain:
 
 * ethereum-common
 * antelope-common
+* injective-common
