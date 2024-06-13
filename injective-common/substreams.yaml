@@ -2,7 +2,7 @@
 specVersion: v0.1.0
 package:
   name: injective_common
-  version: v0.1.0
+  version: v0.1.1
 
 network: cosmos
 
@@ -57,5 +57,23 @@ modules:
       `filtered_events` reads from `all_events` and applies a filter on the event types, only outputing the events that match the filter. 
       The only operator that you should need to use this filter is the logical or `||`, because each event can only match one type.
 
+  - name: filtered_trx_by_events
+    kind: map
+    blockFilter:
+      module: index_events
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_events
+      - map: all_transactions
+    output:
+      type: proto:sf.substreams.cosmos.v1.TransactionList
+    doc: |
+      `filtered_trx_by_events` reads from `all_events` and `all_transactions` and applies a filter on the event types, 
+      only outputing the transactions that match the filter. The only operator that you should need to use this filter 
+      is the logical or `||`, because each event can only match one type.
+
 params:
   filtered_events: "message"
+  filtered_trx_by_events: "message"

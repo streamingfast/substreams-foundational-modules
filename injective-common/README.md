@@ -2,8 +2,6 @@
 
 The Injective Foundational modules are Substreams modules extracting common data from the Injective blockchain.
 
-
-
 ## Modules
 
 ### all_events
@@ -14,7 +12,11 @@ The `all_events` module extracts only the events and provides them, along with t
 
 The `filtered_events` module allows a reduction of the `all_events` output, only matching the events that match the requested type.
 
-Use with the parameter, ex: `substreams run [...] -p filtered_events="message || injective.peggy.v1.EventDepositClaim"
+Use with the parameter, ex:
+
+```bash
+substreams run [...] -p filtered_events="message || injective.peggy.v1.EventDepositClaim"
+```
 
 ### all_transactions (work in progress)
 
@@ -23,11 +25,21 @@ The `all_transactions` module extracts all the transactions from the Injective b
 Some message types are parsed from their "Any" type into the the corresponding type of an enum. See ./proto/cosmos/v1/transactions.proto to see the ones that are supported.
 The other types will still be shown as protobuf "Any" type.
 
+### filtered_trx_by_events
+
+The `filtered_trx_by_events` modules allows a reduction of the `all_transactions` output, only matching the events that match the requested type. The module will return the entire transactions. Some event types will appear that do not match from the filtered params as the entire transaction is returned.
+
+Use with the parameter, ex:
+
+```bash
+substreams run [...] -p filtered_trx_by_events="message || injective.peggy.v1.EventDepositClaim"
+```
+
 ## Getting Started
 
-### Gather protobuf definitions in generated-buf-build.binpb 
+### Gather protobuf definitions in generated-buf-build.binpb
 
-The required protobuf modules are referenced in `buf.yaml`. 
+The required protobuf modules are referenced in `buf.yaml`.
 You need a (free) API token to access https://buf.build and resolve the dependencies into a single file, generated-buf-build.binpb.
 That file is then used to generate the rust protobuf bindings or to bundle the definitions in the .spkg. (it is referenced in the substreams.yaml)
 
