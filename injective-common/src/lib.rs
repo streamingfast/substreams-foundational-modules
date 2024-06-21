@@ -182,6 +182,9 @@ fn filtered_events(query: String, events: EventList) -> Result<EventList, Error>
         })
         .collect();
 
+    if filtered.len() == 0 {
+        return Ok(EventList::default());
+    }
     Ok(EventList {
         events: filtered,
         clock: events.clock,
@@ -216,6 +219,9 @@ fn filtered_event_groups(query: String, events: EventList) -> Result<EventList, 
         })
         .collect();
 
+    if filtered.len() == 0 {
+        return Ok(EventList::default());
+    }
     Ok(EventList {
         events: filtered,
         clock: events.clock,
@@ -256,6 +262,9 @@ fn filtered_trx_by_events(query: String, trxs: TransactionList) -> Result<Transa
         .filter(|t| matching_trx_hashes.contains_key(t.hash.as_str()))
         .collect();
 
+    if transactions.len() == 0 {
+        return Ok(TransactionList::default());
+    }
     Ok(TransactionList {
         transactions: transactions,
         clock: trxs.clock,
@@ -282,6 +291,9 @@ fn filtered_events_by_attribute_value(query: String, events: EventList) -> Resul
         })
         .collect();
 
+    if filtered.len() == 0 {
+        return Ok(EventList::default());
+    }
     Ok(EventList {
         events: filtered,
         clock: events.clock,
@@ -317,6 +329,9 @@ fn filtered_event_groups_by_attribute_value(query: String, events: EventList) ->
         })
         .collect();
 
+    if filtered.len() == 0 {
+        return Ok(EventList::default());
+    }
     Ok(EventList {
         events: filtered,
         clock: events.clock,
@@ -350,6 +365,9 @@ fn filtered_trx_by_events_attribute_value(query: String, events: EventList, trxs
         .filter(|t| matching_trx_hashes.contains_key(t.hash.as_str()))
         .collect();
 
+    if transactions.len() == 0 {
+        return Ok(TransactionList::default());
+    }
     Ok(TransactionList {
         transactions: transactions,
         clock: trxs.clock,

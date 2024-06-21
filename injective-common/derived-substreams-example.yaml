@@ -7,7 +7,7 @@ package:
 network: injective-mainnet
 
 imports:
-  injective: ./injective-common-v0.2.0.spkg
+  injective: ./injective-common-v0.2.1.spkg
 
 modules:
   - name: my_events
