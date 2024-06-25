@@ -2,7 +2,7 @@
 specVersion: v0.1.0
 package:
   name: injective_common
-  version: v0.2.1
+  version: v0.2.2
   url: https://github.com/streamingfast/substreams-foundational-modules/injective-common
   doc: |
     common Injective substreams modules to extract events and transactions with indexing
