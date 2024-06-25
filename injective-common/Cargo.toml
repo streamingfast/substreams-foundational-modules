@@ -14,7 +14,7 @@ strip = "debuginfo"
 crate-type = ["cdylib"]
 
 [dependencies]
-substreams = "^0.5.19"
+substreams = "^0.5.20"
 hex = "0.4.3"
 prost = "0.11"
 prost-types = "0.11"
