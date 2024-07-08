@@ -1,0 +1,169 @@
+syntax = "proto3";
+package sf.gear.type.v1;
+
+option go_package = "github.com/streamingfast/firehose-gear/pb;pbgear";
+
+message Block {
+  uint64 number = 1;
+  string hash = 2;
+  Header header = 3;
+  repeated Extrinsic extrinsics = 4;
+  repeated Event events = 5;
+  repeated DigestItem digest_items = 6;
+  bytes justification = 7;
+}
+
+message Header {
+  // [32]byte
+  string parent_hash = 1;
+  // [32]byte
+  string state_root = 2;
+  // [32]byte
+  string extrinsics_root = 3;
+}
+
+message DigestItem {
+  oneof Item {
+    // [32]byte
+    string as_changes_trie_root = 1;
+    PreRuntime as_pre_runtime = 2;
+    Consensus as_consensus = 3;
+    Seal as_seal = 4;
+    ChangesTrieSignal as_changes_trie_signal = 5;
+    bytes as_other = 6;
+  }
+}
+
+message PreRuntime {
+  uint32 consensus_engine_id = 1;
+  bytes bytes = 2;
+}
+
+message Consensus {
+  uint32 consensus_engine_id = 1;
+  bytes bytes = 2;
+}
+
+message Seal {
+  uint32 consensus_engine_id = 1;
+  bytes bytes = 2;
+}
+
+message ChangesTrieSignal {
+  bool is_new_configuration = 1;
+  bytes as_new_configuration = 2;
+}
+
+message Extrinsic {
+  uint32 version = 1;
+  Signature signature = 2;
+  Call method = 3;
+}
+
+message Signature {
+  MultiAddress signer = 1;
+  MultiSignature signature = 2;
+  ExtrinsicEra era = 3;
+  // big.Int
+  string nonce = 4;
+  // big.Int
+  string tip = 5;
+}
+
+message MultiAddress {
+  bool is_id = 1;
+  // [32]byte
+  string as_id = 2;
+  bool is_index = 3;
+  uint32 as_index = 4;
+  bool is_raw = 5;
+  // []byte
+  string as_raw = 6;
+  bool is_address_32 = 7;
+  // []byte
+  string as_address_32 = 8;
+  bool is_address_20 = 9;
+  // [20]byte
+  string as_address_20 = 10;
+}
+
+message MultiSignature {
+  bool is_ed_25519 = 1;
+  // [64]byte
+  string as_ed_25519 = 2;
+  bool is_sr_25519 = 3;
+  // [64]byte
+  string as_sr_25519 = 4;
+  bool is_ecdsa = 5;
+  // [65]byte
+  string as_ecdsa = 6;
+}
+
+message ExtrinsicEra {
+  bool is_immortal_era = 1;
+  bool is_mortal_era = 2;
+  MortalEra as_mortal_era = 3;
+}
+
+message Call {
+  CallIndex call_index = 1;
+  bytes args = 2;
+}
+
+message Field {
+  string name = 1;
+  int64 lookup_index = 2;
+
+  oneof value {
+    string json_value = 3;
+    Fields fields = 4;
+  }
+}
+
+message Fields {
+  repeated Field value = 1;
+}
+
+message CallIndex {
+  uint32 section_index = 1;
+  uint32 method_index = 2;
+}
+
+message Event {
+  string name = 1;
+  repeated Field fields = 2;
+  // [2]byte
+  string id = 3;
+  Phase phase = 4;
+  // [32]byte
+  repeated string topics = 5;
+}
+
+message Phase {
+   bool is_apply_extrinsic = 1;
+   uint32 as_apply_extrinsic = 2;
+   bool is_finalization = 3;
+   bool is_initialization = 4;
+}
+
+message SignatureDef {
+  bool is_ed25519 = 1;
+  // [64]byte
+  string  as_ed25519 = 2;
+  bool is_sr25519 = 3;
+  // [64]byte
+  string as_sr25519 = 4;
+  bool is_ecdsa = 5;
+  // [65]byte
+  string as_ecdsa = 6;
+}
+
+message MortalEra {
+  uint32 first = 1;
+  uint32 second = 2;
+}
+
+message PaymentFields {
+  // big.Int
+  string tip = 1;
+}

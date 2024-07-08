@@ -1,0 +1,95 @@
+syntax = "proto3";
+package sf.substreams.vara.v1;
+
+option go_package = "github.com/streamingfast/firehose-gear/pb;pbgear";
+
+message ParsedExtrinsics {
+    string block_hash = 1;
+    repeated ParsedExtrinsic extrinsics = 2;
+}
+
+message ParsedExtrinsic {
+    string name = 1;
+    repeated ParsedField call_fields = 2;
+    ParsedCallIndex call_index = 3;
+    uint32 version = 4;
+    ParsedSignature signature = 5;
+}
+
+message ParsedField {
+    string name = 1;
+    int64 lookup_index = 2;
+    string type = 3;
+    oneof value {
+        string field_value = 4;
+        ParsedField fields = 5;
+    }
+    
+}
+
+message AirDropTransferExt {
+    // AccountId
+    string source = 1;
+    // AccountId
+    string dest = 2;
+    // U128
+    string amount = 3;
+}
+
+message ParsedCallIndex {
+    uint32 section_index = 1;
+    uint32 method_index = 2;
+}
+
+message ParsedSignature {
+    ParsedSigner signer = 1;
+    ParsedSignatureDef signature = 2;
+    ParsedEra era = 12;
+    // big.Int
+    string none = 13;
+    ParsedPaymentFields payment_fields = 14;
+}
+  
+message ParsedSigner {
+    bool is_ID  = 1;
+    // [32]byte
+    string as_ID = 2;
+    bool is_index = 3;
+    uint32 as_index = 4;
+    bool is_raw = 5;
+    bytes as_raw = 6;
+    bool is_address_32 = 7;
+    // [32]byte
+    string as_address_32 = 8;
+    bool is_address_20 = 9;
+    // [20]byte
+    string as_address_20 = 10;
+}
+  
+message ParsedSignatureDef {
+    bool is_ed25519 = 1;
+    // [64]byte
+    string  as_ed25519 = 2;
+    bool is_sr25519 = 3;
+    // [64]byte
+    string as_sr25519 = 4;
+    bool is_ecdsa = 5;
+    // [65]byte
+    string as_ecdsa = 6;
+}
+  
+message ParsedEra {
+    bool is_immortal_era = 1;
+    bool is_mortal_era = 2;
+    ParsedMortalEra as_mortal_era = 3;
+}
+  
+message ParsedMortalEra {
+    uint32 first = 1;
+    uint32 last = 2;
+}
+
+message ParsedPaymentFields {
+    // big.Int
+    string tip = 1;
+}
