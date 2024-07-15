@@ -16,7 +16,6 @@ import (
 )
 
 func AllTransactions(block *pbstarknet.Block) (*v1.Transactions, error) {
-	Logf("extracting all transactions from block %s", feltToString(block.BlockHash))
 	clock := &pbsubstreams.Clock{
 		Id:        feltToString(block.BlockHash),
 		Number:    block.BlockNumber,
