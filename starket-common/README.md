@@ -9,7 +9,7 @@ First test is to unpack a raw Ethereum Block, from within `tinygo`.
 ## Build
 
 ```bash
-tinygo build -o wasm.wasm -target wasi -scheduler none .
+tinygo build -o wasm.wasm -target wasi -gc leaking -scheduler none .
 ```
 
 ## Usage
