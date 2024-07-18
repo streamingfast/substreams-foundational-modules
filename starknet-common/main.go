@@ -123,9 +123,6 @@ func indexForTransactionsWithReceipt(transaction *pbstarknet.TransactionWithRece
 
 	for _, e := range receipt.Events {
 		index.AddKey(feltToIndexKey("ev:from_address", e.FromAddress))
-		for _, key := range e.Keys {
-			index.AddKey(feltToIndexKey("ev:key", key))
-		}
 	}
 
 	return index, nil
