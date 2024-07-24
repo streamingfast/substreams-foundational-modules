@@ -15,13 +15,13 @@ binaries:
     type: wasip1/tinygo-v1  # wasm/rust-v1
     file: ./wasm.wasm
 
-network: mainnet
+network: vara-mainnet
 
 modules:
-  - name: map_test
+  - name: map_decoded_block
     kind: map
     initialBlock: 12360600
     inputs:
-      - source: sf.ethereum.type.v2.Block
+      - source: sf.gear.type.v1.Block
     output:
-      type: proto:my.Block
+      type: proto:sf.gear.type.v1.DecodedBlock

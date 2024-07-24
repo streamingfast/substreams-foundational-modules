@@ -1,57 +1,42 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
-	pbgear "github.com/streamingfast/tinygo-test/pb"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	pbgear "github.com/streamingfast/firehose-gear/pb/sf/gear/type/v1"
 )
 
-func map_extrinsics(block *pbgear.Block) (*pbgear.ParsedExtrinsics, error) {
-	parsedExtrinsics, err := convertExtrinsics(block.Extrinsics)
+// this will actually return a decodedBlock containing all the decoded calls and events
+func map_decoded_block(block *pbgear.Block) (*pbgear.Block, error) {
+	return nil, nil
+}
+
+func decodeCallExtrinsics(callRegistry registry.CallRegistry, extrinsic *pbgear.Extrinsic) (registry.DecodedFields, error) {
+	callIndex := extrinsic.Method.CallIndex
+	args := extrinsic.Method.Args
+
+	callDecoder, ok := callRegistry[convertCallIndex(callIndex)]
+	if ok != true {
+		return nil, fmt.Errorf("failed to get call decoder")
+	}
+
+	decoder := scale.NewDecoder(bytes.NewReader(args))
+
+	callFields, err := callDecoder.Decode(decoder)
 	if err != nil {
-		return nil, fmt.Errorf("failed to convert extrinsics: %w", err)
+		return nil, fmt.Errorf("failed to decode call: %w", err)
 	}
 
-	return &pbgear.ParsedExtrinsics{
-		BlockHash:  block.Hash,
-		Extrinsics: parsedExtrinsics,
-	}, nil
+	return callFields, nil
 }
 
-func convertExtrinsics(extrinsics []*pbgear.Extrinsic) ([]*pbgear.ParsedExtrinsic, error) {
-	gearExtrinsics := make([]*pbgear.ParsedExtrinsic, 0, len(extrinsics))
-	for _, extrinsic := range extrinsics {
-		callFields, err := convertDecodedFields(extrinsic)
-		if err != nil {
-			return nil, fmt.Errorf("failed to convert decoded fields: %w", err)
-		}
-		_ = callFields
-		// gearExtrinsics = append(gearExtrinsics, &pbgear.ParsedExtrinsic{
-		// 	Name:       extrinsic.Name,
-		// 	CallFields: callFields,
-		// 	CallIndex:  convertCallIndex(extrinsic.CallIndex),
-		// 	Version:    uint32(extrinsic.Version),
-		// 	Signature:  convertExtrinsicsSignature(extrinsic.Signature),
-		// })
-	}
-
-	return gearExtrinsics, nil
-}
-
-func convertDecodedFields(extrinsic *pbgear.Extrinsic) (*pbgear.ParsedExtrinsic, error) {
-	return &pbgear.ParsedExtrinsic{
-		Name: "",
-		CallFields: ,
-		CallIndex: ,
-		Version: extrinsic.Version,
-		Signature: convertSignature(extrinsic.Signature),
-	}, nil
-}
-
-func convertSignature(signature *pbgear.ExtrinsicSignature) *pbgear.ParsedExtrinsicSignature {
-	return &pbgear.ParsedExtrinsicSignature{
-		Signer: signature.Signer,
-		Signature: signature.Signature,
+func convertCallIndex(ci *pbgear.CallIndex) types.CallIndex {
+	return types.CallIndex{
+		SectionIndex: uint8(ci.SectionIndex),
+		MethodIndex:  uint8(ci.MethodIndex),
 	}
 }

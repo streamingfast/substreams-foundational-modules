@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"unsafe"
 
-	pbgear "github.com/streamingfast/tinygo-test/pb"
+	pbgear "github.com/streamingfast/firehose-gear/pb/sf/gear/type/v1"
 )
 
 //go:generate substreams protogen ./substreams.yaml --with-tinygo-maps // creates genre substreams.gen.go
@@ -50,7 +50,7 @@ func _map_extrinsics(blockPtr, blockLen uint32) (retval uint32) {
 		return 1
 	}
 
-	ret, err := map_extrinsics(dest)
+	ret, err := map_decoded_block(dest)
 	if err != nil {
 		panic(fmt.Errorf("map_extrinsics failed: %w", err))
 	}
