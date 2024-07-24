@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"unsafe"
 
@@ -16,117 +17,112 @@ import (
 // Dans WASI: _start
 func main() {}
 
-////export db_get_i64
-//func _db_get_i64(code, scope, key uint64) []byte {}
+func panic(a any) {
+	os.Exit(2) //fail-safe so we know someone call panic
+}
 
 //export output
-func _output(ptr, len int32) {}
+func _output(ptr, len int32)
 
 //go:wasm-module logger
 //export println
-func _log(ptr int32, len int32) {}
-
-// Output the serialized protobuf byte array to the Substreams engine
-func output(out []byte) {
-	_output(byteArrayToPtr(out))
-}
+func _log(ptr int32, len int32)
 
 // Log a line to the Substreams engine
 func Logf(message string, args ...any) {
 	_log(stringToPtr(fmt.Sprintf(message, args...)))
 }
 
+// Output the serialized protobuf byte array to the Substreams engine
+func output(out []byte) {
+	_output(byteArrayToPtr(out))
+}
+
+type OutputError struct {
+	msg string
+}
+
+func (o OutputError) Error() string {
+	return o.msg
+}
+
+func outputVT(out vtMessage) error {
+	if out == nil || reflect.ValueOf(out).IsNil() {
+		return nil
+	}
+	b, err := out.MarshalVT()
+	if err != nil {
+		return fmt.Errorf("marshalling output: %w", err)
+	}
+	if len(b) == 0 {
+		return nil
+	}
+	output(b)
+	return nil
+}
+
 //export all_transactions
 func _all_transactions(blockPtr, blockLen int32) (retval int32) {
-	defer func() {
-		if r := recover(); r != nil {
-			Logf("%#v", r)
-			retval = 1
-		}
-	}()
-
-	a := ptrToString(blockPtr, blockLen)
-	b := []byte(a)
-	dest := &pbstarknet.Block{}
-	if err := dest.UnmarshalVT(b); err != nil {
-		Logf("failed unmarshal: %s", err)
+	block := &pbstarknet.Block{}
+	if err := unmarshalVT(blockPtr, blockLen, block); err != nil {
+		Logf("failed unmarshal block: %s", err)
 		return 1
 	}
 
-	ret, err := AllTransactions(dest)
+	output, err := AllTransactions(block)
 	if err != nil {
-		panic(fmt.Errorf("map_extrinsics failed: %w", err))
+		Logf("executing all_transactions: %s", err)
+		return 1
 	}
-	if ret != nil {
-		cnt, err := ret.MarshalVT()
-		if err != nil {
-			panic(fmt.Errorf("marshal output: %w", err))
-		}
-		output(cnt)
+
+	if err := outputVT(output); err != nil {
+		Logf("outputing vt message: %s", err)
+		return 1
 	}
+
 	return 0
 }
 
 //export index_transactions
 func _index_transactions(ptr, len int32) (retval int32) {
-	defer func() {
-		if r := recover(); r != nil {
-			Logf("%#v", r)
-			retval = 1
-		}
-	}()
-
-	a := ptrToString(int32(ptr), int32(len))
-	b := []byte(a)
-	dest := &v1.Transactions{}
-	if err := dest.UnmarshalVT(b); err != nil {
-		Logf("failed unmarshal: %s", err)
+	transactions := &v1.Transactions{}
+	if err := unmarshalVT(ptr, len, transactions); err != nil {
+		Logf("unmarshalling transactions: %s", err)
 		return 1
 	}
 
-	ret, err := IndexTransaction(dest)
+	output, err := IndexTransactions(transactions)
 	if err != nil {
-		panic(fmt.Errorf("map_extrinsics failed: %w", err))
+		Logf("executing index_transactions: %s", err)
+		return 1
+
 	}
-	if ret != nil {
-		cnt, err := ret.MarshalVT()
-		if err != nil {
-			panic(fmt.Errorf("marshal output: %w", err))
-		}
-		output(cnt)
+	if err := outputVT(output); err != nil {
+		Logf("outputing vt message: %s", err)
+		return 1
 	}
 	return 0
 }
 
 //export filtered_transactions
 func _filtered_transactions(queryPtr, queryLen int32, transactionsPtr, transactionsLen int32) (ret int32) {
-	defer func() {
-		if r := recover(); r != nil {
-			Logf("%#v", r)
-			ret = 1
-		}
-	}()
-
 	query := ptrToString(queryPtr, queryLen)
-	txsData := ptrToBytes(transactionsPtr, transactionsLen)
-	txs := &v1.Transactions{}
 
-	if err := txs.UnmarshalVT(txsData); err != nil {
-		Logf("failed unmarshal: %s", err)
+	txs := &v1.Transactions{}
+	if err := unmarshalVT(transactionsPtr, transactionsLen, txs); err != nil {
+		Logf("failed unmarshal transactions: %s", err)
 		return 1
 	}
 
-	out, err := FilteredTransactions(query, txs)
+	output, err := FilteredTransactions(query, txs)
 	if err != nil {
-		panic(fmt.Errorf("map_extrinsics failed: %w", err))
+		Logf("calling filtered_transactions: %s", err)
+		return 1
 	}
 
-	if out != nil {
-		cnt, err := out.MarshalVT()
-		if err != nil {
-			panic(fmt.Errorf("marshal output: %w", err))
-		}
-		output(cnt)
+	if err := outputVT(output); err != nil {
+		Logf("outputing vt message: %s", err)
+		return 1
 	}
 	return 0
 }
@@ -167,4 +163,14 @@ func byteArrayToPtr(buf []byte) (int32, int32) {
 	ptr := &buf[0]
 	unsafePtr := uintptr(unsafe.Pointer(ptr))
 	return int32(unsafePtr), int32(len(buf))
+}
+
+type vtMessage interface {
+	MarshalVT() ([]byte, error)
+	UnmarshalVT([]byte) error
+}
+
+func unmarshalVT(prt, len int32, dest vtMessage) error {
+	b := ptrToBytes(prt, len)
+	return dest.UnmarshalVT(b)
 }

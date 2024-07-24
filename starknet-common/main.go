@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/streamingfast/substreams-foundational-modules/starknet-common/sqe"
-
 	"github.com/NethermindEth/juno/core/felt"
 	pbstarknet "github.com/streamingfast/substreams-foundational-modules/starknet-common/pb/sf/starknet/type/v1"
 	pbindex "github.com/streamingfast/substreams-foundational-modules/starknet-common/pb/sf/substreams/index/v1"
 	v1 "github.com/streamingfast/substreams-foundational-modules/starknet-common/pb/sf/substreams/starknet/type/v1"
 	pbsubstreams "github.com/streamingfast/substreams-foundational-modules/starknet-common/pb/sf/substreams/v1"
+	"github.com/streamingfast/substreams-foundational-modules/starknet-common/sqe"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -25,6 +24,7 @@ func AllTransactions(block *pbstarknet.Block) (*v1.Transactions, error) {
 	transactions := &v1.Transactions{
 		Clock: clock,
 	}
+
 	for _, tx := range block.Transactions {
 		transactions.TransactionsWithReceipt = append(transactions.TransactionsWithReceipt, tx)
 	}
@@ -32,8 +32,9 @@ func AllTransactions(block *pbstarknet.Block) (*v1.Transactions, error) {
 	return transactions, nil
 }
 
-func IndexTransaction(transactions *v1.Transactions) (*pbindex.Keys, error) {
+func IndexTransactions(transactions *v1.Transactions) (*pbindex.Keys, error) {
 	keys := &pbindex.Keys{}
+
 	for _, tx := range transactions.TransactionsWithReceipt {
 		idx, err := indexForTransactionsWithReceipt(tx)
 		if err != nil {
@@ -41,6 +42,7 @@ func IndexTransaction(transactions *v1.Transactions) (*pbindex.Keys, error) {
 		}
 		keys.Keys = append(keys.Keys, idx.Keys.Keys...)
 	}
+
 	return keys, nil
 }
 
@@ -121,16 +123,13 @@ func indexForTransactionsWithReceipt(transaction *pbstarknet.TransactionWithRece
 
 	for _, e := range receipt.Events {
 		index.AddKey(feltToIndexKey("ev:from_address", e.FromAddress))
-		for _, key := range e.Keys {
-			index.AddKey(feltToIndexKey("ev:key", key))
-		}
 	}
 
 	return index, nil
 }
 
 func FilteredTransactions(query string, transactions *v1.Transactions) (*v1.Transactions, error) {
-	filtered := &v1.Transactions{
+	filteredTransactions := &v1.Transactions{
 		Clock: transactions.Clock,
 	}
 
@@ -145,16 +144,15 @@ func FilteredTransactions(query string, transactions *v1.Transactions) (*v1.Tran
 			return nil, fmt.Errorf("applying query: %w", err)
 		}
 		if match {
-			filtered.TransactionsWithReceipt = append(filtered.TransactionsWithReceipt, tx)
+			filteredTransactions.TransactionsWithReceipt = append(filteredTransactions.TransactionsWithReceipt, tx)
 		}
-
 	}
 
-	if len(filtered.TransactionsWithReceipt) == 0 {
+	if len(filteredTransactions.TransactionsWithReceipt) == 0 {
 		return &v1.Transactions{}, nil
 	}
 
-	return filtered, nil
+	return filteredTransactions, nil
 }
 
 func applyQuery(keys *pbindex.Keys, query string) (bool, error) {
@@ -165,14 +163,6 @@ func applyQuery(keys *pbindex.Keys, query string) (bool, error) {
 	}
 
 	return sqe.KeysApply(q, keyQuerier), nil
-}
-
-type Index struct {
-	Keys *pbindex.Keys
-}
-
-func (i *Index) AddKey(key string) {
-	i.Keys.Keys = append(i.Keys.Keys, key)
 }
 
 func stringToIndexKey(prefix, str string) string {

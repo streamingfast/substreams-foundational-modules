@@ -1,3 +1,5 @@
+//go:build !tinygo && !wasip1
+
 package main
 
 import (
