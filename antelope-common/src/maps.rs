@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::actions::action_keys;
+use crate::actions::{action_keys, action_keys_extra};
 use substreams::matches_keys_in_parsed_expr;
 use substreams_antelope::{
     pb::{ActionTraces, TransactionTraces},
@@ -57,6 +57,50 @@ fn filtered_transactions(
                 .action_traces
                 .iter()
                 .flat_map(action_keys)
+                .collect::<HashSet<_>>()
+                .into_iter()
+                .collect::<Vec<_>>();
+
+            // will panic if the query is invalid
+            matches_keys_in_parsed_expr(&keys, &query).unwrap()
+        })
+        .collect();
+
+    Ok(TransactionTraces { transaction_traces })
+}
+
+#[substreams::handlers::map]
+fn filtered_actions_extra(
+    query: String,
+    actions: ActionTraces,
+) -> Result<ActionTraces, substreams::errors::Error> {
+    let action_traces = actions
+        .action_traces
+        .into_iter()
+        .filter(|action| {
+            let keys = action_keys_extra(action);
+
+            // will panic if the query is invalid
+            matches_keys_in_parsed_expr(&keys, &query).unwrap()
+        })
+        .collect();
+
+    Ok(ActionTraces { action_traces })
+}
+
+#[substreams::handlers::map]
+fn filtered_transactions_extra(
+    query: String,
+    transactions: TransactionTraces,
+) -> Result<TransactionTraces, substreams::errors::Error> {
+    let transaction_traces = transactions
+        .transaction_traces
+        .into_iter()
+        .filter(|trx| {
+            let keys = trx
+                .action_traces
+                .iter()
+                .flat_map(action_keys_extra)
                 .collect::<HashSet<_>>()
                 .into_iter()
                 .collect::<Vec<_>>();

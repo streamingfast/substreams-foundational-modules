@@ -2,7 +2,7 @@ specVersion: v0.1.0
 package:
   name: antelope_common
   image: ./antelope.png
-  version: v0.3.0
+  version: v0.4.0
   url: https://github.com/streamingfast/substreams-foundational-modules/antelope-common
   doc: |
     common Antelope substreams modules to extract transactions with indexing
@@ -10,6 +10,8 @@ package:
     Use one of those optimized modules with a query string as a parameter:
     * filtered_transactions
     * filtered_actions
+    * filtered_transactions_extra
+    * filtered_actions_extra
 
     The query string will be used for the blockfilter as well as the actual filtering of actions/transactions
 
@@ -35,12 +37,23 @@ modules:
       type: proto:sf.substreams.index.v1.Keys
     doc: |
       `index_actions` sets the following keys on the block:
-       * Authorized by      auth:{account}[@{permission}]
-       * Receiver           receiver:{account}
        * Contract account   code:{account}
        * Action             action:{action}
-       * Action params      data.{param}:{value}
+       * Receiver           receiver:{account}
 
+  - name: index_actions_extra
+    kind: blockIndex
+    inputs:
+      - map: all_actions
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+    doc: |
+      `index_actions_extra` sets the following keys on the block:
+       * Contract account   code:{account}
+       * Action             action:{action}
+       * Receiver           receiver:{account}
+       * Authorized by      auth:{account}[@{permission}]
+       * Action params      data.{param}:{value}
 
   - name: all_transactions
     kind: map
@@ -74,7 +87,7 @@ modules:
     doc: |
       `filtered_transactions` reads from all_transactions and applies a filter on the transactions
       Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
-      Example: `code:eosio.token && action:transfer && (data.to:myaccount || data.from:myaccount)`
+      Example: `code:eosio.token && action:transfer`
 
   - name: filtered_actions
     kind: map
@@ -90,8 +103,42 @@ modules:
     doc: |
       `filtered_actions` reads from all_actions and applies a filter on the actions
       Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
+      Example: `code:eosio.token && action:transfer`
+
+  - name: filtered_transactions_extra
+    kind: map
+    blockFilter:
+      module: index_actions_extra
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_transactions
+    output:
+      type: proto:sf.antelope.type.v1.TransactionTraces
+    doc: |
+      `filtered_transactions_extra` reads from all_transactions and applies a filter on the transactions
+      Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
+      Example: `code:eosio.token && action:transfer && (data.to:myaccount || data.from:myaccount)`
+
+  - name: filtered_actions_extra
+    kind: map
+    blockFilter:
+      module: index_actions_extra
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_actions
+    output:
+      type: proto:sf.antelope.type.v1.ActionTraces
+    doc: |
+      `filtered_actions_extra` reads from all_actions and applies a filter on the actions
+      Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
       Example: `code:eosio.token && action:transfer && (data.to:myaccount || data.from:myaccount)`
 
 params:
   filtered_transactions: "code:eosio.token && action:transfer"
   filtered_actions: "code:eosio.token && action:transfer"
+  filtered_transactions_extra: "code:eosio.token && action:transfer"
+  filtered_actions_extra: "code:eosio.token && action:transfer"
