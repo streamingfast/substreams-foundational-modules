@@ -2,9 +2,28 @@
 specVersion: v0.1.0
 package:
   name: injective_common
-  version: v0.1.0
+  version: v0.2.2
+  url: https://github.com/streamingfast/substreams-foundational-modules/injective-common
+  doc: |
+    common Injective substreams modules to extract events and transactions with indexing
 
-network: cosmos
+    Use one of those optimized modules with a query string as a parameter:
+    * filtered_events
+    * filtered_event_groups
+    * filtered_trx_by_events
+
+    The query string will be used for the blockfilter as well as the actual filtering of the events/transactions
+
+    The following modules are also available for more specific filtering, but they do not use an index by default:
+    * filtered_events_by_attribute_value
+    * filtered_event_groups_by_attribute_value
+    * filtered_trx_by_events_attribute_value
+
+    They should be overriden by setting the blockFilter.Query.String parameter to a query that matches the event type 
+    and attribute keys only. See `derived-substreams-example.yaml` for an example 
+    (https://github.com/streamingfast/substreams-foundational-modules/injective-common)
+
+network: injective-mainnet
 
 protobuf:
   descriptorSets:
@@ -23,6 +42,9 @@ modules:
       - source: sf.cosmos.type.v2.Block
     output:
       type: proto:sf.substreams.cosmos.v1.TransactionList
+    doc: |
+      `all_transactions` reads from the `sf.cosmos.type.v2.Block` source and outputs a list of all transactions in the block.
+      Some known message types will be converted to the correct protobuf type, unknown ones will stay as `Any` type.
 
   - name: all_events
     kind: map
@@ -31,6 +53,9 @@ modules:
       - source: sf.cosmos.type.v2.Block
     output:
       type: proto:sf.substreams.cosmos.v1.EventList
+    doc: |
+      `all_events` reads from the `sf.cosmos.type.v2.Block` source and outputs a list of all events in the block.
+      Some events are at the block level, others appear inside the transactions.
 
   - name: index_events
     kind: blockIndex
@@ -39,8 +64,9 @@ modules:
     output:
       type: proto:sf.substreams.index.v1.Keys
     doc: |
-      `index_events` sets the keys corresponding to every event 'type' 
-      ex: `coin_received`, `message` or `injective.peggy.v1.EventDepositClaim`
+      `index_events` sets the keys corresponding to all event 'types' and 'attribute keys' in the block
+      ex: `type:coin_received`, `type:injective.peggy.v1.EventDepositClaim`, `attr:action`, `attr:sender` ...
+      The attribute values are never indexed because they have a high cardinality and would be too expensive to index.
 
   - name: filtered_events
     kind: map
@@ -54,8 +80,92 @@ modules:
     output:
       type: proto:sf.substreams.cosmos.v1.EventList
     doc: |
-      `filtered_events` reads from `all_events` and applies a filter on the event types, only outputing the events that match the filter. 
-      The only operator that you should need to use this filter is the logical or `||`, because each event can only match one type.
+      `filtered_events` reads from `all_events` and applies a filter on the event types and attribute keys, 
+      only outputing the events that match the filter. 
+      Example usage: `(type:message && attr:action) || (type:wasm && attr:_contract_address)`
+
+  - name: filtered_event_groups
+    kind: map
+    blockFilter:
+      module: index_events
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_events
+    output:
+      type: proto:sf.substreams.cosmos.v1.EventList
+    doc: |
+      `filtered_event_groups` reads from `all_events` and applies a filter on the event types and attribute keys, 
+      outputing all the events from transactions that have at least one event matching the filter.
+      Example usage: `type:injective.peggy.v1.EventDepositClaim || (type:wasm && attr:_contract_address)`
+
+  - name: filtered_trx_by_events
+    kind: map
+    blockFilter:
+      module: index_events
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_transactions
+    output:
+      type: proto:sf.substreams.cosmos.v1.TransactionList
+    doc: |
+      `filtered_trx_by_events` reads from `all_transactions` and applies a filter on the event types and attribute keys, 
+      outputing the complete transactions that have at least one event matching the filter.
+      Example usage: `type:injective.peggy.v1.EventDepositClaim || (type:wasm && attr:_contract_address)`
+
+  - name: filtered_events_by_attribute_value
+    kind: map
+    inputs:
+      - params: string
+      - map: all_events
+    output:
+      type: proto:sf.substreams.cosmos.v1.EventList
+    doc: |
+      `filtered_events_by_attribute_value` reads from `all_events` and applies a filter on the event types, attribute keys and values,
+      only outputing the events that match the filter. 
+      Example usage: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
+
+      To use this module with an index, import it and override it with the `use:` parameter, setting blockFilter.Query.String to a query
+      that matches the event type and attribute keys only (ex: `type:wasm && attr:_contract_address`)
+
+  - name: filtered_event_groups_by_attribute_value
+    kind: map
+    inputs:
+      - params: string
+      - map: all_events
+    output:
+      type: proto:sf.substreams.cosmos.v1.EventList
+    doc: |
+      `filtered_events_groups_by_attribute_value` reads from `all_events` and applies a filter on the event types, attribute keys and values,
+      outputing all the events from transactions that have at least one event matching the filter.
+      Example usage: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
+
+      To use this module with an index, import it and override it with the `use:` parameter, setting blockFilter.Query.String to a query
+      that matches the event type and attribute keys only (ex: `type:wasm && attr:_contract_address`)
+
+  - name: filtered_trx_by_events_attribute_value
+    kind: map
+    inputs:
+      - params: string
+      - map: all_events
+      - map: all_transactions
+    output:
+      type: proto:sf.substreams.cosmos.v1.TransactionList
+    doc: |
+      `filtered_trx_by_events_attribute_value` reads from `all_events` and applies a filter on the event types, attribute keys and values,
+      outputing the complete transactions that have at least one event matching the filter.
+      Example usage: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
+
+      To use this module with an index, import it and override it with the `use:` parameter, setting blockFilter.Query.String to a query
+      that matches the event type and attribute keys only (ex: `type:wasm && attr:_contract_address`)
 
 params:
-  filtered_events: "message"
+  filtered_events: "(type:message && attr:action) || (type:wasm && attr:_contract_address)"
+  filtered_event_groups: "type:wasm && attr:_contract_address"
+  filtered_trx_by_events: "type:wasm"
+  filtered_events_by_attribute_value: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
+  filtered_event_groups_by_attribute_value: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
+  filtered_trx_by_events_attribute_value: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"

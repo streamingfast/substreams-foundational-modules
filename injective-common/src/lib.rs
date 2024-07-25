@@ -1,6 +1,7 @@
 mod pb;
 
 use core::panic;
+use std::collections::HashMap;
 
 use crate::pb::cosmos::authz::v1beta1::MsgExec;
 use crate::pb::cosmos::bank::v1beta1::MsgMultiSend;
@@ -99,6 +100,277 @@ pub fn all_transactions(block: Block) -> Result<TransactionList, Error> {
             number: block.height as u64,
             timestamp: block.time,
         }),
+    })
+}
+
+#[substreams::handlers::map]
+pub fn all_events(block: Block) -> Result<EventList, Error> {
+    // Mutable list to add the output of the Substreams
+    let mut events: Vec<Event> = Vec::new();
+
+    if block.txs.len() != block.tx_results.len() {
+        return Err(anyhow!("Transaction list and result list do not match"));
+    }
+
+    // block events are the combination of BeginBlockEvents and EndBlockEvents 
+    events.extend(block.events.into_iter().map(|event| {
+        return Event {
+            event: Some(event),
+            transaction_hash: "".to_string(),
+        };
+    }));
+
+    for (i, tx_result) in block.tx_results.into_iter().enumerate() {
+        let tx_hash = compute_tx_hash(block.txs.get(i).unwrap());
+
+        let block_events: Vec<Event> = tx_result
+            .events
+            .into_iter()
+            .map(|event| {
+                return Event {
+                    event: Some(event),
+                    transaction_hash: tx_hash.clone(),
+                };
+            })
+            .collect();
+
+        events.extend(block_events);
+    }
+
+    Ok(EventList {
+        events: events,
+        clock: Some(Clock {
+            id: hex::encode(block.hash),
+            number: block.height as u64,
+            timestamp: block.time,
+        }),
+    })
+}
+
+#[substreams::handlers::map]
+fn index_events(events: EventList) -> Result<Keys, Error> {
+    let mut keys = Keys::default();
+
+    events.events.into_iter().for_each(|e| {
+        if let Some(ev) = e.event {
+            keys.keys.push(format!("type:{}", ev.r#type));
+            ev.attributes.into_iter().for_each(|attr| {
+                keys.keys.push(format!("attr:{}", attr.key));
+            });
+        }
+    });
+
+    Ok(keys)
+}
+
+#[substreams::handlers::map]
+fn filtered_events(query: String, events: EventList) -> Result<EventList, Error> {
+    let filtered: Vec<Event> = events
+        .events
+        .into_iter()
+        .filter(|e| {
+            if let Some(ev) = &e.event {
+                let mut keys = Vec::new();
+                keys.push(format!("type:{}", ev.r#type.clone()));
+                ev.attributes.iter().for_each(|attr| {
+                    keys.push(format!("attr:{}", attr.key));
+                });
+                matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
+            } else {
+                false
+            }
+        })
+        .collect();
+
+    if filtered.len() == 0 {
+        return Ok(EventList::default());
+    }
+    Ok(EventList {
+        events: filtered,
+        clock: events.clock,
+    })
+}
+
+#[substreams::handlers::map]
+fn filtered_event_groups(query: String, events: EventList) -> Result<EventList, Error> {
+    let matching_trx_hashes= events
+        .events
+        .iter()
+        .filter(|e| {
+            if let Some(ev) = &e.event {
+                let mut keys = Vec::new();
+                keys.push(format!("type:{}", ev.r#type.clone()));
+                ev.attributes.iter().for_each(|attr| {
+                    keys.push(format!("attr:{}", attr.key));
+                });
+                matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
+            } else {
+                false
+            }
+        })
+        .map(|e| (e.transaction_hash.to_string(), true))
+        .collect::<HashMap<String, bool>>();
+
+    let filtered: Vec<Event> = events
+        .events
+        .into_iter()
+        .filter(|e| {
+            matching_trx_hashes.contains_key(e.transaction_hash.as_str())
+        })
+        .collect();
+
+    if filtered.len() == 0 {
+        return Ok(EventList::default());
+    }
+    Ok(EventList {
+        events: filtered,
+        clock: events.clock,
+    })
+}
+
+#[substreams::handlers::map]
+fn filtered_trx_by_events(query: String, trxs: TransactionList) -> Result<TransactionList, Error> {
+    let events = trxs.transactions.iter().map(|t| {
+        t.result_events.iter().map(|e| {
+            Event {
+                transaction_hash: t.hash.clone(),
+                event: Some(e.clone()),
+            }
+        })
+    }).flatten().collect::<Vec<_>>();
+
+    let matching_trx_hashes= events
+        .iter()
+        .filter(|e| {
+            if let Some(ev) = &e.event {
+                let mut keys = Vec::new();
+                keys.push(format!("type:{}", ev.r#type.clone()));
+                ev.attributes.iter().for_each(|attr| {
+                    keys.push(format!("attr:{}", attr.key));
+                });
+                matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
+            } else {
+                false
+            }
+        })
+        .map(|e| (e.transaction_hash.to_string(), true))
+        .collect::<HashMap<String, bool>>();
+
+    let transactions: Vec<Transaction> = trxs
+        .transactions
+        .into_iter()
+        .filter(|t| matching_trx_hashes.contains_key(t.hash.as_str()))
+        .collect();
+
+    if transactions.len() == 0 {
+        return Ok(TransactionList::default());
+    }
+    Ok(TransactionList {
+        transactions: transactions,
+        clock: trxs.clock,
+    })
+}
+
+#[substreams::handlers::map]
+fn filtered_events_by_attribute_value(query: String, events: EventList) -> Result<EventList, Error> {
+    let filtered: Vec<Event> = events
+        .events
+        .into_iter()
+        .filter(|e| {
+            if let Some(ev) = &e.event {
+                let mut keys = Vec::new();
+                keys.push(format!("type:{}", ev.r#type.clone()));
+                ev.attributes.iter().for_each(|attr| {
+                    keys.push(format!("attr:{}", attr.key));
+                    keys.push(format!("attr:{}:{}", attr.key, attr.value));
+                });
+                matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
+            } else {
+                false
+            }
+        })
+        .collect();
+
+    if filtered.len() == 0 {
+        return Ok(EventList::default());
+    }
+    Ok(EventList {
+        events: filtered,
+        clock: events.clock,
+    })
+}
+
+#[substreams::handlers::map]
+fn filtered_event_groups_by_attribute_value(query: String, events: EventList) -> Result<EventList, Error> {
+    let matching_trx_hashes= events
+        .events
+        .iter()
+        .filter(|e| {
+            if let Some(ev) = &e.event {
+                let mut keys = Vec::new();
+                keys.push(format!("type:{}", ev.r#type.clone()));
+                ev.attributes.iter().for_each(|attr| {
+                    keys.push(format!("attr:{}", attr.key));
+                    keys.push(format!("attr:{}:{}", attr.key, attr.value));
+                });
+                matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
+            } else {
+                false
+            }
+        })
+        .map(|e| (e.transaction_hash.to_string(), true))
+        .collect::<HashMap<String, bool>>();
+
+    let filtered: Vec<Event> = events
+        .events
+        .into_iter()
+        .filter(|e| {
+            matching_trx_hashes.contains_key(e.transaction_hash.as_str())
+        })
+        .collect();
+
+    if filtered.len() == 0 {
+        return Ok(EventList::default());
+    }
+    Ok(EventList {
+        events: filtered,
+        clock: events.clock,
+    })
+}
+
+#[substreams::handlers::map]
+fn filtered_trx_by_events_attribute_value(query: String, events: EventList, trxs: TransactionList) -> Result<TransactionList, Error> {
+    let matching_trx_hashes= events
+        .events
+        .iter()
+        .filter(|e| {
+            if let Some(ev) = &e.event {
+                let mut keys = Vec::new();
+                keys.push(format!("type:{}", ev.r#type.clone()));
+                ev.attributes.iter().for_each(|attr| {
+                    keys.push(format!("attr:{}", attr.key));
+                    keys.push(format!("attr:{}:{}", attr.key, attr.value));
+                });
+                matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
+            } else {
+                false
+            }
+        })
+        .map(|e| (e.transaction_hash.to_string(), true))
+        .collect::<HashMap<String, bool>>();
+
+    let transactions: Vec<Transaction> = trxs
+        .transactions
+        .into_iter()
+        .filter(|t| matching_trx_hashes.contains_key(t.hash.as_str()))
+        .collect();
+
+    if transactions.len() == 0 {
+        return Ok(TransactionList::default());
+    }
+    Ok(TransactionList {
+        transactions: transactions,
+        clock: trxs.clock,
     })
 }
 
@@ -260,75 +532,4 @@ fn compute_tx_hash(tx_as_bytes: &[u8]) -> String {
     hasher.update(tx_as_bytes);
     let tx_hash = hasher.finalize();
     return hex::encode(tx_hash);
-}
-
-#[substreams::handlers::map]
-pub fn all_events(block: Block) -> Result<EventList, Error> {
-    // Mutable list to add the output of the Substreams
-    let mut events: Vec<Event> = Vec::new();
-
-    if block.txs.len() != block.tx_results.len() {
-        return Err(anyhow!("Transaction list and result list do not match"));
-    }
-
-    for (i, tx_result) in block.tx_results.into_iter().enumerate() {
-        let tx_hash = compute_tx_hash(block.txs.get(i).unwrap());
-
-        let block_events: Vec<Event> = tx_result
-            .events
-            .into_iter()
-            .map(|event| {
-                return Event {
-                    event: Some(event),
-                    transaction_hash: tx_hash.clone(),
-                };
-            })
-            .collect();
-
-        events.extend(block_events);
-    }
-
-    Ok(EventList {
-        events: events,
-        clock: Some(Clock {
-            id: hex::encode(block.hash),
-            number: block.height as u64,
-            timestamp: block.time,
-        }),
-    })
-}
-
-#[substreams::handlers::map]
-fn index_events(events: EventList) -> Result<Keys, Error> {
-    let mut keys = Keys::default();
-
-    events.events.into_iter().for_each(|e| {
-        if let Some(ev) = e.event {
-            keys.keys.push(ev.r#type);
-        }
-    });
-
-    Ok(keys)
-}
-
-#[substreams::handlers::map]
-fn filtered_events(query: String, events: EventList) -> Result<EventList, Error> {
-    let filtered: Vec<Event> = events
-        .events
-        .into_iter()
-        .filter(|e| {
-            if let Some(ev) = &e.event {
-                let mut keys = Vec::new();
-                keys.push(ev.r#type.clone());
-                matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
-            } else {
-                false
-            }
-        })
-        .collect();
-
-    Ok(EventList {
-        events: filtered,
-        clock: events.clock,
-    })
 }

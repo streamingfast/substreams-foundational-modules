@@ -1,0 +1,43 @@
+# requires substreams v1.7.1 and above
+specVersion: v0.1.0
+package:
+  name: example
+  version: v0.1.0
+
+network: injective-mainnet
+
+imports:
+  injective: ./injective-common-v0.2.1.spkg
+
+modules:
+  - name: my_events
+    use: injective:filtered_events_by_attribute_value
+    initialBlock: 70000000
+    blockFilter:
+      module: injective:index_events
+      query:
+        string: type:wasm && attr:_contract_address
+
+  - name: my_event_groups
+    use: injective:filtered_event_groups_by_attribute_value
+    initialBlock: 70000000
+    blockFilter:
+      module: injective:index_events
+      query:
+        string: type:wasm && attr:_contract_address
+
+  - name: my_transactions
+    use: injective:filtered_trx_by_events_attribute_value
+    initialBlock: 70000000
+    blockFilter:
+      module: injective:index_events
+      query:
+        string: type:wasm && attr:_contract_address
+
+params:
+  my_events: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
+  #my_events: "type:wasm && attr:_contract_address:inj1ja2z7lhtpq7myj9vv936euwepzw9hppd2fd5t0"
+  my_event_groups: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
+  #my_event_groups: "type:wasm && attr:_contract_address:inj1ja2z7lhtpq7myj9vv936euwepzw9hppd2fd5t0"
+  my_transactions: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
+  #my_transactions: "type:wasm && attr:_contract_address:inj1ja2z7lhtpq7myj9vv936euwepzw9hppd2fd5t0"
