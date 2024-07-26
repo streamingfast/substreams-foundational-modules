@@ -1,21 +1,22 @@
 use std::collections::HashSet;
 
-use crate::actions::action_keys;
-use substreams::matches_keys_in_parsed_expr;
+use substreams::{errors::Error, matches_keys_in_parsed_expr};
 use substreams_antelope::{
-    pb::{ActionTraces, TransactionTraces},
+    pb::{ActionTrace, ActionTraces, TransactionTraces},
     Block,
 };
 
+use crate::index::{action_keys, action_keys_extra};
+
 #[substreams::handlers::map]
-fn all_transactions(block: Block) -> Result<TransactionTraces, substreams::errors::Error> {
+fn all_transactions(block: Block) -> Result<TransactionTraces, Error> {
     Ok(TransactionTraces {
         transaction_traces: block.into_transaction_traces().collect(),
     })
 }
 
 #[substreams::handlers::map]
-fn all_actions(transactions: TransactionTraces) -> Result<ActionTraces, substreams::errors::Error> {
+fn all_actions(transactions: TransactionTraces) -> Result<ActionTraces, Error> {
     let action_traces = transactions
         .transaction_traces
         .into_iter()
@@ -26,15 +27,44 @@ fn all_actions(transactions: TransactionTraces) -> Result<ActionTraces, substrea
 }
 
 #[substreams::handlers::map]
-fn filtered_actions(
+fn filtered_actions(query: String, actions: ActionTraces) -> Result<ActionTraces, Error> {
+    filter_actions(query, actions, action_keys)
+}
+
+#[substreams::handlers::map]
+fn filtered_actions_extra(query: String, actions: ActionTraces) -> Result<ActionTraces, Error> {
+    filter_actions(query, actions, action_keys_extra)
+}
+
+#[substreams::handlers::map]
+fn filtered_transactions(
+    query: String,
+    transactions: TransactionTraces,
+) -> Result<TransactionTraces, Error> {
+    filter_transactions(query, transactions, action_keys)
+}
+
+#[substreams::handlers::map]
+fn filtered_transactions_extra(
+    query: String,
+    transactions: TransactionTraces,
+) -> Result<TransactionTraces, Error> {
+    filter_transactions(query, transactions, action_keys_extra)
+}
+
+fn filter_actions<F>(
     query: String,
     actions: ActionTraces,
-) -> Result<ActionTraces, substreams::errors::Error> {
+    key_extractor: F,
+) -> Result<ActionTraces, Error>
+where
+    F: Fn(&ActionTrace) -> Vec<String>,
+{
     let action_traces = actions
         .action_traces
         .into_iter()
         .filter(|action| {
-            let keys = action_keys(action);
+            let keys = key_extractor(action);
 
             // will panic if the query is invalid
             matches_keys_in_parsed_expr(&keys, &query).unwrap()
@@ -44,11 +74,14 @@ fn filtered_actions(
     Ok(ActionTraces { action_traces })
 }
 
-#[substreams::handlers::map]
-fn filtered_transactions(
+fn filter_transactions<F>(
     query: String,
     transactions: TransactionTraces,
-) -> Result<TransactionTraces, substreams::errors::Error> {
+    key_extractor: F,
+) -> Result<TransactionTraces, Error>
+where
+    F: Fn(&ActionTrace) -> Vec<String>,
+{
     let transaction_traces = transactions
         .transaction_traces
         .into_iter()
@@ -56,7 +89,7 @@ fn filtered_transactions(
             let keys = trx
                 .action_traces
                 .iter()
-                .flat_map(action_keys)
+                .flat_map(&key_extractor)
                 .collect::<HashSet<_>>()
                 .into_iter()
                 .collect::<Vec<_>>();
