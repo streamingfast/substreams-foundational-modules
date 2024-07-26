@@ -34,7 +34,7 @@ where
 
 // i.e. https://docs.dfuse.eosnation.io/eosio/public-apis/reference/search/terms/
 pub fn action_keys_extra(trace: &ActionTrace) -> Vec<String> {
-    let action = trace.action.as_ref().unwrap();
+    let action = trace.action.as_ref().expect("invalid action trace");
     if action.account == "eosio" && action.name == "onblock" {
         return vec![];
     }
@@ -53,7 +53,7 @@ pub fn action_keys_extra(trace: &ActionTrace) -> Vec<String> {
     keys.extend(
         json_data
             .as_object()
-            .unwrap()
+            .expect("json_data must be an object")
             .iter()
             .filter_map(|(key, value)| match value {
                 Value::String(value) => Some(format!("data.{}:{}", key, value)),
@@ -83,7 +83,7 @@ pub fn action_keys_extra(trace: &ActionTrace) -> Vec<String> {
 }
 
 pub fn action_keys(trace: &ActionTrace) -> Vec<String> {
-    let action = trace.action.as_ref().unwrap();
+    let action = trace.action.as_ref().expect("invalid action trace");
     if action.account == "eosio" && action.name == "onblock" {
         return vec![];
     }
