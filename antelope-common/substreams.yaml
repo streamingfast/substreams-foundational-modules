@@ -138,7 +138,7 @@ modules:
       Example: `code:eosio.token && action:transfer && (data.to:myaccount || data.from:myaccount)`
 
 params:
-  filtered_transactions: "code:eosio.token && action:transfer"
-  filtered_actions: "code:eosio.token && action:transfer"
-  filtered_transactions_extra: "code:eosio.token && action:transfer"
-  filtered_actions_extra: "code:eosio.token && action:transfer"
+  filtered_transactions: "code:eosio"
+  filtered_actions: "code:eosio"
+  filtered_transactions_extra: "code:eosio"
+  filtered_actions_extra: "code:eosio"
