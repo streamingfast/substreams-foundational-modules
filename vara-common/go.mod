@@ -6,6 +6,7 @@ require github.com/centrifuge/go-substrate-rpc-client/v4 v4.2.1
 
 require (
 	github.com/deckarep/golang-set v1.8.0 // indirect
+	github.com/gobeam/stringy v0.0.7 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/holiman/uint256 v1.2.4 // indirect
 	github.com/rs/cors v1.10.0 // indirect
@@ -26,7 +27,7 @@ require (
 	github.com/mimoo/StrobeGo v0.0.0-20220103164710-9a04d6ca976b // indirect
 	github.com/pierrec/xxHash v0.1.5 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/streamingfast/firehose-gear v0.0.0-20240729184623-81bb516d50f3
+	github.com/streamingfast/firehose-gear v0.0.0-20240730224010-458d076627a8
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/vedhavyas/go-subkey/v2 v2.0.0 // indirect
