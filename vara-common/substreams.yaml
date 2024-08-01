@@ -3,13 +3,6 @@ package:
   name: mytinytest
   version: v0.1.0
 
-protobuf:
-  files:
-    - block.proto
-    - extrinsics.proto
-  importPaths:
-    - ./proto
-
 binaries:
   default:
     type: wasip1/tinygo-v1  # wasm/rust-v1
@@ -20,8 +13,8 @@ network: vara-mainnet
 modules:
   - name: map_decoded_block
     kind: map
-    initialBlock: 12360600
+    initialBlock: 0
     inputs:
       - source: sf.gear.type.v1.Block
     output:
-      type: proto:sf.gear.type.v1.DecodedBlock
+      type: proto:sf.gear.decoded.type.v1.DecodedBlock

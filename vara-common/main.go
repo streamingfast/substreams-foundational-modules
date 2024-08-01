@@ -8,41 +8,58 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/parser"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	pbdecodedgear "github.com/streamingfast/firehose-gear/pb/sf/gear/decoded/type/v1"
 	pbgear "github.com/streamingfast/firehose-gear/pb/sf/gear/type/v1"
 )
 
 // this will actually return a decodedBlock containing all the decoded calls and events
-func map_decoded_block(block *pbgear.Block) (*pbgear.Block, error) {
+func map_decoded_block(block *pbgear.Block) (*pbdecodedgear.DecodedBlock, error) {
 	factory := registry.NewFactory()
 	callRegistry, err := factory.CreateCallRegistry(metadata)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create call registry: %w", err)
 	}
 
-	decodedExtrinsic := make([]registry.DecodedFields, 0)
+	decodedExtrinsicFields := make([]registry.DecodedFields, 0)
 	for _, extrinsic := range block.Extrinsics {
 		decodedField, err := decodeCallExtrinsics(callRegistry, extrinsic)
 		if err != nil {
 			return nil, fmt.Errorf("failed to decode extrinsic: %w", err)
 		}
-		decodedExtrinsic = append(decodedExtrinsic, decodedField)
+		decodedExtrinsicFields = append(decodedExtrinsicFields, decodedField)
 	}
 
-	eventRegistry, err := factory.CreateEventRegistry(metadata)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create event registry: %w", err)
-	}
+	// eventRegistry, err := factory.CreateEventRegistry(metadata)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to create event registry: %w", err)
+	// }
 
-	decodedEvents, err := decodeEvents(eventRegistry, block.RawEvents)
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode events: %w", err)
-	}
-	_ = decodedEvents
+	// decodedEvents, err := decodeEvents(eventRegistry, block.RawEvents)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to decode events: %w", err)
+	// }
 
-	// TODO: here we want to call the code from the gen_types.go and decode the extrinsics and events
-	// then we want to return *pbgear.DecodedBlock containing the decoded calls and events
+	// decodedExtrinsics, err := decodeExtrinsics(decodedExtrinsicFields)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to decode extrinsics: %w", err)
+	// }
+	// Logf("coucou")
 
-	return nil, nil
+	// metadata := load_metadata()
+	// _ = metadata
+
+	return &pbdecodedgear.DecodedBlock{
+		Number:        block.Number,
+		Hash:          block.Hash,
+		Header:        block.Header,
+		Extrinsics:    block.Extrinsics,
+		Events:        block.Events,
+		DigestItems:   block.DigestItems,
+		Justification: block.Justification,
+		RawEvents:     block.RawEvents,
+		// DecodedExtrinsics: decodedExtrinsics,
+		// TODO: add the DecodedEvents also
+	}, nil
 }
 
 func decodeCallExtrinsics(callRegistry registry.CallRegistry, extrinsic *pbgear.Extrinsic) (registry.DecodedFields, error) {
@@ -50,7 +67,7 @@ func decodeCallExtrinsics(callRegistry registry.CallRegistry, extrinsic *pbgear.
 	args := extrinsic.Method.Args
 
 	callDecoder, ok := callRegistry[convertCallIndex(callIndex)]
-	if ok != true {
+	if !ok {
 		return nil, fmt.Errorf("failed to get call decoder")
 	}
 
@@ -69,6 +86,21 @@ func convertCallIndex(ci *pbgear.CallIndex) types.CallIndex {
 		SectionIndex: uint8(ci.SectionIndex),
 		MethodIndex:  uint8(ci.MethodIndex),
 	}
+}
+
+func decodeExtrinsics(decodedExtrinsicFields []registry.DecodedFields) ([]*pbdecodedgear.DecodedExtrinsic, error) {
+	var decodedExtrinsics []*pbdecodedgear.DecodedExtrinsic
+
+	for _, decodedFields := range decodedExtrinsicFields {
+		_ = decodedFields
+		decodedExtrinsic := &pbdecodedgear.DecodedExtrinsic{
+			Call: nil,
+		}
+
+		decodedExtrinsics = append(decodedExtrinsics, decodedExtrinsic)
+	}
+
+	return decodedExtrinsics, nil
 }
 
 func decodeEvents(eventRegistry registry.EventRegistry, storageEvents []byte) ([]*parser.Event, error) {
