@@ -14,20 +14,23 @@ import (
 
 // this will actually return a decodedBlock containing all the decoded calls and events
 func map_decoded_block(block *pbgear.Block) (*pbdecodedgear.DecodedBlock, error) {
+	metadata := loadMetadata()
 	factory := registry.NewFactory()
 	callRegistry, err := factory.CreateCallRegistry(metadata)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create call registry: %w", err)
 	}
 
-	decodedExtrinsicFields := make([]registry.DecodedFields, 0)
-	for _, extrinsic := range block.Extrinsics {
-		decodedField, err := decodeCallExtrinsics(callRegistry, extrinsic)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decode extrinsic: %w", err)
-		}
-		decodedExtrinsicFields = append(decodedExtrinsicFields, decodedField)
-	}
+	_ = callRegistry
+
+	// decodedExtrinsicFields := make([]registry.DecodedFields, 0)
+	// for _, extrinsic := range block.Extrinsics {
+	// 	decodedField, err := decodeCallExtrinsics(callRegistry, extrinsic)
+	// 	if err != nil {
+	// 		return nil, fmt.Errorf("failed to decode extrinsic: %w", err)
+	// 	}
+	// 	decodedExtrinsicFields = append(decodedExtrinsicFields, decodedField)
+	// }
 
 	// eventRegistry, err := factory.CreateEventRegistry(metadata)
 	// if err != nil {
@@ -44,9 +47,6 @@ func map_decoded_block(block *pbgear.Block) (*pbdecodedgear.DecodedBlock, error)
 	// 	return nil, fmt.Errorf("failed to decode extrinsics: %w", err)
 	// }
 	// Logf("coucou")
-
-	// metadata := load_metadata()
-	// _ = metadata
 
 	return &pbdecodedgear.DecodedBlock{
 		Number:        block.Number,
