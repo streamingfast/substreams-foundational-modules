@@ -148,11 +148,6 @@ func toFields(in any, metadata *types.Metadata) *pbvara.Fields {
 			panic("expected an array of 1 element")
 		}
 		fields = i[0].(registry.DecodedFields)
-	//case uint8:
-	//	if i == 0 {
-	//		return &pbvara.Fields{}
-	//	}
-	//	panic(fmt.Sprintf("zero mean that we got no fields. got %d that make no sence", i))
 	case nil:
 		return &pbvara.Fields{}
 	default:
@@ -266,6 +261,7 @@ func toValue(decodedField *registry.DecodedField, metadata *types.Metadata) *pbv
 				panic(fmt.Sprintf("variant not found for: %d", wtf.VariantByte))
 			}
 		case uint8: //this is an enum
+			//todo: we should add a enum type with both name and index
 			for _, variant := range lookupType.Def.Variant.Variants {
 				if byte(variant.Index) == decodedField.Value {
 					value.Typed = &pbvara.Value_String_{
@@ -472,62 +468,6 @@ func toPrimitiveValue(in *types.Si1Type, value any) *pbvara.Value {
 	}
 	return val
 }
-
-//func decodeEvents(eventRegistry registry.EventRegistry, storageEvents []byte) ([]*parser.Event, error) {
-//	decoder := scale.NewDecoder(bytes.NewReader(storageEvents))
-//
-//	eventsCount, err := decoder.DecodeUintCompact()
-//	if err != nil {
-//		return nil, fmt.Errorf("failed to decode events count: %w", err)
-//	}
-//
-//	var events []*parser.Event
-//
-//	for i := uint64(0); i < eventsCount.Uint64(); i++ {
-//		var phase types.Phase
-//
-//		err := decoder.Decode(&phase)
-//		if err != nil {
-//			return nil, fmt.Errorf("failed to decode phase: %w", err)
-//		}
-//
-//		var eventID types.EventID
-//
-//		err = decoder.Decode(&eventID)
-//		if err != nil {
-//			return nil, fmt.Errorf("failed to decode event ID: %w", err)
-//		}
-//
-//		eventDecoder, ok := eventRegistry[eventID]
-//		if !ok {
-//			return nil, fmt.Errorf("failed to get event decoder")
-//		}
-//
-//		eventFields, err := eventDecoder.Decode(decoder)
-//		if err != nil {
-//			return nil, fmt.Errorf("failed to decode event fields: %w", err)
-//		}
-//
-//		var topics []types.Hash
-//
-//		err = decoder.Decode(&topics)
-//		if err != nil {
-//			return nil, fmt.Errorf("failed to decode topics: %w", err)
-//		}
-//
-//		event := &parser.Event{
-//			Name:    eventDecoder.Name,
-//			Fields:  eventFields,
-//			EventID: eventID,
-//			Phase:   &phase,
-//			Topics:  topics,
-//		}
-//
-//		events = append(events, event)
-//	}
-//
-//	return events, nil
-//}
 
 func ToCallIndex(ci *pbgear.CallIndex) types.CallIndex {
 	return types.CallIndex{
