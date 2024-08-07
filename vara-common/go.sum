@@ -18,8 +18,6 @@ github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 h1:HbphB4TFFXpv7MNrT52FGrrgVXF1
 github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0/go.mod h1:DZGJHZMqrU4JJqFAWUS2UO1+lbSKsdiOoYi9Zzey7Fc=
 github.com/ethereum/go-ethereum v1.13.8 h1:1od+thJel3tM52ZUNQwvpYOeRHlbkVFZ5S8fhi0Lgsg=
 github.com/ethereum/go-ethereum v1.13.8/go.mod h1:sc48XYQxCzH3fG9BcrXCOOgQk2JfZzNAmIKnceogzsA=
-github.com/gobeam/stringy v0.0.7 h1:TD8SfhedUoiANhW88JlJqfrMsihskIRpU/VTsHGnAps=
-github.com/gobeam/stringy v0.0.7/go.mod h1:W3620X9dJHf2FSZF5fRnWekHcHQjwmCz8ZQ2d1qloqE=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/gtank/merlin v0.1.1-0.20191105220539-8318aed1a79f/go.mod h1:T86dnYJhcGOh5BjZFCJWTDeTK7XW8uE+E21Cy/bIQ+s=
@@ -42,8 +40,6 @@ github.com/streamingfast/firehose-gear v0.0.0-20240801184131-b94c4ba58381 h1:yYM
 github.com/streamingfast/firehose-gear v0.0.0-20240801184131-b94c4ba58381/go.mod h1:+wP3t4lTTQPkuaqLHVli9NVQcKbbvu5BVBMlDI0aviU=
 github.com/streamingfast/go-substrate-rpc-client/v4 v4.0.0-20240801195649-1435d6f2534e h1:Zn6XjUd4utfv620tkVeLBJJ78q0ydJIsiTQT9Wzsf+E=
 github.com/streamingfast/go-substrate-rpc-client/v4 v4.0.0-20240801195649-1435d6f2534e/go.mod h1:zFQ78PTKtg+cjMRxZn0c1N4QVd8kMuofeRCGZVlZWa0=
-github.com/streamingfast/substreams-gear v0.1.1-0.20240801201633-6759e61f711c h1:nqMvLVbI6Khes19fbTgxowQGThqM0pJDBq1/GVuzFjg=
-github.com/streamingfast/substreams-gear v0.1.1-0.20240801201633-6759e61f711c/go.mod h1:cknCkAI1ymKO0bIt6YNoOOTZzuMQY1+z+p3nfSyOoIU=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=

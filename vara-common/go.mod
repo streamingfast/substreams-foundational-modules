@@ -5,9 +5,7 @@ go 1.22.0
 replace github.com/centrifuge/go-substrate-rpc-client/v4 => github.com/streamingfast/go-substrate-rpc-client/v4 v4.0.0-20240801195649-1435d6f2534e
 
 require (
-	github.com/centrifuge/go-substrate-rpc-client v1.1.0
 	github.com/centrifuge/go-substrate-rpc-client/v4 v4.2.1
-	github.com/gobeam/stringy v0.0.7
 	github.com/stretchr/testify v1.8.4
 )
 
@@ -26,6 +24,7 @@ require (
 
 require (
 	github.com/ChainSafe/go-schnorrkel v1.0.0 // indirect
+	github.com/centrifuge/go-substrate-rpc-client v1.1.0
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/decred/base58 v1.0.4 // indirect
 	github.com/decred/dcrd/crypto/blake256 v1.0.0 // indirect

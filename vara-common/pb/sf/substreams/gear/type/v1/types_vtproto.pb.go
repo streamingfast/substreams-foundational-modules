@@ -27,11 +27,17 @@ func (m *Block) CloneVT() *Block {
 	}
 	r := new(Block)
 	r.Number = m.Number
-	r.Header = m.Header.CloneVT()
 	if rhs := m.Hash; rhs != nil {
 		tmpBytes := make([]byte, len(rhs))
 		copy(tmpBytes, rhs)
 		r.Hash = tmpBytes
+	}
+	if rhs := m.Header; rhs != nil {
+		if vtpb, ok := interface{}(rhs).(interface{ CloneVT() *v1.Header }); ok {
+			r.Header = vtpb.CloneVT()
+		} else {
+			r.Header = proto.Clone(rhs).(*v1.Header)
+		}
 	}
 	if rhs := m.Extrinsics; rhs != nil {
 		tmpContainer := make([]*Extrinsic, len(rhs))
@@ -50,7 +56,11 @@ func (m *Block) CloneVT() *Block {
 	if rhs := m.DigestItems; rhs != nil {
 		tmpContainer := make([]*v1.DigestItem, len(rhs))
 		for k, v := range rhs {
-			tmpContainer[k] = v.CloneVT()
+			if vtpb, ok := interface{}(v).(interface{ CloneVT() *v1.DigestItem }); ok {
+				tmpContainer[k] = vtpb.CloneVT()
+			} else {
+				tmpContainer[k] = proto.Clone(v).(*v1.DigestItem)
+			}
 		}
 		r.DigestItems = tmpContainer
 	}
@@ -76,8 +86,14 @@ func (m *Extrinsic) CloneVT() *Extrinsic {
 	}
 	r := new(Extrinsic)
 	r.Version = m.Version
-	r.Signature = m.Signature.CloneVT()
 	r.Call = m.Call.CloneVT()
+	if rhs := m.Signature; rhs != nil {
+		if vtpb, ok := interface{}(rhs).(interface{ CloneVT() *v1.Signature }); ok {
+			r.Signature = vtpb.CloneVT()
+		} else {
+			r.Signature = proto.Clone(rhs).(*v1.Signature)
+		}
+	}
 	if len(m.unknownFields) > 0 {
 		r.unknownFields = make([]byte, len(m.unknownFields))
 		copy(r.unknownFields, m.unknownFields)
@@ -278,7 +294,11 @@ func (this *Block) EqualVT(that *Block) bool {
 	if string(this.Hash) != string(that.Hash) {
 		return false
 	}
-	if !this.Header.EqualVT(that.Header) {
+	if equal, ok := interface{}(this.Header).(interface{ EqualVT(*v1.Header) bool }); ok {
+		if !equal.EqualVT(that.Header) {
+			return false
+		}
+	} else if !proto.Equal(this.Header, that.Header) {
 		return false
 	}
 	if len(this.Extrinsics) != len(that.Extrinsics) {
@@ -327,7 +347,11 @@ func (this *Block) EqualVT(that *Block) bool {
 			if q == nil {
 				q = &v1.DigestItem{}
 			}
-			if !p.EqualVT(q) {
+			if equal, ok := interface{}(p).(interface{ EqualVT(*v1.DigestItem) bool }); ok {
+				if !equal.EqualVT(q) {
+					return false
+				}
+			} else if !proto.Equal(p, q) {
 				return false
 			}
 		}
@@ -354,7 +378,11 @@ func (this *Extrinsic) EqualVT(that *Extrinsic) bool {
 	if this.Version != that.Version {
 		return false
 	}
-	if !this.Signature.EqualVT(that.Signature) {
+	if equal, ok := interface{}(this.Signature).(interface{ EqualVT(*v1.Signature) bool }); ok {
+		if !equal.EqualVT(that.Signature) {
+			return false
+		}
+	} else if !proto.Equal(this.Signature, that.Signature) {
 		return false
 	}
 	if !this.Call.EqualVT(that.Call) {
@@ -700,12 +728,24 @@ func (m *Block) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	}
 	if len(m.DigestItems) > 0 {
 		for iNdEx := len(m.DigestItems) - 1; iNdEx >= 0; iNdEx-- {
-			size, err := m.DigestItems[iNdEx].MarshalToSizedBufferVT(dAtA[:i])
-			if err != nil {
-				return 0, err
+			if vtmsg, ok := interface{}(m.DigestItems[iNdEx]).(interface {
+				MarshalToSizedBufferVT([]byte) (int, error)
+			}); ok {
+				size, err := vtmsg.MarshalToSizedBufferVT(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			} else {
+				encoded, err := proto.Marshal(m.DigestItems[iNdEx])
+				if err != nil {
+					return 0, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			}
-			i -= size
-			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
 			i--
 			dAtA[i] = 0x32
 		}
@@ -735,12 +775,24 @@ func (m *Block) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		}
 	}
 	if m.Header != nil {
-		size, err := m.Header.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
+		if vtmsg, ok := interface{}(m.Header).(interface {
+			MarshalToSizedBufferVT([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVT(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.Header)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
 		}
-		i -= size
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -800,12 +852,24 @@ func (m *Extrinsic) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		dAtA[i] = 0x1a
 	}
 	if m.Signature != nil {
-		size, err := m.Signature.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
+		if vtmsg, ok := interface{}(m.Signature).(interface {
+			MarshalToSizedBufferVT([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVT(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.Signature)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
 		}
-		i -= size
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -1225,12 +1289,24 @@ func (m *Block) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	}
 	if len(m.DigestItems) > 0 {
 		for iNdEx := len(m.DigestItems) - 1; iNdEx >= 0; iNdEx-- {
-			size, err := m.DigestItems[iNdEx].MarshalToSizedBufferVTStrict(dAtA[:i])
-			if err != nil {
-				return 0, err
+			if vtmsg, ok := interface{}(m.DigestItems[iNdEx]).(interface {
+				MarshalToSizedBufferVTStrict([]byte) (int, error)
+			}); ok {
+				size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			} else {
+				encoded, err := proto.Marshal(m.DigestItems[iNdEx])
+				if err != nil {
+					return 0, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			}
-			i -= size
-			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
 			i--
 			dAtA[i] = 0x32
 		}
@@ -1260,12 +1336,24 @@ func (m *Block) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		}
 	}
 	if m.Header != nil {
-		size, err := m.Header.MarshalToSizedBufferVTStrict(dAtA[:i])
-		if err != nil {
-			return 0, err
+		if vtmsg, ok := interface{}(m.Header).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.Header)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
 		}
-		i -= size
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -1325,12 +1413,24 @@ func (m *Extrinsic) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		dAtA[i] = 0x1a
 	}
 	if m.Signature != nil {
-		size, err := m.Signature.MarshalToSizedBufferVTStrict(dAtA[:i])
-		if err != nil {
-			return 0, err
+		if vtmsg, ok := interface{}(m.Signature).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.Signature)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
 		}
-		i -= size
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -1772,7 +1872,13 @@ func (m *Block) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	if m.Header != nil {
-		l = m.Header.SizeVT()
+		if size, ok := interface{}(m.Header).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.Header)
+		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	if len(m.Extrinsics) > 0 {
@@ -1789,7 +1895,13 @@ func (m *Block) SizeVT() (n int) {
 	}
 	if len(m.DigestItems) > 0 {
 		for _, e := range m.DigestItems {
-			l = e.SizeVT()
+			if size, ok := interface{}(e).(interface {
+				SizeVT() int
+			}); ok {
+				l = size.SizeVT()
+			} else {
+				l = proto.Size(e)
+			}
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
 	}
@@ -1811,7 +1923,13 @@ func (m *Extrinsic) SizeVT() (n int) {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.Version))
 	}
 	if m.Signature != nil {
-		l = m.Signature.SizeVT()
+		if size, ok := interface{}(m.Signature).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.Signature)
+		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	if m.Call != nil {
@@ -2106,8 +2224,16 @@ func (m *Block) UnmarshalVT(dAtA []byte) error {
 			if m.Header == nil {
 				m.Header = &v1.Header{}
 			}
-			if err := m.Header.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			if unmarshal, ok := interface{}(m.Header).(interface {
+				UnmarshalVT([]byte) error
+			}); ok {
+				if err := unmarshal.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+					return err
+				}
+			} else {
+				if err := proto.Unmarshal(dAtA[iNdEx:postIndex], m.Header); err != nil {
+					return err
+				}
 			}
 			iNdEx = postIndex
 		case 4:
@@ -2208,8 +2334,16 @@ func (m *Block) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.DigestItems = append(m.DigestItems, &v1.DigestItem{})
-			if err := m.DigestItems[len(m.DigestItems)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			if unmarshal, ok := interface{}(m.DigestItems[len(m.DigestItems)-1]).(interface {
+				UnmarshalVT([]byte) error
+			}); ok {
+				if err := unmarshal.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+					return err
+				}
+			} else {
+				if err := proto.Unmarshal(dAtA[iNdEx:postIndex], m.DigestItems[len(m.DigestItems)-1]); err != nil {
+					return err
+				}
 			}
 			iNdEx = postIndex
 		case 7:
@@ -2348,8 +2482,16 @@ func (m *Extrinsic) UnmarshalVT(dAtA []byte) error {
 			if m.Signature == nil {
 				m.Signature = &v1.Signature{}
 			}
-			if err := m.Signature.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			if unmarshal, ok := interface{}(m.Signature).(interface {
+				UnmarshalVT([]byte) error
+			}); ok {
+				if err := unmarshal.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+					return err
+				}
+			} else {
+				if err := proto.Unmarshal(dAtA[iNdEx:postIndex], m.Signature); err != nil {
+					return err
+				}
 			}
 			iNdEx = postIndex
 		case 3:
@@ -3327,8 +3469,16 @@ func (m *Block) UnmarshalVTUnsafe(dAtA []byte) error {
 			if m.Header == nil {
 				m.Header = &v1.Header{}
 			}
-			if err := m.Header.UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			if unmarshal, ok := interface{}(m.Header).(interface {
+				UnmarshalVTUnsafe([]byte) error
+			}); ok {
+				if err := unmarshal.UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
+					return err
+				}
+			} else {
+				if err := proto.Unmarshal(dAtA[iNdEx:postIndex], m.Header); err != nil {
+					return err
+				}
 			}
 			iNdEx = postIndex
 		case 4:
@@ -3429,8 +3579,16 @@ func (m *Block) UnmarshalVTUnsafe(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.DigestItems = append(m.DigestItems, &v1.DigestItem{})
-			if err := m.DigestItems[len(m.DigestItems)-1].UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			if unmarshal, ok := interface{}(m.DigestItems[len(m.DigestItems)-1]).(interface {
+				UnmarshalVTUnsafe([]byte) error
+			}); ok {
+				if err := unmarshal.UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
+					return err
+				}
+			} else {
+				if err := proto.Unmarshal(dAtA[iNdEx:postIndex], m.DigestItems[len(m.DigestItems)-1]); err != nil {
+					return err
+				}
 			}
 			iNdEx = postIndex
 		case 7:
@@ -3566,8 +3724,16 @@ func (m *Extrinsic) UnmarshalVTUnsafe(dAtA []byte) error {
 			if m.Signature == nil {
 				m.Signature = &v1.Signature{}
 			}
-			if err := m.Signature.UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			if unmarshal, ok := interface{}(m.Signature).(interface {
+				UnmarshalVTUnsafe([]byte) error
+			}); ok {
+				if err := unmarshal.UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
+					return err
+				}
+			} else {
+				if err := proto.Unmarshal(dAtA[iNdEx:postIndex], m.Signature); err != nil {
+					return err
+				}
 			}
 			iNdEx = postIndex
 		case 3:
