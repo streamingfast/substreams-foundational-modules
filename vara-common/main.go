@@ -6,19 +6,57 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/streamingfast/substreams-foundational-modules/vara-common/metadata"
+	"github.com/streamingfast/substreams-foundational-modules/vara-common/metadata/spec"
 	pbgear "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/gear/type/v1"
 	pbvara "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/substreams/gear/type/v1"
 )
 
+var specVersions = map[uint32]string{
+	100:  spec.V100,
+	120:  spec.V120,
+	130:  spec.V130,
+	140:  spec.V140,
+	210:  spec.V210,
+	310:  spec.V310,
+	320:  spec.V320,
+	330:  spec.V330,
+	340:  spec.V340,
+	350:  spec.V350,
+	1000: spec.V1000,
+	1010: spec.V1010,
+	1020: spec.V1020,
+	1030: spec.V1030,
+	1040: spec.V1040,
+	1050: spec.V1050,
+	1110: spec.V1110,
+	1200: spec.V1200,
+	1210: spec.V1210,
+	1300: spec.V1300,
+	1310: spec.V1310,
+	1400: spec.V1400,
+	1410: spec.V1410,
+	1420: spec.V1420,
+}
+var metadataRegistry = map[uint32]*types.Metadata{}
+
+func init() {
+	for version, data := range specVersions {
+		metadataRegistry[version] = metadata.Load(data)
+	}
+}
+
 // this will actually return a decodedBlock containing all the decoded calls and events
 func map_decoded_block(block *pbgear.Block) (*pbvara.Block, error) {
 	factory := registry.NewFactory()
-	callRegistry, err := factory.CreateCallRegistry(metadata)
+	meta := metadataRegistry[block.Header.SpecVersion]
+
+	callRegistry, err := factory.CreateCallRegistry(meta)
 	if err != nil {
 		return nil, fmt.Errorf("creating call registry: %w", err)
 	}
 
-	extrinsics, err := ToExtrinsics(block.Extrinsics, callRegistry, metadata)
+	extrinsics, err := ToExtrinsics(block.Extrinsics, callRegistry, meta)
 	if err != nil {
 		return nil, fmt.Errorf("converting extrinsics: %w", err)
 	}

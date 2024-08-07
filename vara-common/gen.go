@@ -4,20 +4,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	pbgear "github.com/streamingfast/firehose-gear/pb/sf/gear/type/v1"
 	"os"
 	"reflect"
 	"unsafe"
 )
-
-//go:generate substreams protogen ./substreams.yaml --with-tinygo-maps // creates genre substreams.gen.go
-
-var metadata *types.Metadata //todo: map of version to metadata
-
-func init() {
-	metadata = loadMetadata()
-}
 
 func panic(a any) {
 	os.Exit(2) //fail-safe so we know someone call panic
