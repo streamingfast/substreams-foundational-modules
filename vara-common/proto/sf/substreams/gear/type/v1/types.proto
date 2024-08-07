@@ -46,11 +46,11 @@ message Value {
 
     //reserved 8 to 19;  // For future types
 
+    bool nil_value = 19;
     Array array = 20;
     Fields fields = 21;
   }
 }
-
 message Fields {
   map<string, Value> map = 2;
 }

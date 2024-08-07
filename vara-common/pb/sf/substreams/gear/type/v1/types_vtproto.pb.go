@@ -218,6 +218,15 @@ func (m *Value_Bool) CloneVT() isValue_Typed {
 	return r
 }
 
+func (m *Value_NilValue) CloneVT() isValue_Typed {
+	if m == nil {
+		return (*Value_NilValue)(nil)
+	}
+	r := new(Value_NilValue)
+	r.NilValue = m.NilValue
+	return r
+}
+
 func (m *Value_Array) CloneVT() isValue_Typed {
 	if m == nil {
 		return (*Value_Array)(nil)
@@ -565,6 +574,23 @@ func (this *Value_Bool) EqualVT(thatIface isValue_Typed) bool {
 		return false
 	}
 	if this.Bool != that.Bool {
+		return false
+	}
+	return true
+}
+
+func (this *Value_NilValue) EqualVT(thatIface isValue_Typed) bool {
+	that, ok := thatIface.(*Value_NilValue)
+	if !ok {
+		return false
+	}
+	if this == that {
+		return true
+	}
+	if this == nil && that != nil || this != nil && that == nil {
+		return false
+	}
+	if this.NilValue != that.NilValue {
 		return false
 	}
 	return true
@@ -1108,6 +1134,25 @@ func (m *Value_Bool) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	dAtA[i] = 0x30
 	return len(dAtA) - i, nil
 }
+func (m *Value_NilValue) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *Value_NilValue) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i--
+	if m.NilValue {
+		dAtA[i] = 1
+	} else {
+		dAtA[i] = 0
+	}
+	i--
+	dAtA[i] = 0x1
+	i--
+	dAtA[i] = 0x98
+	return len(dAtA) - i, nil
+}
 func (m *Value_Array) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
@@ -1586,6 +1631,13 @@ func (m *Value) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		}
 		i -= size
 	}
+	if msg, ok := m.Typed.(*Value_NilValue); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+	}
 	if msg, ok := m.Typed.(*Value_Bool); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1714,6 +1766,25 @@ func (m *Value_Bool) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x30
+	return len(dAtA) - i, nil
+}
+func (m *Value_NilValue) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *Value_NilValue) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i--
+	if m.NilValue {
+		dAtA[i] = 1
+	} else {
+		dAtA[i] = 0
+	}
+	i--
+	dAtA[i] = 0x1
+	i--
+	dAtA[i] = 0x98
 	return len(dAtA) - i, nil
 }
 func (m *Value_Array) MarshalToVTStrict(dAtA []byte) (int, error) {
@@ -2045,6 +2116,15 @@ func (m *Value_Bool) SizeVT() (n int) {
 	var l int
 	_ = l
 	n += 2
+	return n
+}
+func (m *Value_NilValue) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	n += 3
 	return n
 }
 func (m *Value_Array) SizeVT() (n int) {
@@ -2989,6 +3069,27 @@ func (m *Value) UnmarshalVT(dAtA []byte) error {
 			}
 			b := bool(v != 0)
 			m.Typed = &Value_Bool{Bool: b}
+		case 19:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NilValue", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			b := bool(v != 0)
+			m.Typed = &Value_NilValue{NilValue: b}
 		case 20:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Array", wireType)
@@ -4250,6 +4351,27 @@ func (m *Value) UnmarshalVTUnsafe(dAtA []byte) error {
 			}
 			b := bool(v != 0)
 			m.Typed = &Value_Bool{Bool: b}
+		case 19:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NilValue", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			b := bool(v != 0)
+			m.Typed = &Value_NilValue{NilValue: b}
 		case 20:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Array", wireType)
