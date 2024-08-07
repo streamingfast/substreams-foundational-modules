@@ -4,19 +4,19 @@ package main
 
 import (
 	"fmt"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	pbgear "github.com/streamingfast/firehose-gear/pb/sf/gear/type/v1"
 	"os"
 	"reflect"
 	"unsafe"
-
-	pbgear "github.com/streamingfast/firehose-gear/pb/sf/gear/type/v1"
 )
 
 //go:generate substreams protogen ./substreams.yaml --with-tinygo-maps // creates genre substreams.gen.go
 
-// Dans WASI: _start
-func main() {
-	// m := load_metadata()
-	// fmt.Println("metadata loaded", m.Version)
+var metadata *types.Metadata //todo: map of version to metadata
+
+func init() {
+	metadata = loadMetadata()
 }
 
 func panic(a any) {
@@ -87,7 +87,6 @@ func _map_decoded_block(blockPtr, blockLen uint32) (retval uint32) {
 	if err != nil {
 		panic(fmt.Errorf("map_extrinsics failed: %w", err))
 	}
-
 	if ret != nil {
 		cnt, err := ret.MarshalVT()
 		if err != nil {

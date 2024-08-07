@@ -2,17 +2,26 @@ module github.com/streamingfast/substreams-foundational-modules/vara-common
 
 go 1.22.0
 
-require github.com/centrifuge/go-substrate-rpc-client/v4 v4.2.1
+replace github.com/centrifuge/go-substrate-rpc-client/v4 => github.com/streamingfast/go-substrate-rpc-client/v4 v4.0.0-20240801195649-1435d6f2534e
 
-replace github.com/centrifuge/go-substrate-rpc-client/v4 => github.com/streamingfast/go-substrate-rpc-client/v4 v4.0.0-20240731152751-689d07763128
+require (
+	github.com/centrifuge/go-substrate-rpc-client v1.1.0
+	github.com/centrifuge/go-substrate-rpc-client/v4 v4.2.1
+	github.com/gobeam/stringy v0.0.7
+	github.com/stretchr/testify v1.8.4
+)
 
-replace github.com/streamingfast/firehose-gear => ../../firehose-gear
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
 
 require (
 	github.com/holiman/uint256 v1.2.4 // indirect
-	github.com/planetscale/vtprotobuf v0.6.0 // indirect
+	github.com/planetscale/vtprotobuf v0.6.0
 	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa // indirect
-	google.golang.org/protobuf v1.33.0 // indirect
+	google.golang.org/protobuf v1.33.0
 )
 
 require (
@@ -25,7 +34,7 @@ require (
 	github.com/gtank/ristretto255 v0.1.2 // indirect
 	github.com/mimoo/StrobeGo v0.0.0-20220103164710-9a04d6ca976b // indirect
 	github.com/pierrec/xxHash v0.1.5 // indirect
-	github.com/streamingfast/firehose-gear v0.0.0-20240731132012-850add1a5ef7
+	github.com/streamingfast/firehose-gear v0.0.0-20240801184131-b94c4ba58381
 	github.com/vedhavyas/go-subkey/v2 v2.0.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect

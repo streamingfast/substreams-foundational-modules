@@ -1,0 +1,4 @@
+version: v1
+deps:
+  - buf.build/streamingfast/firehose-gear
+  - buf.build/streamingfast/substreams

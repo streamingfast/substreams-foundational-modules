@@ -9,11 +9,8 @@ var metadataHex = "0x6d6574610e250a000c1c73705f636f72651863727970746f2c4163636f7
 
 func loadMetadata() *types.Metadata {
 	metadata := &types.Metadata{}
-	Logf("about to decode the metadata")
 	err := codec.DecodeFromHex(metadataHex, metadata)
-	Logf("Done decoding the metadata")
 	if err != nil {
-		Logf("failed to decode metadata %v", err)
 		panic(err)
 	}
 	return metadata

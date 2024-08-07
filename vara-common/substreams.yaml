@@ -17,4 +17,4 @@ modules:
     inputs:
       - source: sf.gear.type.v1.Block
     output:
-      type: proto:sf.gear.decoded.type.v1.DecodedBlock
+      type: proto:sf.gear.type.v1.Block

@@ -1,16 +1,15 @@
 package main
 
 import (
-	"testing"
-
+	"fmt"
 	pbgear "github.com/streamingfast/firehose-gear/pb/sf/gear/type/v1"
+	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 func Test_MapDecodedBlock(t *testing.T) {
 	blk := &pbgear.Block{}
 	dblock, err := map_decoded_block(blk)
-	if err != nil {
-		t.Fatalf("failed to map decoded block: %s", err)
-	}
-	_ = dblock
+	require.NoError(t, err)
+	fmt.Println(dblock.Number)
 }

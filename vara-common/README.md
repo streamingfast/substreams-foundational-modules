@@ -21,5 +21,5 @@ substreams run ./substreams.yaml --plaintext -e 127.0.0.1:10016 -t +10 map_test
 ```
 
 ```bash
-buf generate --exclude-path sf/substreams/v1,sf/substreams/rpc,google/,sf/substreams/sink,sf/substreams
+buf generate  --include-imports
 ```
