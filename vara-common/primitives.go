@@ -45,6 +45,21 @@ func To_string(i any) string {
 	}
 }
 
+func To_int32(i any) int32 {
+	switch v := i.(type) {
+	case types.UCompact:
+		return int32(v.Int64())
+	case types.I8:
+		return int32(v)
+	case types.I16:
+		return int32(v)
+	case types.I32:
+		return int32(v)
+	default:
+		panic("Unknown type")
+	}
+}
+
 func To_uint32(i any) uint32 {
 	switch v := i.(type) {
 	case types.UCompact:
@@ -85,6 +100,31 @@ func To_uint64(a any) uint64 {
 		return uint64(v)
 	case uint64:
 		return uint64(v)
+	default:
+		panic("Unknown type")
+	}
+}
+
+func To_int64(a any) int64 {
+	switch v := a.(type) {
+	case types.UCompact:
+		return int64(v.Int64())
+	case types.I8:
+		return int64(v)
+	case types.I16:
+		return int64(v)
+	case types.I32:
+		return int64(v)
+	case types.I64:
+		return int64(v)
+	case int8:
+		return int64(v)
+	case int16:
+		return int64(v)
+	case int32:
+		return int64(v)
+	case int64:
+		return int64(v)
 	default:
 		panic("Unknown type")
 	}

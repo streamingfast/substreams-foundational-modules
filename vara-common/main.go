@@ -67,11 +67,12 @@ func map_decoded_block(block *pbgear.Block) (*pbvara.Block, error) {
 	if err != nil {
 		return nil, fmt.Errorf("creating event registry: %w", err)
 	}
+	_ = eventRegistry
 
-	events, err := toEvents(block.Events, eventRegistry, block.RawEvents, meta)
-	if err != nil {
-		return nil, fmt.Errorf("converting events: %w", err)
-	}
+	// events, err := toEvents(block.Events, eventRegistry, block.RawEvents, meta)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("converting events: %w", err)
+	// }
 
 	return &pbvara.Block{
 		Number:        block.Number,
@@ -80,7 +81,8 @@ func map_decoded_block(block *pbgear.Block) (*pbvara.Block, error) {
 		DigestItems:   block.DigestItems,
 		Justification: block.Justification,
 		Extrinsics:    extrinsics,
-		Events:        events,
+		Events:        nil,
+		// Events:        events,
 	}, nil
 }
 
@@ -145,7 +147,7 @@ func toFields(fields registry.DecodedFields, metadata *types.Metadata) *pbvara.F
 	}
 
 	return &pbvara.Fields{
-		Map: nil,
+		Map: m,
 	}
 }
 
@@ -155,7 +157,7 @@ func toValue(field *registry.DecodedField, metadata *types.Metadata) *pbvara.Val
 
 	switch {
 	case lookupType.Def.IsPrimitive:
-		value = toPrimitiveValue(lookupType, field.Value, metadata)
+		value = toPrimitiveValue(lookupType, field.Value)
 
 	case lookupType.Def.IsSequence:
 		array := &pbvara.Array{}
@@ -164,7 +166,7 @@ func toValue(field *registry.DecodedField, metadata *types.Metadata) *pbvara.Val
 			var val *pbvara.Value
 
 			if childType.Def.IsPrimitive {
-				val = toPrimitiveValue(childType, item.Value, metadata)
+				val = toPrimitiveValue(childType, item.Value)
 			} else {
 				val.Typed = &pbvara.Value_Fields{
 					Fields: toFields(item.Value.(registry.DecodedFields), metadata),
@@ -185,7 +187,7 @@ func toValue(field *registry.DecodedField, metadata *types.Metadata) *pbvara.Val
 			var val *pbvara.Value
 
 			if childType.Def.IsPrimitive {
-				val = toPrimitiveValue(childType, item.Value, metadata)
+				val = toPrimitiveValue(childType, item.Value)
 			} else {
 				val.Typed = &pbvara.Value_Fields{
 					Fields: toFields(item.Value.(registry.DecodedFields), metadata),
@@ -201,38 +203,21 @@ func toValue(field *registry.DecodedField, metadata *types.Metadata) *pbvara.Val
 
 	case lookupType.Def.IsTuple:
 		panic("not implemented")
-		// array := &pbvara.Array{}
-		// for _, item := range field.Value.([]registry.DecodedField) {
-		// 	childType := metadata.AsMetadataV14.EfficientLookup[lookupType.Def.Tuple.Type.Int64()]
-		// 	var val *pbvara.Value
-
-		// 	if childType.Def.IsPrimitive {
-		// 		val = toPrimitiveValue(childType, item.Value, metadata)
-		// 	} else {
-		// 		val.Typed = &pbvara.Value_Fields{
-		// 			Fields: toFields(item.Value.(registry.DecodedFields), metadata),
-		// 		}
-		// 	}
-
-		// 	array.Items = append(array.Items, val)
-		// }
-
-		// value.Typed = &pbvara.Value_Array{
-		// 	Array: array,
-		// }
 
 	case lookupType.Def.IsVariant:
-		for _, item := range field.Value.([]registry.DecodedField) {
-			idx := item.LookupIndex
-			fmt.Println("variant idx", idx)
+		if _, ok := field.Value.([]registry.DecodedField); !ok {
+			value = toPrimitiveValue(lookupType, field.Value)
+		} else {
+			for _, item := range field.Value.([]registry.DecodedField) {
+				idx := item.LookupIndex
+				fmt.Println("variant idx", idx)
+			}
 		}
-
-		value.Typed = nil
 
 	case lookupType.Def.IsCompact:
 		childType := metadata.AsMetadataV14.EfficientLookup[lookupType.Def.Compact.Type.Int64()]
 		if childType.Def.IsPrimitive {
-			value = toPrimitiveValue(childType, field.Value, metadata)
+			value = toPrimitiveValue(childType, field.Value)
 		} else {
 			value.Typed = &pbvara.Value_Fields{
 				Fields: toFields(field.Value.(registry.DecodedFields), metadata),
@@ -326,36 +311,103 @@ func decodeEvents(eventRegistry registry.EventRegistry, storageEvents []byte) ([
 	return events, nil
 }
 
-func toPrimitiveValue(in *types.Si1Type, value any, metadata *types.Metadata) *pbvara.Value {
+func toPrimitiveValue(in *types.Si1Type, value any) *pbvara.Value {
+	var val *pbvara.Value
 	switch in.Def.Primitive.Si0TypeDefPrimitive {
 	case types.IsBool:
-		return &pbvara.Value{
+		val = &pbvara.Value{
 			Typed: &pbvara.Value_Bool{
 				Bool: To_bool(value),
 			},
 		}
 	case types.IsChar:
+		val = &pbvara.Value{
+			Typed: &pbvara.Value_String_{
+				String_: To_string(value),
+			},
+		}
 	case types.IsStr:
-	case types.IsU8:
-	case types.IsU16:
-	case types.IsU32:
-	case types.IsU64:
-		uint64Val := To_uint64(value)
-		return &pbvara.Value{
+		val = &pbvara.Value{
+			Typed: &pbvara.Value_String_{
+				String_: To_string(value),
+			},
+		}
+	case types.IsU8: // TODO: not sure about this one, should it be bytes ??
+		val = &pbvara.Value{
 			Typed: &pbvara.Value_Bigint{
-				Bigint: fmt.Sprint(uint64Val),
+				Bigint: fmt.Sprint(To_uint32(value)),
+			},
+		}
+	case types.IsU16:
+		val = &pbvara.Value{
+			Typed: &pbvara.Value_Bigint{
+				Bigint: fmt.Sprint(To_uint32(value)),
+			},
+		}
+
+	case types.IsU32:
+		val = &pbvara.Value{
+			Typed: &pbvara.Value_Bigint{
+				Bigint: fmt.Sprint(To_uint32(value)),
+			},
+		}
+
+	case types.IsU64:
+		val = &pbvara.Value{
+			Typed: &pbvara.Value_Bigint{
+				Bigint: fmt.Sprint(To_uint64(value)),
 			},
 		}
 	case types.IsU128:
+		val = &pbvara.Value{
+			Typed: &pbvara.Value_Bigint{
+				Bigint: fmt.Sprint(To_string(value)),
+			},
+		}
 	case types.IsU256:
+		val = &pbvara.Value{
+			Typed: &pbvara.Value_Bigint{
+				Bigint: fmt.Sprint(To_string(value)),
+			},
+		}
 	case types.IsI8:
+		val = &pbvara.Value{
+			Typed: &pbvara.Value_Int32{
+				Int32: To_int32(value),
+			},
+		}
 	case types.IsI16:
+		val = &pbvara.Value{
+			Typed: &pbvara.Value_Int32{
+				Int32: To_int32(value),
+			},
+		}
 	case types.IsI32:
+		val = &pbvara.Value{
+			Typed: &pbvara.Value_Int32{
+				Int32: To_int32(value),
+			},
+		}
 	case types.IsI64:
+		val = &pbvara.Value{
+			Typed: &pbvara.Value_Bigint{
+				Bigint: fmt.Sprint(To_int64(value)),
+			},
+		}
 	case types.IsI128:
+		val = &pbvara.Value{
+			Typed: &pbvara.Value_Bigint{
+				Bigint: fmt.Sprint(To_string(value)),
+			},
+		}
 	case types.IsI256:
+		val = &pbvara.Value{
+			Typed: &pbvara.Value_Bigint{
+				Bigint: fmt.Sprint(To_string(value)),
+			},
+		}
 	}
-	return nil
+	return val
 }
 
 //func decodeEvents(eventRegistry registry.EventRegistry, storageEvents []byte) ([]*parser.Event, error) {
