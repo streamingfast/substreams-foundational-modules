@@ -138,7 +138,16 @@ func toEvents(events []*pbgear.Event, eventRegistry registry.EventRegistry, stor
 	return out, nil
 }
 
-func toFields(fields registry.DecodedFields, metadata *types.Metadata) *pbvara.Fields {
+func toFields(in any, metadata *types.Metadata) *pbvara.Fields {
+	var fields registry.DecodedFields
+	switch i := in.(type) {
+	case *registry.VariantWTF:
+		fields = i.Value.(registry.DecodedFields)
+	case registry.DecodedFields:
+		fields = i
+	default:
+		panic(fmt.Sprintf("unknown type %T", in))
+	}
 	m := map[string]*pbvara.Value{}
 
 	for _, field := range fields {
@@ -151,82 +160,107 @@ func toFields(fields registry.DecodedFields, metadata *types.Metadata) *pbvara.F
 	}
 }
 
-func toValue(field *registry.DecodedField, metadata *types.Metadata) *pbvara.Value {
-	lookupType := metadata.AsMetadataV14.EfficientLookup[field.LookupIndex]
-	var value *pbvara.Value
+func toValue(decodedField *registry.DecodedField, metadata *types.Metadata) *pbvara.Value {
+	lookupType := metadata.AsMetadataV14.EfficientLookup[decodedField.LookupIndex]
+	value := &pbvara.Value{}
 
 	switch {
 	case lookupType.Def.IsPrimitive:
-		value = toPrimitiveValue(lookupType, field.Value)
+		value = toPrimitiveValue(lookupType, decodedField.Value)
 
 	case lookupType.Def.IsSequence:
 		array := &pbvara.Array{}
-		for _, item := range field.Value.([]registry.DecodedField) {
-			childType := metadata.AsMetadataV14.EfficientLookup[lookupType.Def.Sequence.Type.Int64()]
-			var val *pbvara.Value
-
-			if childType.Def.IsPrimitive {
-				val = toPrimitiveValue(childType, item.Value)
-			} else {
-				val.Typed = &pbvara.Value_Fields{
-					Fields: toFields(item.Value.(registry.DecodedFields), metadata),
+		arrayOfTypeID := lookupType.Def.Sequence.Type.Int64()
+		arrayOfType := metadata.AsMetadataV14.EfficientLookup[arrayOfTypeID]
+		if arrayOfType.Def.IsPrimitive {
+			if arrayOfType.Def.Primitive.Si0TypeDefPrimitive == types.IsU8 || arrayOfType.Def.Primitive.Si0TypeDefPrimitive == types.IsI8 {
+				data := To_bytes(decodedField.Value)
+				value.Typed = &pbvara.Value_Bytes{
+					Bytes: data,
 				}
 			}
+		} else {
+			childType := metadata.AsMetadataV14.EfficientLookup[lookupType.Def.Sequence.Type.Int64()]
+			for _, item := range decodedField.Value.([]interface{}) {
+				var val *pbvara.Value
 
-			array.Items = append(array.Items, val)
+				if childType.Def.IsPrimitive {
+					val = toPrimitiveValue(childType, item.(*registry.DecodedField).Value)
+				} else {
+					val = &pbvara.Value{
+						Typed: &pbvara.Value_Fields{
+							Fields: toFields(item.(registry.Valuable).ValueAt(0), metadata),
+						},
+					}
+				}
+				array.Items = append(array.Items, val)
+			}
+
+			value.Typed = &pbvara.Value_Array{
+				Array: array,
+			}
 		}
-
-		value.Typed = &pbvara.Value_Array{
-			Array: array,
-		}
-
 	case lookupType.Def.IsArray:
 		array := &pbvara.Array{}
-		for _, item := range field.Value.([]registry.DecodedField) {
-			childType := metadata.AsMetadataV14.EfficientLookup[lookupType.Def.Array.Type.Int64()]
-			var val *pbvara.Value
-
-			if childType.Def.IsPrimitive {
-				val = toPrimitiveValue(childType, item.Value)
-			} else {
-				val.Typed = &pbvara.Value_Fields{
-					Fields: toFields(item.Value.(registry.DecodedFields), metadata),
+		arrayOfTypeID := lookupType.Def.Array.Type.Int64()
+		arrayOfType := metadata.AsMetadataV14.EfficientLookup[arrayOfTypeID]
+		if arrayOfType.Def.IsPrimitive {
+			if arrayOfType.Def.Primitive.Si0TypeDefPrimitive == types.IsU8 || arrayOfType.Def.Primitive.Si0TypeDefPrimitive == types.IsI8 {
+				data := To_bytes(decodedField.Value)
+				value.Typed = &pbvara.Value_Bytes{
+					Bytes: data,
 				}
 			}
+		} else {
+			childType := metadata.AsMetadataV14.EfficientLookup[lookupType.Def.Array.Type.Int64()]
+			for _, item := range decodedField.Value.([]interface{}) {
+				var val *pbvara.Value
 
-			array.Items = append(array.Items, val)
+				if childType.Def.IsPrimitive {
+					val = toPrimitiveValue(childType, item.(*registry.DecodedField).Value)
+				} else {
+					val = &pbvara.Value{
+						Typed: &pbvara.Value_Fields{
+							Fields: toFields(item.(registry.Valuable).ValueAt(0), metadata),
+						},
+					}
+				}
+				array.Items = append(array.Items, val)
+			}
+
+			value.Typed = &pbvara.Value_Array{
+				Array: array,
+			}
 		}
-
-		value.Typed = &pbvara.Value_Array{
-			Array: array,
-		}
-
 	case lookupType.Def.IsTuple:
 		panic("not implemented")
 
 	case lookupType.Def.IsVariant:
-		if _, ok := field.Value.([]registry.DecodedField); !ok {
-			value = toPrimitiveValue(lookupType, field.Value)
-		} else {
-			for _, item := range field.Value.([]registry.DecodedField) {
-				idx := item.LookupIndex
-				fmt.Println("variant idx", idx)
+		switch v := decodedField.Value.(type) {
+		case *registry.VariantWTF:
+			dfs := v.ValueAt(0).(registry.DecodedFields)
+			value.Typed = &pbvara.Value_Fields{
+				Fields: toFields(dfs, metadata),
 			}
+		case uint8: //I think ths is only occurring when it is an optional
+			return nil
+		default:
+			panic(fmt.Sprintf("unknown type %T", decodedField.Value))
 		}
 
 	case lookupType.Def.IsCompact:
 		childType := metadata.AsMetadataV14.EfficientLookup[lookupType.Def.Compact.Type.Int64()]
 		if childType.Def.IsPrimitive {
-			value = toPrimitiveValue(childType, field.Value)
+			value = toPrimitiveValue(childType, decodedField.Value)
 		} else {
 			value.Typed = &pbvara.Value_Fields{
-				Fields: toFields(field.Value.(registry.DecodedFields), metadata),
+				Fields: toFields(decodedField.Value.(registry.DecodedFields), metadata),
 			}
 		}
 
 	case lookupType.Def.IsComposite:
 		value.Typed = &pbvara.Value_Fields{
-			Fields: toFields(field.Value.(registry.DecodedFields), metadata),
+			Fields: toFields(decodedField.Value.(registry.DecodedFields), metadata),
 		}
 
 	default:

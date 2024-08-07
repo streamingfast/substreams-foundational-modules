@@ -141,6 +141,10 @@ func To_Optional_string(a any) *string {
 }
 
 func To_bool(b any) bool {
+	switch v := b.(type) {
+	case uint8:
+		return v == 1
+	}
 	return b.(bool)
 }
 

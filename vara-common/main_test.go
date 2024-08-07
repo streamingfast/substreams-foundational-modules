@@ -2,6 +2,10 @@ package main
 
 import (
 	"bufio"
+<<<<<<< HEAD
+=======
+	"encoding/hex"
+>>>>>>> 446374196d9754a01b5a837fa0bd1fe278258fb0
 	"encoding/json"
 	"fmt"
 	"os"
