@@ -146,8 +146,8 @@ func (m *Value) CloneVT() *Value {
 		return (*Value)(nil)
 	}
 	r := new(Value)
-	if m.Typed != nil {
-		r.Typed = m.Typed.(interface{ CloneVT() isValue_Typed }).CloneVT()
+	if m.Type != nil {
+		r.Type = m.Type.(interface{ CloneVT() isValue_Type }).CloneVT()
 	}
 	if len(m.unknownFields) > 0 {
 		r.unknownFields = make([]byte, len(m.unknownFields))
@@ -160,7 +160,7 @@ func (m *Value) CloneMessageVT() proto.Message {
 	return m.CloneVT()
 }
 
-func (m *Value_Int32) CloneVT() isValue_Typed {
+func (m *Value_Int32) CloneVT() isValue_Type {
 	if m == nil {
 		return (*Value_Int32)(nil)
 	}
@@ -169,7 +169,7 @@ func (m *Value_Int32) CloneVT() isValue_Typed {
 	return r
 }
 
-func (m *Value_Bigdecimal) CloneVT() isValue_Typed {
+func (m *Value_Bigdecimal) CloneVT() isValue_Type {
 	if m == nil {
 		return (*Value_Bigdecimal)(nil)
 	}
@@ -178,7 +178,7 @@ func (m *Value_Bigdecimal) CloneVT() isValue_Typed {
 	return r
 }
 
-func (m *Value_Bigint) CloneVT() isValue_Typed {
+func (m *Value_Bigint) CloneVT() isValue_Type {
 	if m == nil {
 		return (*Value_Bigint)(nil)
 	}
@@ -187,7 +187,7 @@ func (m *Value_Bigint) CloneVT() isValue_Typed {
 	return r
 }
 
-func (m *Value_String_) CloneVT() isValue_Typed {
+func (m *Value_String_) CloneVT() isValue_Type {
 	if m == nil {
 		return (*Value_String_)(nil)
 	}
@@ -196,7 +196,7 @@ func (m *Value_String_) CloneVT() isValue_Typed {
 	return r
 }
 
-func (m *Value_Bytes) CloneVT() isValue_Typed {
+func (m *Value_Bytes) CloneVT() isValue_Type {
 	if m == nil {
 		return (*Value_Bytes)(nil)
 	}
@@ -209,7 +209,7 @@ func (m *Value_Bytes) CloneVT() isValue_Typed {
 	return r
 }
 
-func (m *Value_Bool) CloneVT() isValue_Typed {
+func (m *Value_Bool) CloneVT() isValue_Type {
 	if m == nil {
 		return (*Value_Bool)(nil)
 	}
@@ -218,7 +218,7 @@ func (m *Value_Bool) CloneVT() isValue_Typed {
 	return r
 }
 
-func (m *Value_NilValue) CloneVT() isValue_Typed {
+func (m *Value_NilValue) CloneVT() isValue_Type {
 	if m == nil {
 		return (*Value_NilValue)(nil)
 	}
@@ -227,7 +227,7 @@ func (m *Value_NilValue) CloneVT() isValue_Typed {
 	return r
 }
 
-func (m *Value_Array) CloneVT() isValue_Typed {
+func (m *Value_Array) CloneVT() isValue_Type {
 	if m == nil {
 		return (*Value_Array)(nil)
 	}
@@ -236,7 +236,7 @@ func (m *Value_Array) CloneVT() isValue_Typed {
 	return r
 }
 
-func (m *Value_Fields) CloneVT() isValue_Typed {
+func (m *Value_Fields) CloneVT() isValue_Type {
 	if m == nil {
 		return (*Value_Fields)(nil)
 	}
@@ -457,13 +457,13 @@ func (this *Value) EqualVT(that *Value) bool {
 	} else if this == nil || that == nil {
 		return false
 	}
-	if this.Typed == nil && that.Typed != nil {
+	if this.Type == nil && that.Type != nil {
 		return false
-	} else if this.Typed != nil {
-		if that.Typed == nil {
+	} else if this.Type != nil {
+		if that.Type == nil {
 			return false
 		}
-		if !this.Typed.(interface{ EqualVT(isValue_Typed) bool }).EqualVT(that.Typed) {
+		if !this.Type.(interface{ EqualVT(isValue_Type) bool }).EqualVT(that.Type) {
 			return false
 		}
 	}
@@ -477,7 +477,7 @@ func (this *Value) EqualMessageVT(thatMsg proto.Message) bool {
 	}
 	return this.EqualVT(that)
 }
-func (this *Value_Int32) EqualVT(thatIface isValue_Typed) bool {
+func (this *Value_Int32) EqualVT(thatIface isValue_Type) bool {
 	that, ok := thatIface.(*Value_Int32)
 	if !ok {
 		return false
@@ -494,7 +494,7 @@ func (this *Value_Int32) EqualVT(thatIface isValue_Typed) bool {
 	return true
 }
 
-func (this *Value_Bigdecimal) EqualVT(thatIface isValue_Typed) bool {
+func (this *Value_Bigdecimal) EqualVT(thatIface isValue_Type) bool {
 	that, ok := thatIface.(*Value_Bigdecimal)
 	if !ok {
 		return false
@@ -511,7 +511,7 @@ func (this *Value_Bigdecimal) EqualVT(thatIface isValue_Typed) bool {
 	return true
 }
 
-func (this *Value_Bigint) EqualVT(thatIface isValue_Typed) bool {
+func (this *Value_Bigint) EqualVT(thatIface isValue_Type) bool {
 	that, ok := thatIface.(*Value_Bigint)
 	if !ok {
 		return false
@@ -528,7 +528,7 @@ func (this *Value_Bigint) EqualVT(thatIface isValue_Typed) bool {
 	return true
 }
 
-func (this *Value_String_) EqualVT(thatIface isValue_Typed) bool {
+func (this *Value_String_) EqualVT(thatIface isValue_Type) bool {
 	that, ok := thatIface.(*Value_String_)
 	if !ok {
 		return false
@@ -545,7 +545,7 @@ func (this *Value_String_) EqualVT(thatIface isValue_Typed) bool {
 	return true
 }
 
-func (this *Value_Bytes) EqualVT(thatIface isValue_Typed) bool {
+func (this *Value_Bytes) EqualVT(thatIface isValue_Type) bool {
 	that, ok := thatIface.(*Value_Bytes)
 	if !ok {
 		return false
@@ -562,7 +562,7 @@ func (this *Value_Bytes) EqualVT(thatIface isValue_Typed) bool {
 	return true
 }
 
-func (this *Value_Bool) EqualVT(thatIface isValue_Typed) bool {
+func (this *Value_Bool) EqualVT(thatIface isValue_Type) bool {
 	that, ok := thatIface.(*Value_Bool)
 	if !ok {
 		return false
@@ -579,7 +579,7 @@ func (this *Value_Bool) EqualVT(thatIface isValue_Typed) bool {
 	return true
 }
 
-func (this *Value_NilValue) EqualVT(thatIface isValue_Typed) bool {
+func (this *Value_NilValue) EqualVT(thatIface isValue_Type) bool {
 	that, ok := thatIface.(*Value_NilValue)
 	if !ok {
 		return false
@@ -596,7 +596,7 @@ func (this *Value_NilValue) EqualVT(thatIface isValue_Typed) bool {
 	return true
 }
 
-func (this *Value_Array) EqualVT(thatIface isValue_Typed) bool {
+func (this *Value_Array) EqualVT(thatIface isValue_Type) bool {
 	that, ok := thatIface.(*Value_Array)
 	if !ok {
 		return false
@@ -621,7 +621,7 @@ func (this *Value_Array) EqualVT(thatIface isValue_Typed) bool {
 	return true
 }
 
-func (this *Value_Fields) EqualVT(thatIface isValue_Typed) bool {
+func (this *Value_Fields) EqualVT(thatIface isValue_Type) bool {
 	that, ok := thatIface.(*Value_Fields)
 	if !ok {
 		return false
@@ -1037,7 +1037,7 @@ func (m *Value) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if vtmsg, ok := m.Typed.(interface {
+	if vtmsg, ok := m.Type.(interface {
 		MarshalToSizedBufferVT([]byte) (int, error)
 	}); ok {
 		size, err := vtmsg.MarshalToSizedBufferVT(dAtA[:i])
@@ -1617,63 +1617,63 @@ func (m *Value) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if msg, ok := m.Typed.(*Value_Fields); ok {
+	if msg, ok := m.Type.(*Value_Fields); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
 		i -= size
 	}
-	if msg, ok := m.Typed.(*Value_Array); ok {
+	if msg, ok := m.Type.(*Value_Array); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
 		i -= size
 	}
-	if msg, ok := m.Typed.(*Value_NilValue); ok {
+	if msg, ok := m.Type.(*Value_NilValue); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
 		i -= size
 	}
-	if msg, ok := m.Typed.(*Value_Bool); ok {
+	if msg, ok := m.Type.(*Value_Bool); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
 		i -= size
 	}
-	if msg, ok := m.Typed.(*Value_Bytes); ok {
+	if msg, ok := m.Type.(*Value_Bytes); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
 		i -= size
 	}
-	if msg, ok := m.Typed.(*Value_String_); ok {
+	if msg, ok := m.Type.(*Value_String_); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
 		i -= size
 	}
-	if msg, ok := m.Typed.(*Value_Bigint); ok {
+	if msg, ok := m.Type.(*Value_Bigint); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
 		i -= size
 	}
-	if msg, ok := m.Typed.(*Value_Bigdecimal); ok {
+	if msg, ok := m.Type.(*Value_Bigdecimal); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
 		i -= size
 	}
-	if msg, ok := m.Typed.(*Value_Int32); ok {
+	if msg, ok := m.Type.(*Value_Int32); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
 			return 0, err
@@ -2053,7 +2053,7 @@ func (m *Value) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if vtmsg, ok := m.Typed.(interface{ SizeVT() int }); ok {
+	if vtmsg, ok := m.Type.(interface{ SizeVT() int }); ok {
 		n += vtmsg.SizeVT()
 	}
 	n += len(m.unknownFields)
@@ -2918,7 +2918,7 @@ func (m *Value) UnmarshalVT(dAtA []byte) error {
 					break
 				}
 			}
-			m.Typed = &Value_Int32{Int32: v}
+			m.Type = &Value_Int32{Int32: v}
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Bigdecimal", wireType)
@@ -2949,7 +2949,7 @@ func (m *Value) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Typed = &Value_Bigdecimal{Bigdecimal: string(dAtA[iNdEx:postIndex])}
+			m.Type = &Value_Bigdecimal{Bigdecimal: string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -2981,7 +2981,7 @@ func (m *Value) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Typed = &Value_Bigint{Bigint: string(dAtA[iNdEx:postIndex])}
+			m.Type = &Value_Bigint{Bigint: string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
@@ -3013,7 +3013,7 @@ func (m *Value) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Typed = &Value_String_{String_: string(dAtA[iNdEx:postIndex])}
+			m.Type = &Value_String_{String_: string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
@@ -3046,7 +3046,7 @@ func (m *Value) UnmarshalVT(dAtA []byte) error {
 			}
 			v := make([]byte, postIndex-iNdEx)
 			copy(v, dAtA[iNdEx:postIndex])
-			m.Typed = &Value_Bytes{Bytes: v}
+			m.Type = &Value_Bytes{Bytes: v}
 			iNdEx = postIndex
 		case 6:
 			if wireType != 0 {
@@ -3068,7 +3068,7 @@ func (m *Value) UnmarshalVT(dAtA []byte) error {
 				}
 			}
 			b := bool(v != 0)
-			m.Typed = &Value_Bool{Bool: b}
+			m.Type = &Value_Bool{Bool: b}
 		case 19:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NilValue", wireType)
@@ -3089,7 +3089,7 @@ func (m *Value) UnmarshalVT(dAtA []byte) error {
 				}
 			}
 			b := bool(v != 0)
-			m.Typed = &Value_NilValue{NilValue: b}
+			m.Type = &Value_NilValue{NilValue: b}
 		case 20:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Array", wireType)
@@ -3119,7 +3119,7 @@ func (m *Value) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if oneof, ok := m.Typed.(*Value_Array); ok {
+			if oneof, ok := m.Type.(*Value_Array); ok {
 				if err := oneof.Array.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
@@ -3128,7 +3128,7 @@ func (m *Value) UnmarshalVT(dAtA []byte) error {
 				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
-				m.Typed = &Value_Array{Array: v}
+				m.Type = &Value_Array{Array: v}
 			}
 			iNdEx = postIndex
 		case 21:
@@ -3160,7 +3160,7 @@ func (m *Value) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if oneof, ok := m.Typed.(*Value_Fields); ok {
+			if oneof, ok := m.Type.(*Value_Fields); ok {
 				if err := oneof.Fields.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
@@ -3169,7 +3169,7 @@ func (m *Value) UnmarshalVT(dAtA []byte) error {
 				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
-				m.Typed = &Value_Fields{Fields: v}
+				m.Type = &Value_Fields{Fields: v}
 			}
 			iNdEx = postIndex
 		default:
@@ -4189,7 +4189,7 @@ func (m *Value) UnmarshalVTUnsafe(dAtA []byte) error {
 					break
 				}
 			}
-			m.Typed = &Value_Int32{Int32: v}
+			m.Type = &Value_Int32{Int32: v}
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Bigdecimal", wireType)
@@ -4224,7 +4224,7 @@ func (m *Value) UnmarshalVTUnsafe(dAtA []byte) error {
 			if intStringLen > 0 {
 				stringValue = unsafe.String(&dAtA[iNdEx], intStringLen)
 			}
-			m.Typed = &Value_Bigdecimal{Bigdecimal: stringValue}
+			m.Type = &Value_Bigdecimal{Bigdecimal: stringValue}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -4260,7 +4260,7 @@ func (m *Value) UnmarshalVTUnsafe(dAtA []byte) error {
 			if intStringLen > 0 {
 				stringValue = unsafe.String(&dAtA[iNdEx], intStringLen)
 			}
-			m.Typed = &Value_Bigint{Bigint: stringValue}
+			m.Type = &Value_Bigint{Bigint: stringValue}
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
@@ -4296,7 +4296,7 @@ func (m *Value) UnmarshalVTUnsafe(dAtA []byte) error {
 			if intStringLen > 0 {
 				stringValue = unsafe.String(&dAtA[iNdEx], intStringLen)
 			}
-			m.Typed = &Value_String_{String_: stringValue}
+			m.Type = &Value_String_{String_: stringValue}
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
@@ -4328,7 +4328,7 @@ func (m *Value) UnmarshalVTUnsafe(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			v := dAtA[iNdEx:postIndex]
-			m.Typed = &Value_Bytes{Bytes: v}
+			m.Type = &Value_Bytes{Bytes: v}
 			iNdEx = postIndex
 		case 6:
 			if wireType != 0 {
@@ -4350,7 +4350,7 @@ func (m *Value) UnmarshalVTUnsafe(dAtA []byte) error {
 				}
 			}
 			b := bool(v != 0)
-			m.Typed = &Value_Bool{Bool: b}
+			m.Type = &Value_Bool{Bool: b}
 		case 19:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NilValue", wireType)
@@ -4371,7 +4371,7 @@ func (m *Value) UnmarshalVTUnsafe(dAtA []byte) error {
 				}
 			}
 			b := bool(v != 0)
-			m.Typed = &Value_NilValue{NilValue: b}
+			m.Type = &Value_NilValue{NilValue: b}
 		case 20:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Array", wireType)
@@ -4401,7 +4401,7 @@ func (m *Value) UnmarshalVTUnsafe(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if oneof, ok := m.Typed.(*Value_Array); ok {
+			if oneof, ok := m.Type.(*Value_Array); ok {
 				if err := oneof.Array.UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
@@ -4410,7 +4410,7 @@ func (m *Value) UnmarshalVTUnsafe(dAtA []byte) error {
 				if err := v.UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
-				m.Typed = &Value_Array{Array: v}
+				m.Type = &Value_Array{Array: v}
 			}
 			iNdEx = postIndex
 		case 21:
@@ -4442,7 +4442,7 @@ func (m *Value) UnmarshalVTUnsafe(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if oneof, ok := m.Typed.(*Value_Fields); ok {
+			if oneof, ok := m.Type.(*Value_Fields); ok {
 				if err := oneof.Fields.UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
@@ -4451,7 +4451,7 @@ func (m *Value) UnmarshalVTUnsafe(dAtA []byte) error {
 				if err := v.UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
-				m.Typed = &Value_Fields{Fields: v}
+				m.Type = &Value_Fields{Fields: v}
 			}
 			iNdEx = postIndex
 		default:
