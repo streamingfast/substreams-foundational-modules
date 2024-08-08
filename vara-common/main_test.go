@@ -63,9 +63,9 @@ func Test_MapDecodedBlock(t *testing.T) {
 				dblock, err := map_decoded_block(b)
 				require.NoError(t, err)
 				require.NotNil(t, dblock)
-				j, err := json.MarshalIndent(dblock, "", "  ")
-				require.NoError(t, err)
-				fmt.Println(string(j))
+				//j, err := json.MarshalIndent(dblock, "", "  ")
+				//require.NoError(t, err)
+				//fmt.Println(string(j))
 			}
 		})
 	}

@@ -110,7 +110,10 @@ func toCall(extrinsic *pbgear.Extrinsic, callRegistry registry.CallRegistry, met
 		return nil, fmt.Errorf("decoding call: %w", err)
 	}
 
-	fields := toFields(decodedCall, metadata)
+	fields, err := toFields(decodedCall, metadata)
+	if err != nil {
+		return nil, fmt.Errorf("converting call fields: %w", err)
+	}
 
 	return &pbvara.Call{
 		Name:   name,
@@ -127,16 +130,20 @@ func toEvents(eventRegistry registry.EventRegistry, storageEvents []byte, metada
 	}
 
 	for _, event := range evts {
+		f, err := toFields(event.Fields, metadata)
+		if err != nil {
+			return nil, fmt.Errorf("converting fields: %w", err)
+		}
 		out = append(out, &pbvara.Event{
 			Name:   event.Name,
-			Fields: toFields(event.Fields, metadata),
+			Fields: f,
 		})
 	}
 
 	return out, nil
 }
 
-func toFields(in any, metadata *types.Metadata) *pbvara.Fields {
+func toFields(in any, metadata *types.Metadata) (*pbvara.Fields, error) {
 	var fields registry.DecodedFields
 	switch i := in.(type) {
 	case *registry.VariantWTF:
@@ -147,20 +154,25 @@ func toFields(in any, metadata *types.Metadata) *pbvara.Fields {
 		fields = i
 	case []interface{}:
 		if len(i) != 1 {
-			panic("expected an array of 1 element")
+			return nil, fmt.Errorf("expected an array of 1 element")
 		}
 		fields = i[0].(registry.DecodedFields)
 	case nil:
-		return &pbvara.Fields{}
+		return &pbvara.Fields{}, nil
 	default:
-		panic(fmt.Sprintf("unknown type %T", in))
+		return nil, fmt.Errorf("unexpected type %T", i)
 	}
 	m := map[string]*pbvara.Value{}
 
 	for _, field := range fields {
-		v := toValue(field, metadata)
 		if _, found := m[field.Name]; found {
-			panic("duplicate field: " + field.Name)
+			return nil, fmt.Errorf("duplicate field: " + field.Name)
+		}
+
+		v, err := toValue(field, metadata)
+
+		if err != nil {
+			return nil, fmt.Errorf("converting field %q: %w", field.Name, err)
 		}
 
 		m[field.Name] = v
@@ -168,50 +180,51 @@ func toFields(in any, metadata *types.Metadata) *pbvara.Fields {
 
 	return &pbvara.Fields{
 		Map: m,
-	}
+	}, nil
 }
 
-func toValue(decodedField *registry.DecodedField, metadata *types.Metadata) *pbvara.Value {
+func toValue(decodedField *registry.DecodedField, metadata *types.Metadata) (*pbvara.Value, error) {
 	lookupType := metadata.AsMetadataV14.EfficientLookup[decodedField.LookupIndex]
-	value := &pbvara.Value{}
 
 	switch {
 	case lookupType.Def.IsPrimitive:
-		value = toPrimitiveValue(lookupType, decodedField.Value)
+		return toPrimitiveValue(lookupType, decodedField.Value)
 
 	case lookupType.Def.IsSequence, lookupType.Def.IsArray:
-		value = toSequenceValue(decodedField, metadata, lookupType)
+		return toSequenceValue(decodedField, metadata, lookupType)
 
 	case lookupType.Def.IsTuple:
 		panic("not implemented")
 
 	case lookupType.Def.IsVariant:
-		value = toVariantValue(decodedField, metadata, lookupType)
+		return toVariantValue(decodedField, metadata, lookupType)
 
 	case lookupType.Def.IsCompact:
-		value = toCompactValue(decodedField, metadata, lookupType)
+		return toCompactValue(decodedField, metadata, lookupType)
 
 	case lookupType.Def.IsComposite:
-		value = toCompositeValue(decodedField, metadata, lookupType)
+		return toCompositeValue(decodedField, metadata, lookupType)
 	default:
-		panic("unknown type")
+		return nil, fmt.Errorf("unknown type")
 	}
 
-	return value
 }
 
-func toCompositeValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) *pbvara.Value {
+func toCompositeValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) (*pbvara.Value, error) {
 	compositeFields := decodedField.Value.(registry.DecodedFields)
 
 	if len(compositeFields) == 1 {
 		f := compositeFields[0]
 		if f.Name == "[u8; 32]" {
-			v := toValue(f, metadata)
+			v, err := toValue(f, metadata)
+			if err != nil {
+				return nil, fmt.Errorf("converting composite field: %w", err)
+			}
 			return &pbvara.Value{
 				Type: &pbvara.Value_Bytes{
 					Bytes: v.Type.(*pbvara.Value_Bytes).Bytes,
 				},
-			}
+			}, nil
 		}
 	}
 
@@ -223,9 +236,17 @@ func toCompositeValue(decodedField *registry.DecodedField, metadata *types.Metad
 
 		switch v := field.Value.(type) {
 		case []interface{}: //this is a Sequence
-			values[field.Name] = toValue(field, metadata)
+			var err error
+			values[field.Name], err = toValue(field, metadata)
+			if err != nil {
+
+			}
 		case registry.DecodedFields:
-			fs := toFields(v, metadata)
+			var err error
+			fs, err := toFields(v, metadata)
+			if err != nil {
+				return nil, fmt.Errorf("converting composite field: %w", err)
+			}
 			values[field.Name] = &pbvara.Value{
 				Type: &pbvara.Value_Fields{
 					Fields: &pbvara.Fields{
@@ -253,20 +274,23 @@ func toCompositeValue(decodedField *registry.DecodedField, metadata *types.Metad
 				Map: values,
 			},
 		},
-	}
+	}, nil
 }
 
-func toCompactValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) *pbvara.Value {
+func toCompactValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) (*pbvara.Value, error) {
 	childType := metadata.AsMetadataV14.EfficientLookup[lookupType.Def.Compact.Type.Int64()]
 	if childType.Def.IsPrimitive {
 		return toPrimitiveValue(childType, decodedField.Value)
 	} else {
-		fields := toFields(decodedField.Value, metadata)
+		fields, err := toFields(decodedField.Value, metadata)
+		if err != nil {
+			return nil, fmt.Errorf("converting none primitive: %w", err)
+		}
 		if len(fields.Map) == 1 {
 			for _, field := range fields.Map {
 				return &pbvara.Value{
 					Type: field.Type,
-				}
+				}, nil
 			}
 		}
 
@@ -274,11 +298,11 @@ func toCompactValue(decodedField *registry.DecodedField, metadata *types.Metadat
 			Type: &pbvara.Value_Fields{
 				Fields: fields,
 			},
-		}
+		}, nil
 	}
 }
 
-func toVariantValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) *pbvara.Value {
+func toVariantValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) (*pbvara.Value, error) {
 	value := &pbvara.Value{}
 
 	switch v := decodedField.Value.(type) {
@@ -291,7 +315,11 @@ func toVariantValue(decodedField *registry.DecodedField, metadata *types.Metadat
 				if len(variant.Fields) == 1 {
 					childType := metadata.AsMetadataV14.EfficientLookup[variant.Fields[0].Type.Int64()]
 					if childType.Def.IsPrimitive {
-						value = toPrimitiveValue(childType, v.ValueAt(0))
+						var err error
+						value, err = toPrimitiveValue(childType, v.ValueAt(0))
+						if err != nil {
+							return nil, fmt.Errorf("converting variant primitive field: %w", err)
+						}
 						break
 					}
 				}
@@ -303,15 +331,18 @@ func toVariantValue(decodedField *registry.DecodedField, metadata *types.Metadat
 
 					break
 				}
+				f, err := toFields(v.ValueAt(0), metadata)
+				if err != nil {
+					return nil, fmt.Errorf("converting variant field item: %w", err)
+				}
 				value.Type = &pbvara.Value_Fields{
-
-					Fields: toFields(v.ValueAt(0), metadata),
+					Fields: f,
 				}
 				break
 			}
 		}
 		if !matched {
-			panic(fmt.Sprintf("variant not found for: %d", wtf.VariantByte))
+			return nil, fmt.Errorf("variant not found for: %d", wtf.VariantByte)
 		}
 	case uint8: //this is an enum
 		//todo: we should add a enum type with both name and index
@@ -323,13 +354,13 @@ func toVariantValue(decodedField *registry.DecodedField, metadata *types.Metadat
 			}
 		}
 	default:
-		panic(fmt.Sprintf("unknown type %T", decodedField.Value))
+		return nil, fmt.Errorf("unknown type %T", decodedField.Value)
 	}
 
-	return value
+	return value, nil
 }
 
-func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) *pbvara.Value {
+func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) (*pbvara.Value, error) {
 	var arrayOfTypeID int64
 	switch {
 	case lookupType.Def.IsSequence:
@@ -345,15 +376,21 @@ func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metada
 			Type: &pbvara.Value_Bytes{
 				Bytes: data,
 			},
-		}
+		}, nil
 
 	} else {
 		for _, item := range decodedField.Value.([]interface{}) {
 			if arrayOfType.Def.IsPrimitive {
-				val := toPrimitiveValue(arrayOfType, item.(*registry.DecodedField).Value)
+				val, err := toPrimitiveValue(arrayOfType, item.(*registry.DecodedField).Value)
+				if err != nil {
+					return nil, fmt.Errorf("decoding primitive value: %w", err)
+				}
 				array.Items = append(array.Items, val)
 			} else if arrayOfType.Def.IsComposite {
-				fields := toFields(item, metadata)
+				fields, err := toFields(item, metadata)
+				if err != nil {
+					return nil, fmt.Errorf("converting composite: %w", err)
+				}
 				if len(fields.Map) == 1 {
 					for _, field := range fields.Map { //composite was just a wrapper
 						val := &pbvara.Value{
@@ -363,19 +400,23 @@ func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metada
 						continue
 					}
 				}
-
 				val := &pbvara.Value{
 					Type: &pbvara.Value_Fields{
-						Fields: toFields(item, metadata),
+						Fields: fields,
 					},
 				}
 				array.Items = append(array.Items, val)
 				continue
 			}
+
 			v := item.(registry.Valuable).ValueAt(0)
+			f, err := toFields(v, metadata)
+			if err != nil {
+				return nil, fmt.Errorf("converting composite field item: %w", err)
+			}
 			val := &pbvara.Value{
 				Type: &pbvara.Value_Fields{
-					Fields: toFields(v, metadata),
+					Fields: f,
 				},
 			}
 			array.Items = append(array.Items, val)
@@ -385,7 +426,7 @@ func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metada
 			Type: &pbvara.Value_Array{
 				Array: array,
 			},
-		}
+		}, nil
 	}
 }
 
@@ -464,7 +505,7 @@ func decodeEvents(eventRegistry registry.EventRegistry, storageEvents []byte) ([
 	return events, nil
 }
 
-func toPrimitiveValue(in *types.Si1Type, value any) *pbvara.Value {
+func toPrimitiveValue(in *types.Si1Type, value any) (*pbvara.Value, error) {
 	var val *pbvara.Value
 	switch in.Def.Primitive.Si0TypeDefPrimitive {
 	case types.IsBool:
@@ -560,7 +601,7 @@ func toPrimitiveValue(in *types.Si1Type, value any) *pbvara.Value {
 			},
 		}
 	}
-	return val
+	return val, nil
 }
 
 func ToCallIndex(ci *pbgear.CallIndex) types.CallIndex {
