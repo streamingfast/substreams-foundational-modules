@@ -28,28 +28,75 @@ func Test_MapDecodedBlock(t *testing.T) {
 		key  string
 	}{
 		{name: "spec100", key: "100"},
+		{name: "spec100", key: "17400"},
+
 		{name: "spec120", key: "17600"},
+		{name: "spec120", key: "137800"},
+
 		{name: "spec130", key: "138000"},
+		{name: "spec130", key: "1213900"},
+
 		{name: "spec140", key: "1380000"},
+		{name: "spec140", key: "4182000"},
+
 		{name: "spec210", key: "4182200"},
+		{name: "spec210", key: "4433300"},
+
 		{name: "spec310", key: "4433500"},
+		{name: "spec310", key: "4641400"},
+
 		{name: "spec320", key: "4641600"},
+		{name: "spec320", key: "4961100"},
+
 		{name: "spec330", key: "4961300"},
+		{name: "spec330", key: "4986700"},
+
 		{name: "spec340", key: "4986900"},
+		{name: "spec340", key: "5046200"},
+
 		{name: "spec350", key: "5046400"},
+		{name: "spec350", key: "5078800"},
+
 		{name: "spec1000", key: "5079000"},
+		{name: "spec1000", key: "6711400"},
+
 		{name: "spec1010", key: "6760600"},
+		{name: "spec1010", key: "7195800"},
+
 		{name: "spec1020", key: "7196000"},
+		{name: "spec1020", key: "8384700"},
+
 		{name: "spec1030", key: "8384900"},
+		{name: "spec1030", key: "8754000"},
+
 		{name: "spec1040", key: "8754200"},
+		{name: "spec1040", key: "8775500"},
+
 		{name: "spec1050", key: "8775700"},
+		{name: "spec1050", key: "9876400"},
+
 		{name: "spec1110", key: "9876600"},
+		{name: "spec1110", key: "10849000"},
+
 		{name: "spec1200", key: "10849200"},
+		{name: "spec1200", key: "10934300"},
+
 		{name: "spec1210", key: "10934500"},
+		{name: "spec1210", key: "11626900"},
+
 		{name: "spec1300", key: "11627100"},
+		{name: "spec1300", key: "12224600"},
+
 		{name: "spec1310", key: "12224800"},
+		{name: "spec1310", key: "12629400"},
+
 		{name: "spec1400", key: "12629600"},
+		{name: "spec1400", key: "12884900"},
+
 		{name: "spec1410", key: "12885100"},
+		{name: "spec1410", key: "14008400"},
+
+		{name: "spec1420", key: "14008600"},
 		{name: "spec1420", key: "14463900"},
 	}
 
