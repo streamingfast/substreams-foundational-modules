@@ -158,10 +158,14 @@ func toFields(in any, metadata *types.Metadata) *pbvara.Fields {
 	m := map[string]*pbvara.Value{}
 
 	for _, field := range fields {
+		if field.Name == "sp_core.crypto.AccountId32.from" {
+			fmt.Println("toto")
+		}
 		v := toValue(field, metadata)
 		if _, found := m[field.Name]; found {
 			panic("duplicate field: " + field.Name)
 		}
+
 		m[field.Name] = v
 	}
 
@@ -208,6 +212,8 @@ func toCompositeValue(decodedField *registry.DecodedField, metadata *types.Metad
 			panic("composite field name not set")
 		}
 		switch v := field.Value.(type) {
+		case []interface{}: //this is a Sequence
+			values[field.Name] = toValue(field, metadata)
 		case registry.DecodedFields:
 			fs := toFields(v, metadata)
 			values[field.Name] = &pbvara.Value{
