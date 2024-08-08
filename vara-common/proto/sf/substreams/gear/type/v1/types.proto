@@ -36,7 +36,7 @@ message Event {
 
 
 message Value {
-  oneof typed {
+  oneof type {
     int32 int32 = 1;
     string bigdecimal = 2;
     string bigint = 3;

@@ -217,7 +217,7 @@ func toCompositeValue(decodedField *registry.DecodedField, metadata *types.Metad
 		case registry.DecodedFields:
 			fs := toFields(v, metadata)
 			values[field.Name] = &pbvara.Value{
-				Typed: &pbvara.Value_Fields{
+				Type: &pbvara.Value_Fields{
 					Fields: &pbvara.Fields{
 						Map: fs.Map,
 					},
@@ -228,7 +228,7 @@ func toCompositeValue(decodedField *registry.DecodedField, metadata *types.Metad
 			for _, e := range enumType.Def.Variant.Variants {
 				if uint8(e.Index) == v {
 					values[field.Name] = &pbvara.Value{
-						Typed: &pbvara.Value_String_{
+						Type: &pbvara.Value_String_{
 							String_: string(e.Name),
 						},
 					}
@@ -238,7 +238,7 @@ func toCompositeValue(decodedField *registry.DecodedField, metadata *types.Metad
 		}
 	}
 	return &pbvara.Value{
-		Typed: &pbvara.Value_Fields{
+		Type: &pbvara.Value_Fields{
 			Fields: &pbvara.Fields{
 				Map: values,
 			},
@@ -255,13 +255,13 @@ func toCompactValue(decodedField *registry.DecodedField, metadata *types.Metadat
 		if len(fields.Map) == 1 {
 			for _, field := range fields.Map {
 				return &pbvara.Value{
-					Typed: field.Typed,
+					Type: field.Type,
 				}
 			}
 		}
 
 		return &pbvara.Value{
-			Typed: &pbvara.Value_Fields{
+			Type: &pbvara.Value_Fields{
 				Fields: fields,
 			},
 		}
@@ -287,13 +287,13 @@ func toVariantValue(decodedField *registry.DecodedField, metadata *types.Metadat
 				}
 
 				if _, ok := v.ValueAt(0).(uint8); ok {
-					value.Typed = &pbvara.Value_String_{
+					value.Type = &pbvara.Value_String_{
 						String_: string(variant.Name),
 					}
 
 					break
 				}
-				value.Typed = &pbvara.Value_Fields{
+				value.Type = &pbvara.Value_Fields{
 
 					Fields: toFields(v.ValueAt(0), metadata),
 				}
@@ -307,7 +307,7 @@ func toVariantValue(decodedField *registry.DecodedField, metadata *types.Metadat
 		//todo: we should add a enum type with both name and index
 		for _, variant := range lookupType.Def.Variant.Variants {
 			if byte(variant.Index) == decodedField.Value {
-				value.Typed = &pbvara.Value_String_{
+				value.Type = &pbvara.Value_String_{
 					String_: string(variant.Name),
 				}
 			}
@@ -332,7 +332,7 @@ func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metada
 	if arrayOfType.Def.IsPrimitive && (arrayOfType.Def.Primitive.Si0TypeDefPrimitive == types.IsU8 || arrayOfType.Def.Primitive.Si0TypeDefPrimitive == types.IsI8) {
 		data := To_bytes(decodedField.Value)
 		return &pbvara.Value{
-			Typed: &pbvara.Value_Bytes{
+			Type: &pbvara.Value_Bytes{
 				Bytes: data,
 			},
 		}
@@ -347,7 +347,7 @@ func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metada
 				if len(fields.Map) == 1 {
 					for _, field := range fields.Map { //composite was just a wrapper
 						val := &pbvara.Value{
-							Typed: field.Typed,
+							Type: field.Type,
 						}
 						array.Items = append(array.Items, val)
 						continue
@@ -355,7 +355,7 @@ func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metada
 				}
 
 				val := &pbvara.Value{
-					Typed: &pbvara.Value_Fields{
+					Type: &pbvara.Value_Fields{
 						Fields: toFields(item, metadata),
 					},
 				}
@@ -364,7 +364,7 @@ func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metada
 			}
 			v := item.(registry.Valuable).ValueAt(0)
 			val := &pbvara.Value{
-				Typed: &pbvara.Value_Fields{
+				Type: &pbvara.Value_Fields{
 					Fields: toFields(v, metadata),
 				},
 			}
@@ -372,7 +372,7 @@ func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metada
 		}
 
 		return &pbvara.Value{
-			Typed: &pbvara.Value_Array{
+			Type: &pbvara.Value_Array{
 				Array: array,
 			},
 		}
@@ -459,93 +459,93 @@ func toPrimitiveValue(in *types.Si1Type, value any) *pbvara.Value {
 	switch in.Def.Primitive.Si0TypeDefPrimitive {
 	case types.IsBool:
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_Bool{
+			Type: &pbvara.Value_Bool{
 				Bool: To_bool(value),
 			},
 		}
 	case types.IsChar:
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_String_{
+			Type: &pbvara.Value_String_{
 				String_: To_string(value),
 			},
 		}
 	case types.IsStr:
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_String_{
+			Type: &pbvara.Value_String_{
 				String_: To_string(value),
 			},
 		}
 	case types.IsU8: // TODO: not sure about this one, should it be bytes ??
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_Bigint{
+			Type: &pbvara.Value_Bigint{
 				Bigint: fmt.Sprint(To_uint32(value)),
 			},
 		}
 	case types.IsU16:
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_Bigint{
+			Type: &pbvara.Value_Bigint{
 				Bigint: fmt.Sprint(To_uint32(value)),
 			},
 		}
 
 	case types.IsU32:
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_Bigint{
+			Type: &pbvara.Value_Bigint{
 				Bigint: fmt.Sprint(To_uint32(value)),
 			},
 		}
 
 	case types.IsU64:
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_Bigint{
+			Type: &pbvara.Value_Bigint{
 				Bigint: fmt.Sprint(To_uint64(value)),
 			},
 		}
 	case types.IsU128:
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_Bigint{
+			Type: &pbvara.Value_Bigint{
 				Bigint: fmt.Sprint(To_string(value)),
 			},
 		}
 	case types.IsU256:
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_Bigint{
+			Type: &pbvara.Value_Bigint{
 				Bigint: fmt.Sprint(To_string(value)),
 			},
 		}
 	case types.IsI8:
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_Int32{
+			Type: &pbvara.Value_Int32{
 				Int32: To_int32(value),
 			},
 		}
 	case types.IsI16:
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_Int32{
+			Type: &pbvara.Value_Int32{
 				Int32: To_int32(value),
 			},
 		}
 	case types.IsI32:
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_Int32{
+			Type: &pbvara.Value_Int32{
 				Int32: To_int32(value),
 			},
 		}
 	case types.IsI64:
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_Bigint{
+			Type: &pbvara.Value_Bigint{
 				Bigint: fmt.Sprint(To_int64(value)),
 			},
 		}
 	case types.IsI128:
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_Bigint{
+			Type: &pbvara.Value_Bigint{
 				Bigint: fmt.Sprint(To_string(value)),
 			},
 		}
 	case types.IsI256:
 		val = &pbvara.Value{
-			Typed: &pbvara.Value_Bigint{
+			Type: &pbvara.Value_Bigint{
 				Bigint: fmt.Sprint(To_string(value)),
 			},
 		}
