@@ -143,6 +143,8 @@ func toFields(in any, metadata *types.Metadata) *pbvara.Fields {
 		fields = i.Value.(registry.DecodedFields)
 	case registry.DecodedFields:
 		fields = i
+	case []*registry.DecodedField:
+		fields = i
 	case []interface{}:
 		if len(i) != 1 {
 			panic("expected an array of 1 element")
@@ -198,24 +200,66 @@ func toValue(decodedField *registry.DecodedField, metadata *types.Metadata) *pbv
 }
 
 func toCompositeValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) *pbvara.Value {
+	compositeFields := decodedField.Value.(registry.DecodedFields)
+
+	values := map[string]*pbvara.Value{}
+	for _, field := range compositeFields {
+		if field.Name == "" {
+			panic("composite field name not set")
+		}
+		switch v := field.Value.(type) {
+		case registry.DecodedFields:
+			fs := toFields(v, metadata)
+			values[field.Name] = &pbvara.Value{
+				Typed: &pbvara.Value_Fields{
+					Fields: &pbvara.Fields{
+						Map: fs.Map,
+					},
+				},
+			}
+		case uint8: //enum
+			enumType := metadata.AsMetadataV14.EfficientLookup[field.LookupIndex]
+			for _, e := range enumType.Def.Variant.Variants {
+				if uint8(e.Index) == v {
+					values[field.Name] = &pbvara.Value{
+						Typed: &pbvara.Value_String_{
+							String_: string(e.Name),
+						},
+					}
+					break
+				}
+			}
+		}
+	}
 	return &pbvara.Value{
 		Typed: &pbvara.Value_Fields{
-			Fields: toFields(decodedField.Value, metadata),
+			Fields: &pbvara.Fields{
+				Map: values,
+			},
 		},
 	}
 }
 
 func toCompactValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) *pbvara.Value {
-	value := &pbvara.Value{}
 	childType := metadata.AsMetadataV14.EfficientLookup[lookupType.Def.Compact.Type.Int64()]
 	if childType.Def.IsPrimitive {
-		value = toPrimitiveValue(childType, decodedField.Value)
+		return toPrimitiveValue(childType, decodedField.Value)
 	} else {
-		value.Typed = &pbvara.Value_Fields{
-			Fields: toFields(decodedField.Value.(registry.DecodedFields), metadata),
+		fields := toFields(decodedField.Value, metadata)
+		if len(fields.Map) == 1 {
+			for _, field := range fields.Map {
+				return &pbvara.Value{
+					Typed: field.Typed,
+				}
+			}
+		}
+
+		return &pbvara.Value{
+			Typed: &pbvara.Value_Fields{
+				Fields: fields,
+			},
 		}
 	}
-	return value
 }
 
 func toVariantValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) *pbvara.Value {
@@ -270,7 +314,6 @@ func toVariantValue(decodedField *registry.DecodedField, metadata *types.Metadat
 }
 
 func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) *pbvara.Value {
-	value := &pbvara.Value{}
 	var arrayOfTypeID int64
 	switch {
 	case lookupType.Def.IsSequence:
@@ -280,42 +323,54 @@ func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metada
 	}
 	arrayOfType := metadata.AsMetadataV14.EfficientLookup[arrayOfTypeID]
 	array := &pbvara.Array{}
-	if arrayOfType.Def.IsPrimitive {
-		if arrayOfType.Def.Primitive.Si0TypeDefPrimitive == types.IsU8 || arrayOfType.Def.Primitive.Si0TypeDefPrimitive == types.IsI8 {
-			data := To_bytes(decodedField.Value)
-			value.Typed = &pbvara.Value_Bytes{
+	if arrayOfType.Def.IsPrimitive && (arrayOfType.Def.Primitive.Si0TypeDefPrimitive == types.IsU8 || arrayOfType.Def.Primitive.Si0TypeDefPrimitive == types.IsI8) {
+		data := To_bytes(decodedField.Value)
+		return &pbvara.Value{
+			Typed: &pbvara.Value_Bytes{
 				Bytes: data,
-			}
+			},
 		}
+
 	} else {
 		for _, item := range decodedField.Value.([]interface{}) {
-			var val *pbvara.Value
-
 			if arrayOfType.Def.IsPrimitive {
-				val = toPrimitiveValue(arrayOfType, item.(*registry.DecodedField).Value)
+				val := toPrimitiveValue(arrayOfType, item.(*registry.DecodedField).Value)
+				array.Items = append(array.Items, val)
 			} else if arrayOfType.Def.IsComposite {
-				value.Typed = &pbvara.Value_Fields{
-					Fields: toFields(item, metadata),
+				fields := toFields(item, metadata)
+				if len(fields.Map) == 1 {
+					for _, field := range fields.Map { //composite was just a wrapper
+						val := &pbvara.Value{
+							Typed: field.Typed,
+						}
+						array.Items = append(array.Items, val)
+						continue
+					}
 				}
-				break
-			} else {
-				v := item.(registry.Valuable).ValueAt(0)
 
-				val = &pbvara.Value{
+				val := &pbvara.Value{
 					Typed: &pbvara.Value_Fields{
-						Fields: toFields(v, metadata),
+						Fields: toFields(item, metadata),
 					},
 				}
+				array.Items = append(array.Items, val)
+				continue
+			}
+			v := item.(registry.Valuable).ValueAt(0)
+			val := &pbvara.Value{
+				Typed: &pbvara.Value_Fields{
+					Fields: toFields(v, metadata),
+				},
 			}
 			array.Items = append(array.Items, val)
 		}
 
-		value.Typed = &pbvara.Value_Array{
-			Array: array,
+		return &pbvara.Value{
+			Typed: &pbvara.Value_Array{
+				Array: array,
+			},
 		}
 	}
-
-	return value
 }
 
 func decodeExtrinsic(extrinsic *pbgear.Extrinsic, callRegistry registry.CallRegistry) (string, registry.DecodedFields, error) {
