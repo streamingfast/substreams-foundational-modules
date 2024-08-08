@@ -157,6 +157,9 @@ func toFields(in any, metadata *types.Metadata) *pbvara.Fields {
 
 	for _, field := range fields {
 		v := toValue(field, metadata)
+		if _, found := m[field.Name]; found {
+			panic("duplicate field: " + field.Name)
+		}
 		m[field.Name] = v
 	}
 
