@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -14,13 +13,6 @@ import (
 )
 
 var testBlocks = loadBlocks()
-
-func Test_MapDecodedBlock_EmptyBlock(t *testing.T) {
-	blk := &pbgear.Block{}
-	dblock, err := map_decoded_block(blk)
-	require.NoError(t, err)
-	fmt.Println(dblock.Number)
-}
 
 func Test_MapDecodedBlock(t *testing.T) {
 	tests := []struct {
