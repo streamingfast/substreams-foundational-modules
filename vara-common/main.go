@@ -203,11 +203,24 @@ func toValue(decodedField *registry.DecodedField, metadata *types.Metadata) *pbv
 func toCompositeValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) *pbvara.Value {
 	compositeFields := decodedField.Value.(registry.DecodedFields)
 
+	if len(compositeFields) == 1 {
+		f := compositeFields[0]
+		if f.Name == "[u8; 32]" {
+			v := toValue(f, metadata)
+			return &pbvara.Value{
+				Type: &pbvara.Value_Bytes{
+					Bytes: v.Type.(*pbvara.Value_Bytes).Bytes,
+				},
+			}
+		}
+	}
+
 	values := map[string]*pbvara.Value{}
 	for _, field := range compositeFields {
 		if field.Name == "" {
 			panic("composite field name not set")
 		}
+
 		switch v := field.Value.(type) {
 		case []interface{}: //this is a Sequence
 			values[field.Name] = toValue(field, metadata)
