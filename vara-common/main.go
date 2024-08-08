@@ -158,9 +158,6 @@ func toFields(in any, metadata *types.Metadata) *pbvara.Fields {
 	m := map[string]*pbvara.Value{}
 
 	for _, field := range fields {
-		if field.Name == "sp_core.crypto.AccountId32.from" {
-			fmt.Println("toto")
-		}
 		v := toValue(field, metadata)
 		if _, found := m[field.Name]; found {
 			panic("duplicate field: " + field.Name)
