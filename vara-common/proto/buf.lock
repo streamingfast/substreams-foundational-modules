@@ -4,15 +4,10 @@ deps:
   - remote: buf.build
     owner: streamingfast
     repository: firehose-gear
-    commit: 48ba4c16b5a0428f9020af00d774de9a
-    digest: shake256:bd9e6f3707da88efb62c396bd2adcfc52bc054c3ef53464a6b4ad11a820d2153afb3abfcff9de2cc62c69389ff487729b18ca7b7e286bfe17c5e8614b35b99f4
+    commit: 5eb3cd2c66a540a19505476f405cd5fa
+    digest: shake256:bb98930530b19cfb6e6a91ec196e4abcc17717e1016b67202f7275c790c064dc63b5496fa99d492119e02421f8473eec72f46dc7e18d6e7caa79f863b10fc2a2
   - remote: buf.build
     owner: streamingfast
     repository: substreams
     commit: ce84563cf22e4befa55edf53f61af055
     digest: shake256:09af59d53626d932d4960525e37559df71ddc7b4f95b98a4320ef742405217219b8d71c9c11541a1a4b0054cabe15fa2ab8fcb8b781435bab8c65e20d25c1090
-  - remote: buf.build
-    owner: streamingfast
-    repository: substreams-gear
-    commit: 27a028b4daaf4e9e80158a3e714c558f
-    digest: shake256:32ad0d2eca8dd72fae8da16690f3d3dc3dda53e21e972a9868bebc3840b19b9b9a574edbf067fc80b942312564996dce4b7cd6b4964ce3dc96b26bdef838453a

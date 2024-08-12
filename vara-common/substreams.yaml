@@ -18,3 +18,50 @@ modules:
       - source: sf.gear.type.v1.Block
     output:
       type: proto:sf.gear.type.v1.Block
+
+  - name: all_extrinsics
+    kind: map
+    initialBlock: 0
+    inputs:
+      - map: map_decoded_block
+    output:
+      type: proto:sf.substreams.gear.type.v1.Extrinsics
+    doc: |
+      `all_extrinsics` reads from the `sf.gear.type.v1.Block` source and outputs a list of all extrinsics in the block.
+
+  - name: index_extrinsics
+    kind: blockIndex
+    inputs:
+      - map: all_extrinsics
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+    doc: |
+      `index_block` sets the keys corresponding to all events and extrinsics in the block
+
+  - name: filtered_extrinsics
+    kind: map
+    blockFilter:
+      module: index_extrinsics
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_extrinsics
+    output:
+      type: proto:sf.substreams.gear.type.v1.Extrinsics
+    doc: |
+      `filtered_extrinsics` reads from `all_extrinsics` and applies a filter on keys, 
+      only outputting extrinsics that match the filter. 
+      Example usage: `(extrinsic:Timestamp.set:event:System.ExtrinsicSuccess)`
+
+params:
+  filtered_transactions: "extrinsic:Gear.run"
+
+#  - name: index
+#    kind: blockIndex
+#    inputs:
+#      - map: map_decoded_block
+#    output:
+#      type: proto:sf.substreams.index.v1.Keys
+#    doc: |
+#      `index_events` sets the keys corresponding to all event 'types' and 'attribute keys' in the block

@@ -5,14 +5,19 @@ go 1.22.0
 replace github.com/centrifuge/go-substrate-rpc-client/v4 => github.com/streamingfast/go-substrate-rpc-client/v4 v4.0.0-20240802141237-cb3f49e2ebd1
 
 require (
+	github.com/RoaringBitmap/roaring v1.9.1
+	github.com/alecthomas/participle v0.7.1
 	github.com/centrifuge/go-substrate-rpc-client/v4 v4.2.1
 	github.com/stretchr/testify v1.8.4
 )
 
 require (
+	github.com/bits-and-blooms/bitset v1.12.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/deckarep/golang-set v1.8.0 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rs/cors v1.10.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
@@ -37,7 +42,6 @@ require (
 	github.com/gtank/ristretto255 v0.1.2 // indirect
 	github.com/mimoo/StrobeGo v0.0.0-20220103164710-9a04d6ca976b // indirect
 	github.com/pierrec/xxHash v0.1.5 // indirect
-	github.com/streamingfast/firehose-gear v0.0.0-20240801184131-b94c4ba58381
 	github.com/vedhavyas/go-subkey/v2 v2.0.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect

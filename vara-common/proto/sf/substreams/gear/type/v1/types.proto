@@ -4,24 +4,38 @@ package sf.substreams.vara.type.v1;
 
 option go_package = "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/vara/v1";
 
+import "google/protobuf/timestamp.proto";
 import "sf/gear/type/v1/block.proto";
 import "sf/substreams/v1/clock.proto";
+import "sf/substreams/index/v1/keys.proto";
 
 
 message Block {
   uint64 number = 1;
   bytes hash = 2;
-  sf.gear.type.v1.Header header = 3;
-  repeated Extrinsic extrinsics = 4;
-  repeated Event events = 5;
-  repeated sf.gear.type.v1.DigestItem digest_items = 6;
-  bytes justification = 7;
+  google.protobuf.Timestamp timestamp  = 3;
+  sf.gear.type.v1.Header header = 4;
+  repeated Extrinsic extrinsics = 5;
+  repeated Event events = 6;
+  repeated sf.gear.type.v1.DigestItem digest_items = 7;
+  bytes justification = 8;
+}
+
+message Extrinsics {
+  .sf.substreams.v1.Clock clock = 1;
+  repeated Extrinsic extrinsics =2;
+}
+
+message Events {
+  .sf.substreams.v1.Clock clock = 1;
+  repeated Event events =2;
 }
 
 message Extrinsic {
   uint32 version = 1;
   sf.gear.type.v1.Signature signature = 2;
   Call call = 3;
+  repeated Event events = 4;
 }
 
 message Call {
@@ -31,7 +45,9 @@ message Call {
 
 message Event {
   string name = 1;
-  Fields fields = 2;
+  sf.gear.type.v1.Phase phase = 2;
+  Fields fields = 3;
+  repeated bytes topics = 4;
 }
 
 

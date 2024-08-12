@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"context"
+	"encoding/hex"
 	"fmt"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
@@ -12,6 +14,9 @@ import (
 	"github.com/streamingfast/substreams-foundational-modules/vara-common/metadata/spec"
 	pbgear "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/gear/type/v1"
 	pbvara "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/substreams/gear/type/v1"
+	pbindex "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/substreams/index/v1"
+	pbsubstreams "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/substreams/v1"
+	"github.com/streamingfast/substreams-foundational-modules/vara-common/sqe"
 )
 
 var specVersions = map[uint32]string{
@@ -49,7 +54,7 @@ func init() {
 }
 
 // this will actually return a decodedBlock containing all the decoded calls and events
-func map_decoded_block(block *pbgear.Block) (*pbvara.Block, error) {
+func MapDecodedBlock(block *pbgear.Block) (*pbvara.Block, error) {
 	factory := registry.NewFactory()
 	meta := metadataRegistry[block.Header.SpecVersion]
 
@@ -73,15 +78,99 @@ func map_decoded_block(block *pbgear.Block) (*pbvara.Block, error) {
 		return nil, fmt.Errorf("converting events: %w", err)
 	}
 
+	for _, event := range events {
+		if event.Phase.IsApplyExtrinsic {
+			ex := extrinsics[int(event.Phase.AsApplyExtrinsic)]
+			ex.Events = append(ex.Events, event)
+		}
+	}
+
 	return &pbvara.Block{
 		Number:        block.Number,
 		Hash:          block.Hash,
 		Header:        block.Header,
+		Timestamp:     block.Timestamp,
 		DigestItems:   block.DigestItems,
 		Justification: block.Justification,
 		Extrinsics:    extrinsics,
 		Events:        events,
 	}, nil
+}
+
+func AllExtrinsics(block *pbvara.Block) (*pbvara.Extrinsics, error) {
+	clock := &pbsubstreams.Clock{
+		Id:        hex.EncodeToString(block.Hash),
+		Number:    block.Number,
+		Timestamp: block.Timestamp,
+	}
+
+	return &pbvara.Extrinsics{
+		Clock:      clock,
+		Extrinsics: block.Extrinsics,
+	}, nil
+}
+
+func IndexExtrinsics(extrinsics *pbvara.Extrinsics) (*pbindex.Keys, error) {
+	out := &Index{
+		Keys: &pbindex.Keys{},
+	}
+	for _, extrinsic := range extrinsics.Extrinsics {
+		idx := indexExtrinsic(extrinsic)
+		out.Keys.Keys = append(out.Keys.Keys, idx.Keys.Keys...)
+	}
+	return out.Keys, nil
+}
+
+func indexExtrinsic(extrinsic *pbvara.Extrinsic) *Index {
+	index := &Index{
+		Keys: &pbindex.Keys{},
+	}
+
+	k := "extrinsic:" + extrinsic.Call.Name
+	index.AddKey(k)
+	for _, event := range extrinsic.Events {
+		ek := "event:" + event.Name
+		index.AddKey(k + ":" + ek)
+		//extrinsic:Gear.run:event:Success
+	}
+
+	return index
+}
+
+func FilteredExtrinsics(query string, block *pbvara.Block) (*pbvara.Extrinsics, error) {
+	clock := &pbsubstreams.Clock{
+		Id:        hex.EncodeToString(block.Hash),
+		Number:    block.Number,
+		Timestamp: block.Timestamp,
+	}
+
+	out := &pbvara.Extrinsics{
+		Clock: clock,
+	}
+
+	for _, extrinsic := range block.Extrinsics {
+		index := indexExtrinsic(extrinsic)
+		match, err := applyQuery(query, index.Keys)
+		if err != nil {
+			return nil, fmt.Errorf("applying query: %w", err)
+		}
+		if match {
+			out.Extrinsics = append(out.Extrinsics, extrinsic)
+		}
+
+	}
+
+	return out, nil
+}
+
+func applyQuery(query string, keys *pbindex.Keys) (bool, error) {
+	keyQuerier := sqe.NewFromKeys(keys.Keys)
+	q, err := sqe.Parse(context.Background(), query)
+	if err != nil {
+		return false, fmt.Errorf("parsing query %q: %w", query, err)
+	}
+
+	return sqe.KeysApply(q, keyQuerier), nil
 }
 
 func ToExtrinsics(extrinsics []*pbgear.Extrinsic, callRegistry registry.CallRegistry, metadata *types.Metadata) ([]*pbvara.Extrinsic, error) {
@@ -134,9 +223,24 @@ func toEvents(eventRegistry registry.EventRegistry, storageEvents []byte, metada
 		if err != nil {
 			return nil, fmt.Errorf("converting fields: %w", err)
 		}
+
+		var topics [][]byte
+
+		for _, topic := range event.Topics {
+			h := [32]byte(topic)
+			topics = append(topics, h[:])
+		}
+
 		out = append(out, &pbvara.Event{
-			Name:   event.Name,
+			Name: event.Name,
+			Phase: &pbgear.Phase{
+				IsApplyExtrinsic: event.Phase.IsApplyExtrinsic,
+				AsApplyExtrinsic: event.Phase.AsApplyExtrinsic,
+				IsFinalization:   event.Phase.IsFinalization,
+				IsInitialization: event.Phase.IsFinalization,
+			},
 			Fields: f,
+			Topics: topics,
 		})
 	}
 
@@ -194,7 +298,7 @@ func toValue(decodedField *registry.DecodedField, metadata *types.Metadata) (*pb
 		return toSequenceValue(decodedField, metadata, lookupType)
 
 	case lookupType.Def.IsTuple:
-		panic("not implemented")
+		return nil, fmt.Errorf("tuple is not yet supported")
 
 	case lookupType.Def.IsVariant:
 		return toVariantValue(decodedField, metadata, lookupType)
@@ -207,7 +311,6 @@ func toValue(decodedField *registry.DecodedField, metadata *types.Metadata) (*pb
 	default:
 		return nil, fmt.Errorf("unknown type")
 	}
-
 }
 
 func toCompositeValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) (*pbvara.Value, error) {
