@@ -1,6 +1,6 @@
 specVersion: v0.1.0
 package:
-  name: foundational-modules-vara-common
+  name: foundational_modules_vara_common
   version: v0.1.0
 
 imports:
