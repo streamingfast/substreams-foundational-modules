@@ -1,10 +1,9 @@
-//go:build tinygo || wasip1
+// bozo go:build tinygo || wasip1
 
 package main
 
 import (
 	"fmt"
-	"os"
 	"reflect"
 	"unsafe"
 
@@ -12,9 +11,12 @@ import (
 	pbvara "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/substreams/gear/type/v1"
 )
 
-func panic(a any) {
-	os.Exit(2) //fail-safe so we know someone call panic
-}
+func main() {}
+
+// func panic(a any) {
+// 	Logf("panic: %v", a)
+// 	os.Exit(2) //fail-safe so we know someone call panic
+// }
 
 //export db_get_i64
 func _db_get_i64(code, scope, key uint64) []byte
@@ -28,7 +30,8 @@ func _log(ptr, len uint32)
 
 // Log a line to the Substreams engine
 func Logf(message string, args ...any) {
-	_log(stringToPtr(fmt.Sprintf(message, args...)))
+	unsafePtr, bufPtr := stringToPtr(fmt.Sprintf(message, args...))
+	_log(uint32(unsafePtr), uint32(bufPtr))
 }
 
 // Output the serialized protobuf byte array to the Substreams engine
@@ -59,7 +62,7 @@ func outputVT(out vtMessage) error {
 	return nil
 }
 
-//export MapDecodedBlock
+//export map_decoded_block
 func _map_decoded_block(blockPtr, blockLen int32) int32 {
 	a := ptrToString(blockPtr, blockLen)
 	b := []byte(a)
@@ -72,7 +75,8 @@ func _map_decoded_block(blockPtr, blockLen int32) int32 {
 
 	ret, err := MapDecodedBlock(in)
 	if err != nil {
-		panic(fmt.Errorf("map_extrinsics failed: %w", err))
+		Logf("map_decoded_block failed: %s", err)
+		return 1
 	}
 	if ret != nil {
 		cnt, err := ret.MarshalVT()

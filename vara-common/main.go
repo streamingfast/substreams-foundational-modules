@@ -553,6 +553,10 @@ func decodeExtrinsic(extrinsic *pbgear.Extrinsic, callRegistry registry.CallRegi
 }
 
 func decodeEvents(eventRegistry registry.EventRegistry, storageEvents []byte) ([]*parser.Event, error) {
+	if storageEvents == nil {
+		return nil, nil
+	}
+
 	decoder := scale.NewDecoder(bytes.NewReader(storageEvents))
 
 	eventsCount, err := decoder.DecodeUintCompact()

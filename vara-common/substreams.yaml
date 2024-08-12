@@ -3,6 +3,15 @@ package:
   name: mytinytest
   version: v0.1.0
 
+imports:
+  gear: https://github.com/streamingfast/substreams-gear/releases/download/v0.1.1/gear-v0.1.1.spkg
+
+protobuf:
+  files:
+    - types.proto
+  importPaths:
+    - ./proto/sf/substreams/gear/type/v1
+
 binaries:
   default:
     type: wasip1/tinygo-v1  # wasm/rust-v1
@@ -17,7 +26,7 @@ modules:
     inputs:
       - source: sf.gear.type.v1.Block
     output:
-      type: proto:sf.gear.type.v1.Block
+      type: proto:sf.substreams.vara.type.v1.Block
 
   - name: all_extrinsics
     kind: map
@@ -27,7 +36,7 @@ modules:
     output:
       type: proto:sf.substreams.gear.type.v1.Extrinsics
     doc: |
-      `all_extrinsics` reads from the `sf.gear.type.v1.Block` source and outputs a list of all extrinsics in the block.
+      `all_extrinsics` reads from the `sf.substreams.vara.type.v1.Block` source and outputs a list of all extrinsics in the block.
 
   - name: index_extrinsics
     kind: blockIndex
@@ -36,7 +45,7 @@ modules:
     output:
       type: proto:sf.substreams.index.v1.Keys
     doc: |
-      `index_block` sets the keys corresponding to all events and extrinsics in the block
+      `index_extrinsics` sets the keys corresponding to all events and extrinsics in the block
 
   - name: filtered_extrinsics
     kind: map
@@ -55,13 +64,4 @@ modules:
       Example usage: `(extrinsic:Timestamp.set:event:System.ExtrinsicSuccess)`
 
 params:
-  filtered_transactions: "extrinsic:Gear.run"
-
-#  - name: index
-#    kind: blockIndex
-#    inputs:
-#      - map: map_decoded_block
-#    output:
-#      type: proto:sf.substreams.index.v1.Keys
-#    doc: |
-#      `index_events` sets the keys corresponding to all event 'types' and 'attribute keys' in the block
+  filtered_extrinsics: "extrinsic:Gear.run"

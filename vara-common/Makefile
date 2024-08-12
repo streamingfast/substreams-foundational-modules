@@ -1,6 +1,6 @@
 .PHONY: build
 build:
-	tinygo build -o wasm.wasm -target wasi -gc leaking -scheduler none .
+	tinygo build -o wasm.wasm -target wasi -gc leaking -scheduler none . && wizer wasm.wasm  --allow-wasi -o my2-wasm.wasm -f _start  --wasm-bulk-memory true 
 
 .PHONY: run
 run:

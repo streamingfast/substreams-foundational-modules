@@ -2,7 +2,7 @@ module github.com/streamingfast/substreams-foundational-modules/vara-common
 
 go 1.22.0
 
-replace github.com/centrifuge/go-substrate-rpc-client/v4 => github.com/streamingfast/go-substrate-rpc-client/v4 v4.0.0-20240802141237-cb3f49e2ebd1
+replace github.com/centrifuge/go-substrate-rpc-client/v4 => github.com/streamingfast/go-substrate-rpc-client/v4 v4.0.0-20240802141845-c547d19d232f
 
 require (
 	github.com/RoaringBitmap/roaring v1.9.1
@@ -14,14 +14,9 @@ require (
 require (
 	github.com/bits-and-blooms/bitset v1.12.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/deckarep/golang-set v1.8.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
-	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/rs/cors v1.10.0 // indirect
-	github.com/stretchr/objx v0.5.0 // indirect
-	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
@@ -42,6 +43,7 @@ func To_string(i any) string {
 		return v.String()
 	default:
 		panic("Unknown type")
+		return "" // tinygo compilation is strict and requires a return statement
 	}
 }
 
@@ -57,6 +59,7 @@ func To_int32(i any) int32 {
 		return int32(v)
 	default:
 		panic("Unknown type")
+		return math.MaxInt32 // tinygo compilation is strict and requires a return statement
 	}
 }
 
@@ -72,6 +75,7 @@ func To_uint32(i any) uint32 {
 		return uint32(v)
 	default:
 		panic("Unknown type")
+		return math.MaxUint32 // tinygo compilation is strict and requires a return statement
 	}
 }
 
@@ -102,6 +106,7 @@ func To_uint64(a any) uint64 {
 		return uint64(v)
 	default:
 		panic("Unknown type")
+		return math.MaxUint64 // tinygo compilation is strict and requires a return statement
 	}
 }
 
@@ -127,6 +132,7 @@ func To_int64(a any) int64 {
 		return int64(v)
 	default:
 		panic("Unknown type")
+		return math.MaxInt64 // tinygo compilation is strict and requires a return statement
 	}
 }
 
