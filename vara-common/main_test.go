@@ -15,13 +15,6 @@ import (
 
 var testBlocks = loadBlocks()
 
-func Test_MapDecodedBlock_EmptyBlock(t *testing.T) {
-	blk := &pbgear.Block{}
-	dblock, err := MapDecodedBlock(blk)
-	require.NoError(t, err)
-	fmt.Println(dblock.Number)
-}
-
 func Test_MapDecodedBlock(t *testing.T) {
 	//tests := []struct {
 	//	name string
@@ -57,20 +50,25 @@ func Test_MapDecodedBlock(t *testing.T) {
 	//	t.Run(tt.name, func(t *testing.T) {
 	//		key := tt.key
 	for _, blocks := range testBlocks {
-		for _, b := range blocks {
-			dblock, err := MapDecodedBlock(b)
-			require.NoError(t, err)
-			require.NotNil(t, dblock)
+		t.Run(fmt.Sprintf("test blocks %d", blocks[0].Number), func(t *testing.T) {
+			for _, b := range blocks {
+				dblock, err := MapDecodedBlock(b)
+				if err != nil {
+					t.Fatalf("unable to decode block %d: %s", b.Number, err)
+				}
+				require.NotNil(t, dblock)
 
-			fmt.Println(dblock.Number)
-			extrinsics, err := FilteredExtrinsics("extrinsic:Gear.run:event:System.ExtrinsicSuccess", dblock)
-			require.NoError(t, err)
-			require.Equal(t, 1, len(extrinsics.Extrinsics))
+				extrinsics, err := FilteredExtrinsics("extrinsic:Gear.run:event:System.ExtrinsicSuccess", dblock)
+				require.NoError(t, err)
+				require.Equal(t, 1, len(extrinsics.Extrinsics))
 
-			//j, err := json.MarshalIndent(dblock, "", "  ")
-			//require.NoError(t, err)
-			//fmt.Println(string(j))
-		}
+				if blocks[0].Number == 103900 {
+					j, err := json.MarshalIndent(dblock, "", "  ")
+					require.NoError(t, err)
+					fmt.Println(string(j))
+				}
+			}
+		})
 	}
 
 	//})

@@ -295,10 +295,10 @@ func toValue(decodedField *registry.DecodedField, metadata *types.Metadata) (*pb
 		return toPrimitiveValue(lookupType, decodedField.Value)
 
 	case lookupType.Def.IsSequence, lookupType.Def.IsArray:
-		return toSequenceValue(decodedField, metadata, lookupType)
+		return toSequenceValue(decodedField.Value, metadata, lookupType)
 
 	case lookupType.Def.IsTuple:
-		return nil, fmt.Errorf("tuple is not yet supported")
+		return toTupleValue(decodedField, metadata, lookupType)
 
 	case lookupType.Def.IsVariant:
 		return toVariantValue(decodedField, metadata, lookupType)
@@ -311,6 +311,10 @@ func toValue(decodedField *registry.DecodedField, metadata *types.Metadata) (*pb
 	default:
 		return nil, fmt.Errorf("unknown type")
 	}
+}
+
+func toTupleValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) (*pbvara.Value, error) {
+	return nil, fmt.Errorf("not implemented")
 }
 
 func toCompositeValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) (*pbvara.Value, error) {
@@ -463,7 +467,7 @@ func toVariantValue(decodedField *registry.DecodedField, metadata *types.Metadat
 	return value, nil
 }
 
-func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) (*pbvara.Value, error) {
+func toSequenceValue(value any, metadata *types.Metadata, lookupType *types.Si1Type) (*pbvara.Value, error) {
 	var arrayOfTypeID int64
 	switch {
 	case lookupType.Def.IsSequence:
@@ -474,7 +478,7 @@ func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metada
 	arrayOfType := metadata.AsMetadataV14.EfficientLookup[arrayOfTypeID]
 	array := &pbvara.Array{}
 	if arrayOfType.Def.IsPrimitive && (arrayOfType.Def.Primitive.Si0TypeDefPrimitive == types.IsU8 || arrayOfType.Def.Primitive.Si0TypeDefPrimitive == types.IsI8) {
-		data := To_bytes(decodedField.Value)
+		data := To_bytes(value)
 		return &pbvara.Value{
 			Type: &pbvara.Value_Bytes{
 				Bytes: data,
@@ -482,13 +486,34 @@ func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metada
 		}, nil
 
 	} else {
-		for _, item := range decodedField.Value.([]interface{}) {
+		for _, item := range value.([]interface{}) {
 			if arrayOfType.Def.IsPrimitive {
 				val, err := toPrimitiveValue(arrayOfType, item.(*registry.DecodedField).Value)
 				if err != nil {
 					return nil, fmt.Errorf("decoding primitive value: %w", err)
 				}
 				array.Items = append(array.Items, val)
+				continue
+			} else if arrayOfType.Def.IsTuple {
+				fields, err := toFields(item, metadata)
+				if err != nil {
+					return nil, fmt.Errorf("converting tuple: %w", err)
+				}
+				val := &pbvara.Value{
+					Type: &pbvara.Value_Fields{
+						Fields: fields,
+					},
+				}
+				array.Items = append(array.Items, val)
+				continue
+			} else if arrayOfType.Def.IsSequence || arrayOfType.Def.IsArray {
+				val, err := toSequenceValue(item, metadata, arrayOfType)
+				if err != nil {
+					return nil, fmt.Errorf("converting sequence: %w", err)
+				}
+				array.Items = append(array.Items, val)
+				continue
+
 			} else if arrayOfType.Def.IsComposite {
 				fields, err := toFields(item, metadata)
 				if err != nil {
@@ -512,7 +537,11 @@ func toSequenceValue(decodedField *registry.DecodedField, metadata *types.Metada
 				continue
 			}
 
-			v := item.(registry.Valuable).ValueAt(0)
+			valuable, ok := item.(registry.Valuable)
+			if !ok {
+				fmt.Println("wtf")
+			}
+			v := valuable.ValueAt(0)
 			f, err := toFields(v, metadata)
 			if err != nil {
 				return nil, fmt.Errorf("converting composite field item: %w", err)
