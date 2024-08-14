@@ -1,0 +1,81 @@
+specVersion: v0.1.0
+package:
+  name: "solana_common"
+  version: v0.2.0
+  image: ./solana.png
+  doc: |
+    This packages holds simple modules to allow you to explore the Solana data model.
+
+network: solana
+
+imports:
+  solana: https://github.com/streamingfast/firehose-solana/releases/download/v0.1.1/solana-v0.1.1.spkg
+
+protobuf:
+  files:
+    - instructions.proto
+    - transactions.proto
+  importPaths:
+    - ./proto
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+
+modules:
+   - name: map_block_without_votes
+    kind: map
+    inputs:
+      - source: sf.solana.type.v1.Block
+    output:
+      type: proto:sf.solana.type.v1.Block
+
+  - name: all_transactions
+    kind: map
+    inputs:
+      - map: map_block_without_votes
+    output:
+      type: proto:sol.transactions.v1.Transactions
+
+  - name: all_instructions
+    kind: map
+    inputs:
+      - map: all_transactions_without_votes
+    output:
+      type: proto:sol.instructions.v1.Instructions
+
+  - name: index_instructions
+    kind: blockIndex
+    inputs:
+      - map: all_instructions
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+
+  - name: filtered_instructions
+    kind: map
+    blockFilter:
+      module: index_instructions
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_instructions
+    output:
+      type: proto:sol.instructions.v1.Instructions
+
+  - name: filtered_txs_by_instructions
+    kind: map
+    blockFilter:
+      module: index_instructions
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_transactions_without_votes
+    output:
+      type: proto:sol.transactions.v1.Transactions
+
+params:
+  filtered_instructions: "program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+  filtered_txs_by_instructions: "program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
