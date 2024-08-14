@@ -29,7 +29,7 @@ fn filtered_txs_by_instructions_without_votes(query: String, transactions: Trans
     let filtered_transations: Vec<ConfirmedTransaction> = transactions.transactions
             .into_iter()
             .filter(|trans| {
-                let hash = bs58::encode(trans.transaction.as_ref().unwrap().signatures[0].clone()).into_string();
+                let hash = bs58::encode(&trans.transaction.as_ref().unwrap().signatures[0]).into_string();
 
                 return matching_trx_hashes.contains_key(&hash);
             }).collect();
