@@ -43,26 +43,25 @@ fn filtered_instructions_without_votes(query: String, instructions: Instructions
 pub fn get_instructions_from_transactions(transactions: &Vec<ConfirmedTransaction>) -> Vec<Instruction> {
     let mut processed_instructions: Vec<Instruction> = Vec::new();
 
-    for confirmed_transaction in transactions.into_iter() {
-        let confirmed_borrowed = &confirmed_transaction;
-        let acct_keys: Vec<&Vec<u8>> = confirmed_borrowed.resolved_accounts();
-        
-        if let Some(transaction) = &confirmed_borrowed.transaction {
+    for confirmed_transaction in transactions.iter() {
+        let acct_keys: Vec<&[u8]> = confirmed_transaction.resolved_accounts().iter().map(|k| k.as_slice()).collect();
+
+        if let Some(transaction) = &confirmed_transaction.transaction {
             for instruction in confirmed_transaction.all_instructions().into_iter() {
-                let general_instruction = instruction.instruction;
+                let general_instruction = &instruction.instruction;
                 processed_instructions.push(Instruction {
-                    program_id: bs58::encode(acct_keys[general_instruction.program_id_index() as usize].clone()).into_string(),
-                    data: bs58::encode(&general_instruction.data()).into_string(),
+                    program_id: bs58::encode(acct_keys[general_instruction.program_id_index() as usize]).into_string(),
+                    data: bs58::encode(general_instruction.data()).into_string(),
                     accounts: general_instruction
                         .accounts()
                         .iter()
-                        .map(|acct| bs58::encode(acct_keys[*acct as usize].clone()).into_string())
+                        .map(|&acct| bs58::encode(acct_keys[acct as usize]).into_string())
                         .collect(),
-                    tx_hash: bs58::encode(transaction.signatures[0].clone()).into_string(),
+                    tx_hash: bs58::encode(&transaction.signatures[0]).into_string(),
                 });
             }
         }
     }
 
-    return processed_instructions;
+    processed_instructions
 }
