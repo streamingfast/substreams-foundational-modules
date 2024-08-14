@@ -410,61 +410,66 @@ func toCompactValue(decodedField *registry.DecodedField, metadata *types.Metadat
 }
 
 func toVariantValue(decodedField *registry.DecodedField, metadata *types.Metadata, lookupType *types.Si1Type) (*pbvara.Value, error) {
-	value := &pbvara.Value{}
-
 	switch v := decodedField.Value.(type) {
 	case *registry.VariantWTF:
 		wtf := decodedField.Value.(*registry.VariantWTF)
-		matched := false
 		for _, variant := range lookupType.Def.Variant.Variants {
 			if byte(variant.Index) == wtf.VariantByte {
-				matched = true
 				if len(variant.Fields) == 1 {
 					childType := metadata.AsMetadataV14.EfficientLookup[variant.Fields[0].Type.Int64()]
 					if childType.Def.IsPrimitive {
-						var err error
-						value, err = toPrimitiveValue(childType, v.ValueAt(0))
+						value, err := toPrimitiveValue(childType, v.ValueAt(0))
 						if err != nil {
 							return nil, fmt.Errorf("converting variant primitive field: %w", err)
 						}
-						break
+						return value, nil
+					}
+					if childType.Def.IsSequence || childType.Def.IsArray {
+						value, err := toSequenceValue(v.ValueAt(0), metadata, childType)
+						if err != nil {
+							return nil, fmt.Errorf("converting variant sequence field: %w", err)
+						}
+						return value, nil
 					}
 				}
 
 				if _, ok := v.ValueAt(0).(uint8); ok {
+					value := &pbvara.Value{}
 					value.Type = &pbvara.Value_String_{
 						String_: string(variant.Name),
 					}
 
-					break
+					return value, nil
 				}
+
 				f, err := toFields(v.ValueAt(0), metadata)
 				if err != nil {
 					return nil, fmt.Errorf("converting variant field item: %w", err)
 				}
+				value := &pbvara.Value{}
 				value.Type = &pbvara.Value_Fields{
 					Fields: f,
 				}
-				break
+
+				return value, nil
 			}
 		}
-		if !matched {
-			return nil, fmt.Errorf("variant not found for: %d", wtf.VariantByte)
-		}
+		return nil, fmt.Errorf("variant not found for: %d", wtf.VariantByte)
 	case uint8: //this is an enum
 		//todo: we should add a enum type with both name and index
 		for _, variant := range lookupType.Def.Variant.Variants {
 			if byte(variant.Index) == decodedField.Value {
+				value := &pbvara.Value{}
 				value.Type = &pbvara.Value_String_{
 					String_: string(variant.Name),
 				}
+				return value, nil
 			}
 		}
+		return nil, fmt.Errorf("enum variant not found for: %d", decodedField.Value)
 	default:
 		return nil, fmt.Errorf("unknown type %T", decodedField.Value)
 	}
-
-	return value, nil
 }
 
 func toSequenceValue(value any, metadata *types.Metadata, lookupType *types.Si1Type) (*pbvara.Value, error) {

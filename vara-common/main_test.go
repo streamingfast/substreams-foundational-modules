@@ -50,8 +50,15 @@ func Test_MapDecodedBlock(t *testing.T) {
 	//	t.Run(tt.name, func(t *testing.T) {
 	//		key := tt.key
 	for _, blocks := range testBlocks {
+		//if blocks[0].Number != 4641100 {
+		//	continue
+		//}
 		t.Run(fmt.Sprintf("test blocks %d", blocks[0].Number), func(t *testing.T) {
 			for _, b := range blocks {
+				//if b.Number != 4641152 {
+				//	continue
+				//}
+
 				dblock, err := MapDecodedBlock(b)
 				if err != nil {
 					t.Fatalf("unable to decode block %d: %s", b.Number, err)
