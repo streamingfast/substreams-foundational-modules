@@ -6,14 +6,14 @@ use substreams_solana::pb::sf::solana::r#type::v1::Block;
 use substreams_solana::pb::sf::solana::r#type::v1::ConfirmedTransaction;
 
 #[substreams::handlers::map]
-fn all_transactions(blk: Block) -> Result<Transactions, substreams::errors::Error> {
+fn all_transactions_without_votes(blk: Block) -> Result<Transactions, substreams::errors::Error> {
     let transactions: Vec<ConfirmedTransaction> = blk.transactions.into_iter().collect();
 
     Ok(Transactions { transactions })
 }
 
 #[substreams::handlers::map]
-fn filtered_txs_by_instructions(query: String, transactions: Transactions) -> Result<Transactions, substreams::errors::Error> {
+fn filtered_txs_by_instructions_without_votes(query: String, transactions: Transactions) -> Result<Transactions, substreams::errors::Error> {
 
     let instructions = get_instructions_from_transactions(&transactions.transactions);
     let matching_trx_hashes = instructions

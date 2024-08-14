@@ -6,7 +6,7 @@ use substreams::matches_keys_in_parsed_expr;
 use substreams_solana::pb::sf::solana::r#type::v1::ConfirmedTransaction;
 
 #[substreams::handlers::map]
-fn all_instructions(transactions: Transactions) -> Result<Instructions, substreams::errors::Error> {
+fn all_instructions_without_votes(transactions: Transactions) -> Result<Instructions, substreams::errors::Error> {
     let instructions = get_instructions_from_transactions(&transactions.transactions);
 
     Ok(Instructions {
@@ -15,7 +15,7 @@ fn all_instructions(transactions: Transactions) -> Result<Instructions, substrea
 }
 
 #[substreams::handlers::map]
-fn index_instructions(instructions: Instructions) -> Result<Keys, substreams::errors::Error> {
+fn index_instructions_without_votes(instructions: Instructions) -> Result<Keys, substreams::errors::Error> {
     let keys: Vec<String> = instructions.instructions
             .into_iter()
             .map(|inst| format!("program:{}", inst.program_id))
@@ -25,7 +25,7 @@ fn index_instructions(instructions: Instructions) -> Result<Keys, substreams::er
 }
 
 #[substreams::handlers::map]
-fn filtered_instructions(query: String, instructions: Instructions) -> Result<Instructions, substreams::errors::Error> {
+fn filtered_instructions_without_votes(query: String, instructions: Instructions) -> Result<Instructions, substreams::errors::Error> {
     let filtered_instructions = instructions.instructions
             .into_iter()
             .filter(|inst| {
