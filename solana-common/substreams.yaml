@@ -93,7 +93,7 @@ modules:
     output:
       type: proto:sol.transactions.v1.Transactions
     doc: |
-      `filtered_txs_by_instructions_without_votes` allows you to consume transaction containing specficic instructions.
+      `filtered_txs_by_instructions_without_votes` allows you to consume transactions containing specficic instructions.
       It behaves similar to the `filtered_instructions_without_votes` module, but it provides you with the full transaction data, not only the instruction data.
       Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`.
       Example to only consume TRANSACTIONS containing Token or ComputeBudget instructions: `program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA || program:ComputeBudget111111111111111111111111111111`.
