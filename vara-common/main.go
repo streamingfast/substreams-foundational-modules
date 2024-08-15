@@ -45,35 +45,47 @@ var specVersions = map[uint32]string{
 	1410: spec.V1410,
 	1420: spec.V1420,
 }
-var metadataRegistry = map[uint32]*types.Metadata{}
+
+type regItem struct {
+	meta          *types.Metadata
+	callRegistry  registry.CallRegistry
+	eventRegistry registry.EventRegistry
+}
+
+var metadataRegistry = map[uint32]*regItem{}
 
 func init() {
+	factory := registry.NewFactory()
 	for version, data := range specVersions {
-		metadataRegistry[version] = metadata.Load(data)
+		meta := metadata.Load(data)
+
+		callRegistry, err := factory.CreateCallRegistry(meta)
+		if err != nil {
+			panic(fmt.Errorf("creating call registry: %w", err))
+		}
+
+		eventRegistry, err := factory.CreateEventRegistry(meta)
+		if err != nil {
+			panic(fmt.Errorf("creating event registry: %w", err))
+		}
+		metadataRegistry[version] = &regItem{
+			meta:          meta,
+			callRegistry:  callRegistry,
+			eventRegistry: eventRegistry,
+		}
 	}
 }
 
 // this will actually return a decodedBlock containing all the decoded calls and events
 func MapDecodedBlock(block *pbgear.Block) (*pbvara.Block, error) {
-	factory := registry.NewFactory()
-	meta := metadataRegistry[block.Header.SpecVersion]
+	reg := metadataRegistry[block.Header.SpecVersion]
 
-	callRegistry, err := factory.CreateCallRegistry(meta)
-	if err != nil {
-		return nil, fmt.Errorf("creating call registry: %w", err)
-	}
-
-	extrinsics, err := ToExtrinsics(block.Extrinsics, callRegistry, meta)
+	extrinsics, err := ToExtrinsics(block.Extrinsics, reg.callRegistry, reg.meta)
 	if err != nil {
 		return nil, fmt.Errorf("converting extrinsics: %w", err)
 	}
 
-	eventRegistry, err := factory.CreateEventRegistry(meta)
-	if err != nil {
-		return nil, fmt.Errorf("creating event registry: %w", err)
-	}
-
-	events, err := toEvents(eventRegistry, block.RawEvents, meta)
+	events, err := toEvents(reg.eventRegistry, block.RawEvents, reg.meta)
 	if err != nil {
 		return nil, fmt.Errorf("converting events: %w", err)
 	}
