@@ -29,8 +29,7 @@ fn filtered_instructions_without_votes(query: String, instructions: Instructions
     let filtered_instructions = instructions.instructions
             .into_iter()
             .filter(|inst| {
-                let mut keys = Vec::new();
-                keys.push(format!("program:{}", inst.program_id));
+                let keys = vec![format!("program:{}", inst.program_id)];
 
                 matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
             }).collect();
@@ -51,7 +50,7 @@ pub fn get_instructions_from_transactions(transactions: &Vec<ConfirmedTransactio
                 let general_instruction = &instruction.instruction;
                 processed_instructions.push(Instruction {
                     program_id: bs58::encode(acct_keys[general_instruction.program_id_index() as usize]).into_string(),
-                    data: bs58::encode(general_instruction.data()).into_string(),
+                    data: general_instruction.data().to_vec(),
                     accounts: general_instruction
                         .accounts()
                         .iter()

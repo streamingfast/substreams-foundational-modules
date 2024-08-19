@@ -554,7 +554,6 @@ dependencies = [
  "base64",
  "bs58",
  "getrandom",
- "hex-literal",
  "num-bigint",
  "prost",
  "regex",

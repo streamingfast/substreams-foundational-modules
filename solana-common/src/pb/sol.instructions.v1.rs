@@ -12,8 +12,8 @@ pub struct Instruction {
     pub program_id: ::prost::alloc::string::String,
     #[prost(string, repeated, tag="2")]
     pub accounts: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-    #[prost(string, tag="3")]
-    pub data: ::prost::alloc::string::String,
+    #[prost(bytes="vec", tag="3")]
+    pub data: ::prost::alloc::vec::Vec<u8>,
     #[prost(string, tag="4")]
     pub tx_hash: ::prost::alloc::string::String,
 }

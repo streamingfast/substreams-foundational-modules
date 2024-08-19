@@ -3,7 +3,7 @@ name = "solana-common"
 version = "0.1.0"
 description = "Substreams showcasing the building blocks of Solana"
 edition = "2021"
-repository = "https://github.com/streamingfast/substreams-explorers"
+repository = "https://github.com/streamingfast/substreams-foundational-modules/solana-common"
 license = "Apache 2.0"
 
 [lib]
@@ -12,7 +12,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 bs58 = "0.4"
-hex-literal = "0.3"
 num-bigint = "0.4"
 prost = "0.11"
 # Use latest from https://crates.io/crates/substreams

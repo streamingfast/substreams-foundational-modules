@@ -26,7 +26,7 @@ fn filtered_txs_by_instructions_without_votes(query: String, transactions: Trans
             }).map(|inst| (inst.tx_hash, true))
             .collect::<HashMap<String, bool>>();
 
-    let filtered_transations: Vec<ConfirmedTransaction> = transactions.transactions
+    let filtered_transactions: Vec<ConfirmedTransaction> = transactions.transactions
             .into_iter()
             .filter(|trans| {
                 let hash = bs58::encode(&trans.transaction.as_ref().unwrap().signatures[0]).into_string();
@@ -35,7 +35,7 @@ fn filtered_txs_by_instructions_without_votes(query: String, transactions: Trans
             }).collect();
 
     Ok(Transactions {
-        transactions: filtered_transations
+        transactions: filtered_transactions
     })
 }
 

@@ -9,6 +9,6 @@ message Instructions {
 message Instruction {
   string program_id = 1;
   repeated string accounts = 2;
-  string data = 3;
+  bytes data = 3;
   string tx_hash = 4;
 }
