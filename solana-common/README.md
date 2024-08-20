@@ -12,7 +12,6 @@ The `substreams.yaml` file defines all the different modules available, and also
 
 ## Filtered Modules
 
-Usually, you want to only listen for specific transactions or instruction types. The following module allow you to specify a filter based on the program ID of the instruction to efficiently retrive filtered transactions and instructions.
+Usually, you want to only listen for specific transactions or instruction types. The following module allow you to specify a filter based on the program ID of the instruction to efficiently retrive filtered transactions.
 
-- `filtered_instructions_without_votes`: use logical operators (`&&`, `||`) to select from which specific instructions you want to consume data. For example: `program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA || program:ComputeBudget111111111111111111111111111111` will only retrieve Token and ComputeBudget instructions.
 - `filtered_txs_by_instructions_without_votes`: consume all the transactions containing a specific instruction. You will get access to the full transaction data, but you will use the logical operators (`&&`, `||`) to select which specific instructions you want to the transaction to contain. For example, `program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA || program:ComputeBudget111111111111111111111111111111` will get all the transactions that contain the Token and ComputeBudget instructions.

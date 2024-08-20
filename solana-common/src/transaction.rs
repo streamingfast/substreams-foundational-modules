@@ -19,8 +19,7 @@ fn filtered_txs_by_instructions_without_votes(query: String, transactions: Trans
     let matching_trx_hashes = instructions
             .into_iter()
             .filter(|inst| {
-                let mut keys = Vec::new();
-                keys.push(format!("program:{}", inst.program_id));
+                let keys = vec![format!("program:{}", inst.program_id)];
 
                 return matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
             }).map(|inst| (inst.tx_hash, true))

@@ -6,7 +6,6 @@ package:
   doc: |
     Common Solana modules that allow you to consume transactions and instructions, and apply filters to efficiently retrieve the data that you need.
     To consume data, use the following optimized modules:
-    - `filtered_instructions_without_votes`: allows you to specify which specific instruction types you need (based on the program ID).
     - `filtered_txs_by_instructions_without_votes`: allows you consume transactions containing specific instruction types (based on the program ID).
 network: solana
 
@@ -65,22 +64,6 @@ modules:
       For example, the following sets keys for the Token program:
       * program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
 
-  - name: filtered_instructions_without_votes
-    kind: map
-    blockFilter:
-      module: index_instructions_without_votes
-      query:
-        params: true
-    inputs:
-      - params: string
-      - map: all_instructions_without_votes
-    output:
-      type: proto:sol.instructions.v1.Instructions
-    doc: |
-      `filtered_instructions_without_votes` reads from the `all_instructions_without_votes` module and applies a filter to only keep the program ID instructions that you want.
-      Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`.
-      Example to only consume Token or ComputeBudget instructions: `program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA || program:ComputeBudget111111111111111111111111111111`.
-
   - name: filtered_txs_by_instructions_without_votes
     kind: map
     blockFilter:
@@ -94,10 +77,9 @@ modules:
       type: proto:sol.transactions.v1.Transactions
     doc: |
       `filtered_txs_by_instructions_without_votes` allows you to consume transactions containing specficic instructions.
-      It behaves similar to the `filtered_instructions_without_votes` module, but it provides you with the full transaction data, not only the instruction data.
+      It provides you with all the transaction where the filter applies.
       Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`.
       Example to only consume TRANSACTIONS containing Token or ComputeBudget instructions: `program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA || program:ComputeBudget111111111111111111111111111111`.
 
 params: # Default parameters for the filter modules. You can override these parameters based on your needs.
-  filtered_instructions_without_votes: "program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
   filtered_txs_by_instructions_without_votes: "program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"

@@ -2,7 +2,6 @@ use crate::pb::sol::instructions::v1::Instruction;
 use crate::pb::sol::instructions::v1::Instructions;
 use crate::pb::sol::transactions::v1::Transactions;
 use substreams::pb::sf::substreams::index::v1::Keys;
-use substreams::matches_keys_in_parsed_expr;
 use substreams_solana::pb::sf::solana::r#type::v1::ConfirmedTransaction;
 
 #[substreams::handlers::map]
@@ -22,21 +21,6 @@ fn index_instructions_without_votes(instructions: Instructions) -> Result<Keys, 
             .collect();
 
     Ok(Keys { keys })
-}
-
-#[substreams::handlers::map]
-fn filtered_instructions_without_votes(query: String, instructions: Instructions) -> Result<Instructions, substreams::errors::Error> {
-    let filtered_instructions = instructions.instructions
-            .into_iter()
-            .filter(|inst| {
-                let keys = vec![format!("program:{}", inst.program_id)];
-
-                matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
-            }).collect();
-
-    Ok(Instructions {
-        instructions: filtered_instructions
-    })
 }
 
 pub fn get_instructions_from_transactions(transactions: &Vec<ConfirmedTransaction>) -> Vec<Instruction> {
