@@ -52,6 +52,7 @@ fn index_events(events: Events) -> Result<Keys, Error> {
 
 #[substreams::handlers::map]
 fn filtered_events(query: String, events: Events) -> Result<Events, Error> {
+    let query = query.to_lowercase();
     let filtered: Vec<Event> = events
         .events
         .into_iter()

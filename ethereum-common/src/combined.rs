@@ -3,11 +3,11 @@ use crate::events::*;
 use crate::pb::sf::substreams::ethereum::v1::{
     Call, Calls, Event, Events, EventsAndCalls, Transaction, Transactions,
 };
-use substreams::pb::sf::substreams::index::v1::Keys;
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use std::collections::HashMap;
 use substreams::errors::Error;
+use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::{Block, Call as ethCall, Log};
 
@@ -40,6 +40,7 @@ fn filtered_events_and_calls(
     events: Events,
     calls: Calls,
 ) -> Result<EventsAndCalls, Error> {
+    let query = query.to_lowercase();
     let filtered_calls: Vec<Call> = calls
         .calls
         .into_iter()
@@ -73,6 +74,7 @@ fn filtered_events_and_calls(
 
 #[substreams::handlers::map]
 fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Error> {
+    let query = query.to_lowercase();
     let mut events: HashMap<String, Vec<&Log>> = HashMap::new();
     block.logs().for_each(|log| {
         let k = Hex::encode(&log.receipt.transaction.hash);

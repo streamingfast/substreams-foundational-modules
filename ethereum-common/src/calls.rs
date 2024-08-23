@@ -50,6 +50,7 @@ fn index_calls(calls: Calls) -> Result<Keys, Error> {
 
 #[substreams::handlers::map]
 fn filtered_calls(query: String, calls: Calls) -> Result<Calls, Error> {
+    let query = query.to_lowercase();
     let filtered: Vec<Call> = calls
         .calls
         .into_iter()
