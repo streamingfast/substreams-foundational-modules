@@ -31,6 +31,7 @@ binaries:
 modules:
   - name: index_actions
     kind: blockIndex
+    initialBlock: 2
     inputs:
       - map: all_actions
     output:
@@ -43,6 +44,7 @@ modules:
 
   - name: index_actions_extra
     kind: blockIndex
+    initialBlock: 2
     inputs:
       - map: all_actions
     output:
@@ -57,6 +59,7 @@ modules:
 
   - name: all_transactions
     kind: map
+    initialBlock: 2
     inputs:
       - source: sf.antelope.type.v1.Block
     output:
@@ -66,6 +69,7 @@ modules:
 
   - name: all_actions
     kind: map
+    initialBlock: 2
     inputs:
       - map: all_transactions
     output:
@@ -75,6 +79,7 @@ modules:
 
   - name: filtered_transactions
     kind: map
+    initialBlock: 2
     blockFilter:
       module: index_actions
       query:
@@ -91,6 +96,7 @@ modules:
 
   - name: filtered_actions
     kind: map
+    initialBlock: 2
     blockFilter:
       module: index_actions
       query:
@@ -107,6 +113,7 @@ modules:
 
   - name: filtered_transactions_extra
     kind: map
+    initialBlock: 2
     blockFilter:
       module: index_actions_extra
       query:
@@ -123,6 +130,7 @@ modules:
 
   - name: filtered_actions_extra
     kind: map
+    initialBlock: 2
     blockFilter:
       module: index_actions_extra
       query:
