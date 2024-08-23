@@ -1,14 +1,16 @@
 specVersion: v0.1.0
 package:
-  name: mytinytest
-  version: v0.1.0
+  name: foundational_modules_vara_common
+  version: v0.1.3
+
+imports:
+  gear: https://github.com/streamingfast/substreams-gear/releases/download/v0.1.1/gear-v0.1.1.spkg
 
 protobuf:
   files:
-    - block.proto
-    - extrinsics.proto
+    - types.proto
   importPaths:
-    - ./proto
+    - ./proto/sf/substreams/gear/type/v1
 
 binaries:
   default:
@@ -20,8 +22,46 @@ network: vara-mainnet
 modules:
   - name: map_decoded_block
     kind: map
-    initialBlock: 12360600
+    initialBlock: 0
     inputs:
       - source: sf.gear.type.v1.Block
     output:
-      type: proto:sf.gear.type.v1.DecodedBlock
+      type: proto:sf.substreams.vara.type.v1.Block
+
+  - name: all_extrinsics
+    kind: map
+    initialBlock: 0
+    inputs:
+      - map: map_decoded_block
+    output:
+      type: proto:sf.substreams.gear.type.v1.Extrinsics
+    doc: |
+      `all_extrinsics` reads from the `sf.substreams.vara.type.v1.Block` source and outputs a list of all extrinsics in the block.
+
+  - name: index_extrinsics
+    kind: blockIndex
+    inputs:
+      - map: all_extrinsics
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+    doc: |
+      `index_extrinsics` sets the keys corresponding to all events and extrinsics in the block
+
+  - name: filtered_extrinsics
+    kind: map
+    blockFilter:
+      module: index_extrinsics
+      query:
+        params: true
+    inputs:
+      - params: string
+      - map: all_extrinsics
+    output:
+      type: proto:sf.substreams.gear.type.v1.Extrinsics
+    doc: |
+      `filtered_extrinsics` reads from `all_extrinsics` and applies a filter on keys, 
+      only outputting extrinsics that match the filter. 
+      Example usage: `(extrinsic:Timestamp.set:event:System.ExtrinsicSuccess)`
+
+params:
+  filtered_extrinsics: "extrinsic:Gear.run"

@@ -1,2 +1,12 @@
 .DS_Store
 wasm.wasm
+tiny.wasm
+.env
+.vscode/
+bin/
+/.fleet/settings.json
+/.idea/.gitignore
+/.idea/modules.xml
+/.idea/vara-common.iml
+/.idea/vcs.xml
+/.idea/watcherTasks.xml
