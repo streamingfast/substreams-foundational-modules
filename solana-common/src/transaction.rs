@@ -1,6 +1,6 @@
-use std::collections::HashMap;
 use crate::instruction::get_instructions_from_transactions;
 use crate::pb::sol::transactions::v1::Transactions;
+use std::collections::HashMap;
 use substreams::matches_keys_in_parsed_expr;
 use substreams_solana::pb::sf::solana::r#type::v1::Block;
 use substreams_solana::pb::sf::solana::r#type::v1::ConfirmedTransaction;
@@ -13,28 +13,32 @@ fn all_transactions_without_votes(blk: Block) -> Result<Transactions, substreams
 }
 
 #[substreams::handlers::map]
-fn filtered_txs_by_instructions_without_votes(query: String, transactions: Transactions) -> Result<Transactions, substreams::errors::Error> {
-
+fn filtered_txs_by_instructions_without_votes(
+    query: String,
+    transactions: Transactions,
+) -> Result<Transactions, substreams::errors::Error> {
     let instructions = get_instructions_from_transactions(&transactions.transactions);
     let matching_trx_hashes = instructions
-            .into_iter()
-            .filter(|inst| {
-                let keys = vec![format!("program:{}", inst.program_id)];
+        .into_iter()
+        .filter(|inst| {
+            let keys = vec![format!("program:{}", inst.program_id)];
 
-                return matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
-            }).map(|inst| (inst.tx_hash, true))
-            .collect::<HashMap<String, bool>>();
+            return matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query");
+        })
+        .map(|inst| (inst.tx_hash, true))
+        .collect::<HashMap<String, bool>>();
 
-    let filtered_transactions: Vec<ConfirmedTransaction> = transactions.transactions
-            .into_iter()
-            .filter(|trans| {
-                let hash = bs58::encode(&trans.transaction.as_ref().unwrap().signatures[0]).into_string();
+    let filtered_transactions: Vec<ConfirmedTransaction> = transactions
+        .transactions
+        .into_iter()
+        .filter(|trans| {
+            let hash = bs58::encode(&trans.transaction.as_ref().unwrap().signatures[0]).into_string();
 
-                return matching_trx_hashes.contains_key(&hash);
-            }).collect();
+            return matching_trx_hashes.contains_key(&hash);
+        })
+        .collect();
 
     Ok(Transactions {
-        transactions: filtered_transactions
+        transactions: filtered_transactions,
     })
 }
-
