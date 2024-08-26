@@ -116,7 +116,7 @@ modules:
 
       To use this module with an index, import it and override it with the `use:` parameter, setting blockFilter.Query.String to a query
       that matches the event type and attribute keys only (ex: `type:wasm && attr:_contract_address`)
-;
+
 params:
   filtered_events: "(type:message && attr:action) || (type:wasm && attr:_contract_address)"
   filtered_event_groups: "type:wasm && attr:_contract_address"
