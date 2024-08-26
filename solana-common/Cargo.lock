@@ -126,9 +126,9 @@ dependencies = [
 
 [[package]]
 name = "fastrand"
-version = "2.1.0"
+version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9fc0510504f03c51ada170672ac806f1f105a88aa97a5281117e1ddc3368e51a"
+checksum = "e8c02a5121d4ea3eb16a80748c74f5549a5665e4c21333c6098f283870fbdea6"
 
 [[package]]
 name = "fixedbitset"
@@ -291,7 +291,7 @@ dependencies = [
  "proc-macro-crate",
  "proc-macro2",
  "quote",
- "syn 2.0.75",
+ "syn 2.0.76",
 ]
 
 [[package]]
@@ -346,7 +346,7 @@ dependencies = [
  "pest_meta",
  "proc-macro2",
  "quote",
- "syn 2.0.75",
+ "syn 2.0.76",
 ]
 
 [[package]]
@@ -505,22 +505,22 @@ dependencies = [
 
 [[package]]
 name = "serde"
-version = "1.0.208"
+version = "1.0.209"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cff085d2cb684faa248efb494c39b68e522822ac0de72ccf08109abde717cfb2"
+checksum = "99fce0ffe7310761ca6bf9faf5115afbc19688edd00171d81b1bb1b116c63e09"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.208"
+version = "1.0.209"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "24008e81ff7613ed8e5ba0cfaf24e2c2f1e5b8a0495711e44fcd4882fca62bcf"
+checksum = "a5831b979fd7b5439637af1752d535ff49f4860c0f341d1baeb6faf0f4242170"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.75",
+ "syn 2.0.76",
 ]
 
 [[package]]
@@ -565,9 +565,9 @@ dependencies = [
 
 [[package]]
 name = "substreams"
-version = "0.5.21"
+version = "0.5.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0639e6552e6ade9125122a57474c39fd2a626c520a6f49f73351698ffd838f49"
+checksum = "92e47e531af83a3cbb78c627ee8232a0ac86604f11c89e34bd4b721ec41e03e5"
 dependencies = [
  "anyhow",
  "bigdecimal",
@@ -588,9 +588,9 @@ dependencies = [
 
 [[package]]
 name = "substreams-macro"
-version = "0.5.21"
+version = "0.5.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd4f708b3bcf08a8045992d62d26f1d234cbb2a76f44a315595331c45d6944f5"
+checksum = "a4ac77f08d723dace35739d65df8ed122f6d04e2a3e47929831d4021e3339240"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -601,8 +601,7 @@ dependencies = [
 [[package]]
 name = "substreams-solana"
 version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ccd9e1a4637e26cdbd7c4a245ece013ecf83b32806e4b64f1a9834a3ac269968"
+source = "git+https://github.com/streamingfast/substreams-solana?branch=master#76463f33486f9d0c2d5e3484c0b78af9602a3a90"
 dependencies = [
  "anyhow",
  "num_enum",
@@ -614,8 +613,7 @@ dependencies = [
 [[package]]
 name = "substreams-solana-core"
 version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7bf9f5313d14347b07a1bc00f7489430709113ac3f983cc2f209ad9e0531f0b0"
+source = "git+https://github.com/streamingfast/substreams-solana?branch=master#76463f33486f9d0c2d5e3484c0b78af9602a3a90"
 dependencies = [
  "bs58",
  "prost",
@@ -626,8 +624,7 @@ dependencies = [
 [[package]]
 name = "substreams-solana-macro"
 version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4d7e8ae00f862ff34f61a98fecd78fd063be69383eac2991277b76e83988a19d"
+source = "git+https://github.com/streamingfast/substreams-solana?branch=master#76463f33486f9d0c2d5e3484c0b78af9602a3a90"
 dependencies = [
  "bs58",
 ]
@@ -656,9 +653,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.75"
+version = "2.0.76"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6af063034fc1935ede7be0122941bafa9bacb949334d090b77ca98b5817c7d9"
+checksum = "578e081a14e0cefc3279b0472138c513f37b41a08d5a3cca9b6e4e8ceb6cd525"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -695,7 +692,7 @@ checksum = "a4558b58466b9ad7ca0f102865eccc95938dca1a74a856f2b57b6629050da261"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.75",
+ "syn 2.0.76",
 ]
 
 [[package]]

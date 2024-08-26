@@ -1,44 +1,30 @@
-use crate::instruction::get_instructions_from_transactions;
 use crate::pb::sol::transactions::v1::Transactions;
-use std::collections::HashMap;
-use substreams::matches_keys_in_parsed_expr;
-use substreams_solana::pb::sf::solana::r#type::v1::Block;
-use substreams_solana::pb::sf::solana::r#type::v1::ConfirmedTransaction;
+use substreams_solana::pb::sf::solana::r#type::v1::{Block, ConfirmedTransaction};
+
+impl Transactions {
+    pub fn iter(&self) -> impl Iterator<Item = &ConfirmedTransaction> {
+        self.transactions.iter()
+    }
+}
 
 #[substreams::handlers::map]
 fn all_transactions_without_votes(blk: Block) -> Result<Transactions, substreams::errors::Error> {
-    let transactions: Vec<ConfirmedTransaction> = blk.transactions.into_iter().collect();
-
-    Ok(Transactions { transactions })
+    Ok(Transactions {
+        transactions: blk.transactions,
+    })
 }
 
 #[substreams::handlers::map]
 fn filtered_txs_by_instructions_without_votes(
     query: String,
-    transactions: Transactions,
+    mut transactions: Transactions,
 ) -> Result<Transactions, substreams::errors::Error> {
-    let instructions = get_instructions_from_transactions(&transactions.transactions);
-    let matching_trx_hashes = instructions
-        .into_iter()
-        .filter(|inst| {
-            let keys = vec![format!("program:{}", inst.program_id)];
+    let query = substreams::expr_matcher(&query);
 
-            return matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query");
-        })
-        .map(|inst| (inst.tx_hash, true))
-        .collect::<HashMap<String, bool>>();
+    transactions.transactions.retain(|trx| {
+        trx.instructions()
+            .any(|view| query.matches_keys(&vec![format!("program:{}", view.program_id().to_string())]))
+    });
 
-    let filtered_transactions: Vec<ConfirmedTransaction> = transactions
-        .transactions
-        .into_iter()
-        .filter(|trans| {
-            let hash = bs58::encode(&trans.transaction.as_ref().unwrap().signatures[0]).into_string();
-
-            return matching_trx_hashes.contains_key(&hash);
-        })
-        .collect();
-
-    Ok(Transactions {
-        transactions: filtered_transactions,
-    })
+    Ok(transactions)
 }
