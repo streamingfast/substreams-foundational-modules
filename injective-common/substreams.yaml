@@ -2,7 +2,7 @@
 specVersion: v0.1.0
 package:
   name: injective_common
-  version: v0.2.2
+  version: v0.2.3
   url: https://github.com/streamingfast/substreams-foundational-modules/injective-common
   doc: |
     common Injective substreams modules to extract events and transactions with indexing
@@ -10,14 +10,12 @@ package:
     Use one of those optimized modules with a query string as a parameter:
     * filtered_events
     * filtered_event_groups
-    * filtered_trx_by_events
 
     The query string will be used for the blockfilter as well as the actual filtering of the events/transactions
 
     The following modules are also available for more specific filtering, but they do not use an index by default:
     * filtered_events_by_attribute_value
     * filtered_event_groups_by_attribute_value
-    * filtered_trx_by_events_attribute_value
 
     They should be overriden by setting the blockFilter.Query.String parameter to a query that matches the event type 
     and attribute keys only. See `derived-substreams-example.yaml` for an example 
@@ -35,17 +33,6 @@ binaries:
     file: target/wasm32-unknown-unknown/release/injective_common.wasm
 
 modules:
-  - name: all_transactions
-    kind: map
-    initialBlock: 0
-    inputs:
-      - source: sf.cosmos.type.v2.Block
-    output:
-      type: proto:sf.substreams.cosmos.v1.TransactionList
-    doc: |
-      `all_transactions` reads from the `sf.cosmos.type.v2.Block` source and outputs a list of all transactions in the block.
-      Some known message types will be converted to the correct protobuf type, unknown ones will stay as `Any` type.
-
   - name: all_events
     kind: map
     initialBlock: 0
@@ -100,22 +87,6 @@ modules:
       outputing all the events from transactions that have at least one event matching the filter.
       Example usage: `type:injective.peggy.v1.EventDepositClaim || (type:wasm && attr:_contract_address)`
 
-  - name: filtered_trx_by_events
-    kind: map
-    blockFilter:
-      module: index_events
-      query:
-        params: true
-    inputs:
-      - params: string
-      - map: all_transactions
-    output:
-      type: proto:sf.substreams.cosmos.v1.TransactionList
-    doc: |
-      `filtered_trx_by_events` reads from `all_transactions` and applies a filter on the event types and attribute keys, 
-      outputing the complete transactions that have at least one event matching the filter.
-      Example usage: `type:injective.peggy.v1.EventDepositClaim || (type:wasm && attr:_contract_address)`
-
   - name: filtered_events_by_attribute_value
     kind: map
     inputs:
@@ -145,27 +116,9 @@ modules:
 
       To use this module with an index, import it and override it with the `use:` parameter, setting blockFilter.Query.String to a query
       that matches the event type and attribute keys only (ex: `type:wasm && attr:_contract_address`)
-
-  - name: filtered_trx_by_events_attribute_value
-    kind: map
-    inputs:
-      - params: string
-      - map: all_events
-      - map: all_transactions
-    output:
-      type: proto:sf.substreams.cosmos.v1.TransactionList
-    doc: |
-      `filtered_trx_by_events_attribute_value` reads from `all_events` and applies a filter on the event types, attribute keys and values,
-      outputing the complete transactions that have at least one event matching the filter.
-      Example usage: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
-
-      To use this module with an index, import it and override it with the `use:` parameter, setting blockFilter.Query.String to a query
-      that matches the event type and attribute keys only (ex: `type:wasm && attr:_contract_address`)
-
+;
 params:
   filtered_events: "(type:message && attr:action) || (type:wasm && attr:_contract_address)"
   filtered_event_groups: "type:wasm && attr:_contract_address"
-  filtered_trx_by_events: "type:wasm"
   filtered_events_by_attribute_value: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
   filtered_event_groups_by_attribute_value: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
-  filtered_trx_by_events_attribute_value: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
