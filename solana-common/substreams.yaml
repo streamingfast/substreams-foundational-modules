@@ -25,61 +25,43 @@ binaries:
     file: ./target/wasm32-unknown-unknown/release/substreams.wasm
 
 modules:
-  - name: map_block_without_votes
+  - name: blocks_without_votes
     kind: map
     inputs:
       - source: sf.solana.type.v1.Block
     output:
       type: proto:sf.solana.type.v1.Block
     doc: |
-      `map_block_without_votes` allows you to consume a full Solana Block without Vote instructions (`Vote111111111111111111111111111111111111111`). 
+      `blocks_without_votes` allows you to consume a full Solana Block without Vote instructions (`Vote111111111111111111111111111111111111111`). 
       If you consume it on HISTORICAL data (+1000 blocks from HEAD), you will be reading from the StreamingFast cache, thus saving costs on the amount of TB read.
 
-  - name: all_transactions_without_votes
-    kind: map
-    inputs:
-      - map: map_block_without_votes
-    output:
-      type: proto:sol.transactions.v1.Transactions
-    doc: |
-      `all_transactions_without_votes` provides you with all the transactions in a block, excluding the Vote transaction (transactions containing `Vote111111111111111111111111111111111111111` instructions).
-
-  - name: all_instructions_without_votes
-    kind: map
-    inputs:
-      - map: all_transactions_without_votes
-    output:
-      type: proto:sol.instructions.v1.Instructions
-    doc: |
-      `all_instructions_without_votes` provides you with all the instructions in a block, excluding the Vote (`Vote111111111111111111111111111111111111111`) instructions.
-
-  - name: index_instructions_without_votes
+  - name: program_ids_without_votes
     kind: blockIndex
     inputs:
-      - map: all_instructions_without_votes
+      - map: blocks_without_votes
     output:
       type: proto:sf.substreams.index.v1.Keys
     doc: |
-      `index_instructions_without_votes` creates a _cache_ to efficiently retrieve instructions based on the program ID.
+      `program_ids_without_votes` creates a _cache_ to efficiently retrieve instructions based on the program ID.
       For example, the following sets keys for the Token program:
       * program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
 
-  - name: filtered_txs_by_instructions_without_votes
+  - name: filtered_transactions_without_votes
     kind: map
-    blockFilter:
-      module: index_instructions_without_votes
-      query:
-        params: true
     inputs:
       - params: string
-      - map: all_transactions_without_votes
+      - map: blocks_without_votes
     output:
       type: proto:sol.transactions.v1.Transactions
+    blockFilter:
+      module: program_ids_without_votes
+      query:
+        params: true
     doc: |
-      `filtered_txs_by_instructions_without_votes` allows you to consume transactions containing specficic instructions.
-      It provides you with all the transaction where the filter applies.
+      `filtered_transactions_without_votes` allows you to consume transactions containing instructions from specific program_id based on a filter string.
       Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`.
-      Example to only consume TRANSACTIONS containing Token or ComputeBudget instructions: `program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA || program:ComputeBudget111111111111111111111111111111`.
+      Example: to only consume TRANSACTIONS containing Token or ComputeBudget instructions: `program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA || program:ComputeBudget111111111111111111111111111111`.
+      Transactions containing `Vote111111111111111111111111111111111111111` are always excluded.
 
 params: # Default parameters for the filter modules. You can override these parameters based on your needs.
-  filtered_txs_by_instructions_without_votes: "program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+  filtered_transactions_without_votes: "program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"

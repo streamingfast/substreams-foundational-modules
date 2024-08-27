@@ -4,7 +4,7 @@ use substreams_solana::pb::sf::solana::r#type::v1::Block;
 static VOTE_INSTRUCTION: [u8; 32] = b58!("Vote111111111111111111111111111111111111111");
 
 #[substreams::handlers::map]
-fn map_block_without_votes(mut block: Block) -> Result<Block, substreams::errors::Error> {
+fn blocks_without_votes(mut block: Block) -> Result<Block, substreams::errors::Error> {
     block.transactions.retain(|trx| {
         let meta = match trx.meta.as_ref() {
             Some(meta) => meta,
