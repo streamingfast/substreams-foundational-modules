@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package sol.instructions.v1;
+
+message Instructions {
+  repeated Instruction instructions = 1;
+}
+
+message Instruction {
+  string program_id = 1;
+  repeated string accounts = 2;
+  bytes data = 3;
+  string tx_hash = 4;
+}

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package sol.transactions.v1;
+
+import 'sf/solana/type/v1/type.proto';
+
+message Transactions {
+  repeated .sf.solana.type.v1.ConfirmedTransaction transactions = 1;
+}

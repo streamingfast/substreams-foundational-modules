@@ -1,0 +1,34 @@
+[package]
+name = "solana-common"
+version = "0.1.0"
+description = "Substreams showcasing the building blocks of Solana"
+edition = "2021"
+repository = "https://github.com/streamingfast/substreams-foundational-modules/solana-common"
+license = "Apache 2.0"
+
+[lib]
+name = "substreams"
+crate-type = ["cdylib"]
+
+[dependencies]
+bs58 = "0.4"
+num-bigint = "0.4"
+prost = "0.11"
+# Use latest from https://crates.io/crates/substreams
+substreams = "0.5.14"
+# Use latest from https://crates.io/crates/substreams-solana
+substreams-solana = { git = "https://github.com/streamingfast/substreams-solana", branch = "release/0.13.0" }
+substreams-solana-program-instructions = "0.1"
+serde_qs = "0.12.0"
+serde = { version = "1.0", features = ["derive"] }
+anyhow = "1.0"
+base64 = "0.22.1"
+regex = "1.10.5"
+
+[target.wasm32-unknown-unknown.dependencies]
+getrandom = { version = "0.2", features = ["custom"] }
+
+[profile.release]
+lto = true
+opt-level = 's'
+strip = "debuginfo"
