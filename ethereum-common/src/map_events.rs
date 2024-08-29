@@ -5,10 +5,10 @@ use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use std::collections::HashMap;
 use substreams::errors::Error;
-use substreams::Hex;
-use substreams_ethereum::pb::eth::v2::{Block, Call as ethCall, Log};
 use substreams::parser::matches_keys_in_parsed_expr;
 use substreams::pb::sf::substreams::index::v1::Keys;
+use substreams::Hex;
+use substreams_ethereum::pb::eth::v2::{Block, Call as ethCall, Log};
 
 #[substreams::handlers::map]
 fn all_events(blk: Block) -> Result<Events, Error> {
@@ -58,7 +58,6 @@ fn all_calls(blk: Block) -> Result<Calls, Error> {
             })
         })
         .collect();
-
 
     Ok(Calls {
         calls: calls,
@@ -141,14 +140,11 @@ fn filtered_events(query: String, events: Events) -> Result<Events, Error> {
 }
 
 fn evt_matches(log: &substreams_ethereum::pb::eth::v2::Log, query: &str) -> bool {
-    matches_keys_in_parsed_expr(evt_keys(log),query) 
+    matches_keys_in_parsed_expr(evt_keys(log), query)
 }
 
-fn call_matches(
-    call: &substreams_ethereum::pb::eth::v2::Call,
-    query: &str,
-) -> bool {
-    matches_keys_in_parsed_expr(call_keys(call),query)
+fn call_matches(call: &substreams_ethereum::pb::eth::v2::Call, query: &str) -> bool {
+    matches_keys_in_parsed_expr(call_keys(call), query)
 }
 
 #[substreams::handlers::map]
@@ -172,7 +168,11 @@ fn filtered_calls(query: String, calls: Calls) -> Result<Calls, Error> {
 }
 
 #[substreams::handlers::map]
-fn filtered_events_and_calls(query: String, events: Events, calls: Calls) -> Result<EventsAndCalls, Error> {
+fn filtered_events_and_calls(
+    query: String,
+    events: Events,
+    calls: Calls,
+) -> Result<EventsAndCalls, Error> {
     let filtered_calls: Vec<Call> = calls
         .calls
         .into_iter()
@@ -197,14 +197,12 @@ fn filtered_events_and_calls(query: String, events: Events, calls: Calls) -> Res
         })
         .collect();
 
-
     Ok(EventsAndCalls {
         events: filtered_events,
         calls: filtered_calls,
         clock: calls.clock,
     })
 }
-
 
 #[substreams::handlers::map]
 fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Error> {

@@ -1,9 +1,9 @@
 use crate::pb::sf::substreams::ethereum::v1::{Event, Events};
-use substreams::pb::sf::substreams::index::v1::Keys;
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use substreams::errors::Error;
 use substreams::matches_keys_in_parsed_expr;
+use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::Block;
 
@@ -84,6 +84,9 @@ pub fn evt_keys(log: &substreams_ethereum::pb::eth::v2::Log) -> Vec<String> {
     keys
 }
 
-pub fn evt_matches(log: &substreams_ethereum::pb::eth::v2::Log, query: &str) -> Result<bool, Error> {
+pub fn evt_matches(
+    log: &substreams_ethereum::pb::eth::v2::Log,
+    query: &str,
+) -> Result<bool, Error> {
     matches_keys_in_parsed_expr(&evt_keys(log), query)
 }

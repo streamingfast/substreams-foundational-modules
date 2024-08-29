@@ -1,9 +1,9 @@
 use crate::pb::sf::substreams::ethereum::v1::{Call, Calls};
-use substreams::pb::sf::substreams::index::v1::Keys;
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use substreams::errors::Error;
 use substreams::matches_keys_in_parsed_expr;
+use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::Block;
 
@@ -49,26 +49,23 @@ fn index_calls(calls: Calls) -> Result<Keys, Error> {
 }
 
 #[substreams::handlers::map]
-fn filtered_calls(query: String, calls: Calls) -> Result<Calls, Error> {
-    let filtered: Vec<Call> = calls
-        .calls
-        .into_iter()
-        .filter(|e| {
-            if let Some(call) = &e.call {
-                call_matches(call, &query).expect("matching calls from query")
-            } else {
-                false
-            }
-        })
-        .collect();
+fn filtered_calls(query: String, mut calls: Calls) -> Result<Calls, Error> {
+    let matcher = substreams::expr_matcher(&query);
 
-    Ok(Calls {
-        calls: filtered,
-        clock: calls.clock,
-    })
+    calls.calls.retain(|call| {
+        let keys = call_keys(call.call.as_ref().unwrap());
+        let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
+
+        matcher.matches_keys(&keys)
+    });
+
+    Ok(calls)
 }
 
-pub fn call_matches(call: &substreams_ethereum::pb::eth::v2::Call, query: &str) -> Result<bool, Error> {
+pub fn call_matches(
+    call: &substreams_ethereum::pb::eth::v2::Call,
+    query: &str,
+) -> Result<bool, Error> {
     matches_keys_in_parsed_expr(&call_keys(call), query)
 }
 
