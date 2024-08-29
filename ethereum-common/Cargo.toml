@@ -10,6 +10,10 @@ license = "Apache 2.0"
 name = "substreams"
 crate-type = ["cdylib"]
 
+[[bench]]
+name = "filter_calls"
+harness = false
+
 [dependencies]
 ethabi = "17"
 hex-literal = "0.3"
@@ -29,8 +33,10 @@ regex = "1.10.4"
 [target.wasm32-unknown-unknown.dependencies]
 getrandom = { version = "0.2", features = ["custom"] }
 
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
 [profile.release]
 lto = true
 opt-level = 's'
 strip = "debuginfo"
-
