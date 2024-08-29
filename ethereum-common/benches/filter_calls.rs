@@ -1,40 +1,51 @@
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use ethereum_common::{calls::filtered_calls, pb::sf::substreams::ethereum::v1::Calls};
-use substreams::hex;
+use substreams::{hex, Hex};
 use substreams_ethereum::pb::eth::v2::BigInt;
 
 criterion_group!(filter_calls, criterion_benchmark);
 criterion_main!(filter_calls);
 
 fn criterion_benchmark(c: &mut Criterion) {
-    let mut query = "call_from:0x01ffffffff111111111111111111111111111111".to_string();
-    let query_ptr = query.as_mut_ptr();
-    let query_len = query.len();
+    for (name, density) in [
+        ("match_0%", 0),
+        ("match_33%", 5),
+        ("match_66%", 10),
+        ("match_100%", 15),
+    ] {
+        let mut group = c.benchmark_group(format!("{}/count", name));
 
-    let mut group = c.benchmark_group("size");
+        let mut query = match density {
+            // Matches nothing
+            0 => "call_from:0x0000000000000000000000000000000000000000".to_string(),
+            n => FROM_ADDRESSES[0..n]
+                .iter()
+                .map(|address| format!("call_from:0x{}", Hex::encode(address)))
+                .collect::<Vec<String>>()
+                .join(" || "),
+        };
+        let query_ptr = query.as_mut_ptr();
+        let query_len = query.len();
 
-    for count in [100, 200, 400, 800, 1600, 3200, 6400, 12800].iter() {
-        let calls = create_calls(*count, 1);
-        let mut calls_buffer = prost::Message::encode_to_vec(&calls);
-        let calls_ptr = calls_buffer.as_mut_ptr();
-        let calls_len = calls_buffer.len();
+        for count in [100, 200, 400, 800, 1600, 3200, 6400, 12800].iter() {
+            let calls = create_calls(*count, &FROM_ADDRESSES, &TO_ADDRESSES);
+            let mut calls_buffer = prost::Message::encode_to_vec(&calls);
+            let calls_ptr = calls_buffer.as_mut_ptr();
+            let calls_len = calls_buffer.len();
 
-        group.throughput(Throughput::Elements(*count as u64));
-        group.bench_with_input(
-            BenchmarkId::from_parameter(count),
-            count,
-            |b, &_call_count| {
-                b.iter(|| filtered_calls(query_ptr, query_len, calls_ptr, calls_len));
-            },
-        );
+            group.throughput(Throughput::Elements(*count as u64));
+            group.bench_with_input(
+                BenchmarkId::from_parameter(count),
+                count,
+                |b, &_call_count| {
+                    b.iter(|| filtered_calls(query_ptr, query_len, calls_ptr, calls_len));
+                },
+            );
+        }
     }
 }
 
-fn create_calls(n: usize, address_density: usize) -> Calls {
-    if address_density > FROM_ADDRESSES.len() {
-        panic!("address_density must be less than or equal to 15");
-    }
-
+fn create_calls(n: usize, from_addresses: &[[u8; 20]], to_addresses: &[[u8; 20]]) -> Calls {
     let mut calls = Calls {
         calls: Vec::with_capacity(n),
         clock: Some(ethereum_common::pb::sf::substreams::v1::Clock {
@@ -49,8 +60,8 @@ fn create_calls(n: usize, address_density: usize) -> Calls {
             .calls
             .push(ethereum_common::pb::sf::substreams::ethereum::v1::Call {
                 call: Some(::substreams_ethereum::pb::eth::v2::Call {
-                    caller: FROM_ADDRESSES[n % address_density].to_vec(),
-                    address: TO_ADDRESSES[n % address_density].to_vec(),
+                    caller: from_addresses[n % from_addresses.len()].to_vec(),
+                    address: to_addresses[n % to_addresses.len()].to_vec(),
                     input: hex!("").to_vec(),
                     logs: logs(3),
                     balance_changes: balance_changes(5),
