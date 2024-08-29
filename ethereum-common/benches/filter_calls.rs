@@ -6,6 +6,19 @@ use substreams_ethereum::pb::eth::v2::BigInt;
 criterion_group!(filter_calls, criterion_benchmark);
 criterion_main!(filter_calls);
 
+// To run, you need to edit `Cargo.toml` to comment out the `name` and `crate-type` under
+// `[lib]` section, this is to allow benchmarks here to import the crate as a library.
+//
+// When uncommented, run:
+//
+// ```
+// cargo bench -- --save-baseline develop
+// <Make optimizations on code>
+//
+// # Compares against the develop baseline
+// cargo bench -- --baseline develop
+// ```
+
 fn criterion_benchmark(c: &mut Criterion) {
     for (name, density) in [
         ("match_0%", 0),
