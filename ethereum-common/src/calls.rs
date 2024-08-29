@@ -49,23 +49,17 @@ fn index_calls(calls: Calls) -> Result<Keys, Error> {
 }
 
 #[substreams::handlers::map]
-fn filtered_calls(query: String, calls: Calls) -> Result<Calls, Error> {
-    let filtered: Vec<Call> = calls
-        .calls
-        .into_iter()
-        .filter(|e| {
-            if let Some(call) = &e.call {
-                call_matches(call, &query).expect("matching calls from query")
-            } else {
-                false
-            }
-        })
-        .collect();
+fn filtered_calls(query: String, mut calls: Calls) -> Result<Calls, Error> {
+    let matcher = substreams::expr_matcher(&query);
 
-    Ok(Calls {
-        calls: filtered,
-        clock: calls.clock,
-    })
+    calls.calls.retain(|call| {
+        let keys = call_keys(call.call.as_ref().unwrap());
+        let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
+
+        matcher.matches_keys(&keys)
+    });
+
+    Ok(calls)
 }
 
 pub fn call_matches(
