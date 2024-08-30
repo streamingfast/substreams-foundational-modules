@@ -1,0 +1,48 @@
+specVersion: v0.1.0
+package:
+  name: "solana_common"
+  version: v0.3.0 # based on v0.2.0 to keep the caches on the existing modules
+  image: ./solana.png
+
+network: solana
+
+imports:
+  solana: https://github.com/streamingfast/firehose-solana/releases/download/v0.1.1/solana-v0.1.1.spkg
+  v020: https://spkg.io/streamingfast/solana-common-v0.2.0.spkg
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+
+modules:
+  - name: blocks_without_votes
+    use: v020:blocks_without_votes # unchanged
+    #kind: map
+
+  - name: program_ids_without_votes
+    use: v020:program_ids_without_votes # unchanged
+    #kind: blockIndex
+
+  - name: program_ids_and_accounts_without_votes
+    kind: blockIndex
+    inputs:
+      - map: blocks_without_votes
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+
+  - name: transactions_by_programid_without_votes
+    use: v020:filtered_transactions_without_votes # unchanged, just renamed
+    #kind: map
+
+  - name: transactions_by_programid_and_account_without_votes
+    kind: map
+    inputs:
+      - params: string
+      - map: blocks_without_votes
+    output:
+      type: proto:sol.transactions.v1.Transactions
+
+params: # Default parameters for the filter modules. You can override these parameters based on your needs.
+  transactions_by_programid_without_votes: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy"
+  transactions_by_programid_and_account_without_votes: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy || (program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA && account:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy)"
