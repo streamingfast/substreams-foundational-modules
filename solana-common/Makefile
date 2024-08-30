@@ -8,7 +8,7 @@ build:
 
 .PHONY: run
 run: build
-	substreams run substreams.yaml $(if $(MODULE),$(MODULE),all_instructions_without_votes) $(if $(START_BLOCK),-s $(START_BLOCK)) $(if $(STOP_BLOCK),-t $(STOP_BLOCK)) $(if $(PARAMS),-p '$(PARAMS)')
+	substreams run substreams.yaml $(if $(MODULE),$(MODULE),filtered_transactions_without_votes) $(if $(START_BLOCK),-s $(START_BLOCK)) $(if $(STOP_BLOCK),-t $(STOP_BLOCK)) $(if $(PARAMS),-p '$(PARAMS)')
 
 .PHONY: package
 package: build
