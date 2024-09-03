@@ -14,8 +14,8 @@ imports:
 
 protobuf:
   files:
-    - instructions.proto
-    - transactions.proto
+    - sol/instructions/v1/instructions.proto
+    - sol/transactions/v1/transactions.proto
   importPaths:
     - ./proto
 
@@ -32,7 +32,7 @@ modules:
     output:
       type: proto:sf.solana.type.v1.Block
     doc: |
-      `blocks_without_votes` allows you to consume a full Solana Block without Vote instructions (`Vote111111111111111111111111111111111111111`). 
+      `blocks_without_votes` allows you to consume a full Solana Block without Vote instructions (`Vote111111111111111111111111111111111111111`).
       If you consume it on HISTORICAL data (+1000 blocks from HEAD), you will be reading from the StreamingFast cache, thus saving costs on the amount of TB read.
 
   - name: program_ids_without_votes
