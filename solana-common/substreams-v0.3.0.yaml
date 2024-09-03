@@ -31,18 +31,30 @@ modules:
     output:
       type: proto:sf.substreams.index.v1.Keys
 
-  - name: transactions_by_programid_without_votes
-    use: v020:filtered_transactions_without_votes # unchanged, just renamed
-    #kind: map
+  - name: transactions_by_programid_without_votes # rebuilt to show new output type
+    kind: map
+    inputs:
+      - params: string
+      - map: blocks_without_votes
+    blockFilter:
+      module: program_ids_without_votes
+      query:
+        params: true
+    output:
+      type: proto:sf.substreams.solana.v1.Transactions
 
   - name: transactions_by_programid_and_account_without_votes
     kind: map
     inputs:
       - params: string
       - map: blocks_without_votes
+    blockFilter:
+      module: program_ids_without_votes
+      query:
+        params: true
     output:
-      type: proto:sol.transactions.v1.Transactions
+      type: proto:sf.substreams.solana.v1.Transactions
 
 params: # Default parameters for the filter modules. You can override these parameters based on your needs.
   transactions_by_programid_without_votes: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy"
-  transactions_by_programid_and_account_without_votes: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy || (program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA && account:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy)"
+  transactions_by_programid_and_account_without_votes: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy || (account:Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD && program:FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH)"
