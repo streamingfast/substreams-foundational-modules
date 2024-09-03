@@ -49,7 +49,7 @@ modules:
       - params: string
       - map: blocks_without_votes
     blockFilter:
-      module: program_ids_without_votes
+      module: program_ids_and_accounts_without_votes
       query:
         params: true
     output:
