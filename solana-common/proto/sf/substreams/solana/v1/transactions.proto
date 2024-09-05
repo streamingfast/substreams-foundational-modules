@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package sol.transactions.v1;
+package sf.substreams.solana.v1;
 
 import 'sf/solana/type/v1/type.proto';
 

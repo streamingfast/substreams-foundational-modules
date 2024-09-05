@@ -1,6 +1,6 @@
 .PHONY: protogen
 protogen:
-	substreams protogen ./substreams.yaml --exclude-paths="sf/substreams,google"
+	substreams protogen
 
 .PHONY: build
 build:

@@ -1,0 +1,67 @@
+specVersion: v0.1.0
+package:
+  name: "solana_common"
+  version: v0.2.0
+  image: ./solana.png
+  doc: |
+    Common Solana modules that allow you to consume transactions and instructions, and apply filters to efficiently retrieve the data that you need.
+    To consume data, use the following optimized modules:
+    - `filtered_txs_by_instructions_without_votes`: allows you consume transactions containing specific instruction types (based on the program ID).
+network: solana
+
+imports:
+  solana: https://github.com/streamingfast/firehose-solana/releases/download/v0.1.1/solana-v0.1.1.spkg
+
+protobuf:
+  files:
+    - instructions.proto
+    - transactions.proto
+  importPaths:
+    - ./proto
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+
+modules:
+  - name: blocks_without_votes
+    kind: map
+    inputs:
+      - source: sf.solana.type.v1.Block
+    output:
+      type: proto:sf.solana.type.v1.Block
+    doc: |
+      `blocks_without_votes` allows you to consume a full Solana Block without Vote instructions (`Vote111111111111111111111111111111111111111`). 
+      If you consume it on HISTORICAL data (+1000 blocks from HEAD), you will be reading from the StreamingFast cache, thus saving costs on the amount of TB read.
+
+  - name: program_ids_without_votes
+    kind: blockIndex
+    inputs:
+      - map: blocks_without_votes
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+    doc: |
+      `program_ids_without_votes` creates a _cache_ to efficiently retrieve instructions based on the program ID.
+      For example, the following sets keys for the Token program:
+      * program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+
+  - name: filtered_transactions_without_votes
+    kind: map
+    inputs:
+      - params: string
+      - map: blocks_without_votes
+    output:
+      type: proto:sol.transactions.v1.Transactions
+    blockFilter:
+      module: program_ids_without_votes
+      query:
+        params: true
+    doc: |
+      `filtered_transactions_without_votes` allows you to consume transactions containing instructions from specific program_id based on a filter string.
+      Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`.
+      Example: to only consume TRANSACTIONS containing Token or ComputeBudget instructions: `program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA || program:ComputeBudget111111111111111111111111111111`.
+      Transactions containing `Vote111111111111111111111111111111111111111` are always excluded.
+
+params: # Default parameters for the filter modules. You can override these parameters based on your needs.
+  filtered_transactions_without_votes: "program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
