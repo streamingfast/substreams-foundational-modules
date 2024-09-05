@@ -15,7 +15,7 @@ In your substreams.yaml,
 ```
 imports:
   sol: https://spkg.io/streamingfast/solana-common-v0.3.0.spkg
-``` 
+```
 
 2. Replace any `source: sf.solana.type.v1.Block` input with `map: sol:blocks_without_votes` (you will be getting the same protobuf object, but with some vote-related transactions already pruned)
 
@@ -48,7 +48,7 @@ In your substreams.yaml,
 ```
 imports:
   sol: https://spkg.io/streamingfast/solana-common-v0.3.0.spkg
-``` 
+```
 
 2. Set one of `transactions_by_programid_without_votes` or `transactions_by_programid_and_account_without_votes` (along with `source: sf.substreams.v1.Clock` if you need slot number/ID/timestamp) as your module input, ex:
 
@@ -107,6 +107,7 @@ Use it to only get blocks that contain instructions matching the programID/accou
       query:
         string: (account:Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD && program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA)
 ```
+
 ### `transactions_by_programid_without_votes` (map)
 
 * This modules uses the `program_ids_without_votes` index to only process blocks that contain matching instructions. 
