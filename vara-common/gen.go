@@ -8,7 +8,7 @@ import (
 	"unsafe"
 
 	pbgear "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/gear/type/v1"
-	pbvara "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/substreams/gear/type/v1"
+	pbvara "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/substreams/vara/type/v1"
 )
 
 func main() {}

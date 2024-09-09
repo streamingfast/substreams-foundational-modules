@@ -10,7 +10,7 @@ protobuf:
   files:
     - types.proto
   importPaths:
-    - ./proto/sf/substreams/gear/type/v1
+    - ./proto/sf/substreams/vara/type/v1
 
 binaries:
   default:
@@ -55,13 +55,13 @@ modules:
         params: true
     inputs:
       - params: string
-      - map: all_extrinsics
+      - map: map_decoded_block
     output:
-      type: proto:sf.substreams.gear.type.v1.Extrinsics
+      type: proto:sf.substreams.vara.type.v1.Extrinsics
     doc: |
       `filtered_extrinsics` reads from `all_extrinsics` and applies a filter on keys, 
       only outputting extrinsics that match the filter. 
-      Example usage: `(extrinsic:Timestamp.set:event:System.ExtrinsicSuccess)`
+      Example usage: `(extrinsic:Timestamp.set || extrinsic:Gear.run)`
 
 params:
-  filtered_extrinsics: "extrinsic:Gear.run"
+  filtered_extrinsics: "extrinsic:Timestamp.set"

@@ -13,9 +13,9 @@ import (
 	"github.com/streamingfast/substreams-foundational-modules/vara-common/metadata"
 	"github.com/streamingfast/substreams-foundational-modules/vara-common/metadata/spec"
 	pbgear "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/gear/type/v1"
-	pbvara "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/substreams/gear/type/v1"
 	pbindex "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/substreams/index/v1"
 	pbsubstreams "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/substreams/v1"
+	pbvara "github.com/streamingfast/substreams-foundational-modules/vara-common/pb/sf/substreams/vara/type/v1"
 	"github.com/streamingfast/substreams-foundational-modules/vara-common/sqe"
 )
 
