@@ -10,12 +10,12 @@ protobuf:
     - ./proto/sf/substreams/starknet/type/v1
 
 imports:
-  starknet: /Users/cbillett/devel/sf/substreams-starknet/starknet-v0.1.2.spkg
+  starknet: https://github.com/streamingfast/substreams-starknet/releases/download/v0.1.1/starknet-v0.1.1.spkg
 
 binaries:
   default:
     type: wasip1/tinygo-v1  # wasm/rust-v1
-    file: ./wasm.wasm
+    file: ./main.wasm
 
 network: starknet
 
