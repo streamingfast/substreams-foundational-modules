@@ -69,11 +69,11 @@ func Test_MapDecodedBlock(t *testing.T) {
 				require.NoError(t, err)
 				require.Equal(t, 1, len(extrinsics.Extrinsics))
 
-				if blocks[0].Number == 103900 {
-					j, err := json.MarshalIndent(dblock, "", "  ")
-					require.NoError(t, err)
-					fmt.Println(string(j))
-				}
+				// if blocks[0].Number == 103900 {
+				// 	j, err := json.MarshalIndent(dblock, "", "  ")
+				// 	require.NoError(t, err)
+				// 	fmt.Println(string(j))
+				// }
 			}
 		})
 	}
