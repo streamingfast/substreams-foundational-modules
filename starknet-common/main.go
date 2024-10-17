@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/NethermindEth/juno/core/felt"
@@ -170,11 +171,29 @@ func stringToIndexKey(prefix, str string) string {
 }
 
 func feltToIndexKey(prefix string, bytes []byte) string {
-	return fmt.Sprintf("%s:%s", prefix, feltToString(bytes))
+	felt_string := feltToString(bytes)
+
+	sanitize_string := padFeltString(felt_string)
+
+	return fmt.Sprintf("%s:%s", prefix, sanitize_string)
 }
 
 func feltToString(bytes []byte) string {
 	f := &felt.Felt{}
 	f.SetBytes(bytes)
 	return f.String()
+}
+
+const hexPrefix = "0x"
+
+func padFeltString(str string) string {
+	trimmedStr := strings.TrimPrefix(str, hexPrefix)
+
+	paddedStr := fmt.Sprintf("%064s", trimmedStr)
+
+	if strings.HasPrefix(str, hexPrefix) {
+		return hexPrefix + paddedStr
+	}
+
+	return paddedStr
 }

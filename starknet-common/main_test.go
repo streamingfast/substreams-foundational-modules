@@ -6,9 +6,8 @@ import (
 	"encoding/hex"
 	"testing"
 
-	v1 "github.com/streamingfast/substreams-foundational-modules/starknet-common/pb/sf/substreams/starknet/type/v1"
-
 	pbstarknet "github.com/streamingfast/substreams-foundational-modules/starknet-common/pb/sf/starknet/type/v1"
+	v1 "github.com/streamingfast/substreams-foundational-modules/starknet-common/pb/sf/substreams/starknet/type/v1"
 	"github.com/stretchr/testify/require"
 )
 
@@ -29,7 +28,7 @@ func Test_mapBlockEvents(t *testing.T) {
 
 func Test_FilteredTransactions(t *testing.T) {
 	ch := []byte("class_hash")
-	xch := "0x" + hex.EncodeToString(ch)
+	xch := padFeltString("0x" + hex.EncodeToString(ch))
 
 	tx := &pbstarknet.TransactionWithReceipt{
 		Transaction: &pbstarknet.TransactionWithReceipt_DeployTransactionV0{
@@ -49,4 +48,35 @@ func Test_FilteredTransactions(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, 1, len(txs.TransactionsWithReceipt))
+}
+
+func TestPadFeltString(t *testing.T) {
+	cases := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "sunny_path",
+			input:    "0x29598b407c8716b17f6d2795eca1b471413fa03fb145a5e337",
+			expected: "0x0000000000000029598b407c8716b17f6d2795eca1b471413fa03fb145a5e337",
+		},
+		{
+			name:     "ekubo_contract",
+			input:    "0x2e0af29598b407c8716b17f6d2795eca1b471413fa03fb145a5e33722184067",
+			expected: "0x02e0af29598b407c8716b17f6d2795eca1b471413fa03fb145a5e33722184067",
+		},
+		{
+			name:     "address without lead",
+			input:    "2e0af29598b407c8716b17f6d2795eca1b471413fa03fb145a5e33722184067",
+			expected: "02e0af29598b407c8716b17f6d2795eca1b471413fa03fb145a5e33722184067",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			result := padFeltString(c.input)
+			require.Equal(t, c.expected, result)
+		})
+	}
 }

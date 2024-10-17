@@ -56,4 +56,4 @@ modules:
       Example usage: `(tx:class_hash:0x0000000 && rc:type:0)`
 
 params:
-  filtered_transactions: "(rc:execution_status:1)"
+ filtered_transactions: "(rc:execution_status:1)"
