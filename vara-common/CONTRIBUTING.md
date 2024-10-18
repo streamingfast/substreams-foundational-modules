@@ -54,6 +54,33 @@ var V1501 = "contents of 1501.hex"
 
 Then you can safely delete the `<version>.hex` file.
 
+### Updating the substreams to support the new metadata version
+
+```golang
+var specVersions = map[uint32]string{
+    //[...]
+    <version>: spec.V<version>, // add newly fetch metadata version
+}
+```
+
+### Bump substreams.yaml version
+
+```yaml
+specVersion: v0.1.0
+package:
+  name: vara_common
+  version: <---- bump the version here
+```
+
+### Compile, pack and release the new spkg
+
+```bash
+make build
+substreams pack
+```
+
+Then make a new GitHub release and upload the new spkg on <https://substreams.dev/>
+
 ### Add new tests for new metadata files
 
 ```bash
