@@ -1,9 +1,11 @@
+use std::collections::HashSet;
+
 use crate::pb::sf::substreams::ethereum::v1::{Event, Events};
-use substreams::pb::sf::substreams::index::v1::Keys;
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use substreams::errors::Error;
 use substreams::matches_keys_in_parsed_expr;
+use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::Block;
 
@@ -37,17 +39,16 @@ fn all_events(blk: Block) -> Result<Events, Error> {
 
 #[substreams::handlers::map]
 fn index_events(events: Events) -> Result<Keys, Error> {
-    let mut keys = Keys::default();
+    let keys: Vec<_> = events
+        .events
+        .iter()
+        .filter_map(|event| event.log.as_ref())
+        .flat_map(evt_keys)
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect();
 
-    events.events.into_iter().for_each(|e| {
-        if let Some(log) = e.log {
-            evt_keys(&log).into_iter().for_each(|k| {
-                keys.keys.push(k);
-            });
-        }
-    });
-
-    Ok(keys)
+    Ok(Keys { keys })
 }
 
 #[substreams::handlers::map]
@@ -84,6 +85,9 @@ pub fn evt_keys(log: &substreams_ethereum::pb::eth::v2::Log) -> Vec<String> {
     keys
 }
 
-pub fn evt_matches(log: &substreams_ethereum::pb::eth::v2::Log, query: &str) -> Result<bool, Error> {
+pub fn evt_matches(
+    log: &substreams_ethereum::pb::eth::v2::Log,
+    query: &str,
+) -> Result<bool, Error> {
     matches_keys_in_parsed_expr(&evt_keys(log), query)
 }

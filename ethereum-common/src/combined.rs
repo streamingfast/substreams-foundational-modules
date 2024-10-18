@@ -3,35 +3,38 @@ use crate::events::*;
 use crate::pb::sf::substreams::ethereum::v1::{
     Call, Calls, Event, Events, EventsAndCalls, Transaction, Transactions,
 };
-use substreams::pb::sf::substreams::index::v1::Keys;
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use std::collections::HashMap;
+use std::collections::HashSet;
 use substreams::errors::Error;
+use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::{Block, Call as ethCall, Log};
 
 #[substreams::handlers::map]
+
 fn index_events_and_calls(events: Events, calls: Calls) -> Result<Keys, Error> {
-    let mut keys = Keys::default();
+    let event_keys: HashSet<_> = events
+        .events
+        .iter()
+        .filter_map(|e| e.log.as_ref())
+        .flat_map(evt_keys)
+        .collect();
 
-    events.events.into_iter().for_each(|e| {
-        if let Some(log) = e.log {
-            evt_keys(&log).into_iter().for_each(|k| {
-                keys.keys.push(k);
-            });
-        }
-    });
+    let call_keys: HashSet<_> = calls
+        .calls
+        .iter()
+        .filter_map(|call| call.call.as_ref())
+        .flat_map(call_keys)
+        .collect();
 
-    calls.calls.into_iter().for_each(|call| {
-        if let Some(call) = &call.call {
-            call_keys(call).into_iter().for_each(|k| {
-                keys.keys.push(k);
-            });
-        }
-    });
+    let keys: Vec<_> = event_keys
+        .into_iter()
+        .chain(call_keys.into_iter())
+        .collect();
 
-    Ok(keys)
+    Ok(Keys { keys })
 }
 
 #[substreams::handlers::map]

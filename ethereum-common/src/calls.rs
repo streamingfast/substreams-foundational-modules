@@ -1,9 +1,11 @@
+use std::collections::HashSet;
+
 use crate::pb::sf::substreams::ethereum::v1::{Call, Calls};
-use substreams::pb::sf::substreams::index::v1::Keys;
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use substreams::errors::Error;
 use substreams::matches_keys_in_parsed_expr;
+use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::Block;
 
@@ -36,16 +38,16 @@ fn all_calls(blk: Block) -> Result<Calls, Error> {
 
 #[substreams::handlers::map]
 fn index_calls(calls: Calls) -> Result<Keys, Error> {
-    let mut keys = Keys::default();
+    let keys: Vec<_> = calls
+        .calls
+        .iter()
+        .filter_map(|call| call.call.as_ref())
+        .flat_map(call_keys)
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect();
 
-    calls.calls.into_iter().for_each(|call| {
-        if let Some(call) = &call.call {
-            call_keys(call).into_iter().for_each(|k| {
-                keys.keys.push(k);
-            });
-        }
-    });
-    Ok(keys)
+    Ok(Keys { keys })
 }
 
 #[substreams::handlers::map]
@@ -68,7 +70,10 @@ fn filtered_calls(query: String, calls: Calls) -> Result<Calls, Error> {
     })
 }
 
-pub fn call_matches(call: &substreams_ethereum::pb::eth::v2::Call, query: &str) -> Result<bool, Error> {
+pub fn call_matches(
+    call: &substreams_ethereum::pb::eth::v2::Call,
+    query: &str,
+) -> Result<bool, Error> {
     matches_keys_in_parsed_expr(&call_keys(call), query)
 }
 
