@@ -47,6 +47,7 @@ var specVersions = map[uint32]string{
 	1421: spec.V1421,
 	1500: spec.V1500,
 	1501: spec.V1501,
+	1620: spec.V1620,
 }
 
 type regItem struct {
