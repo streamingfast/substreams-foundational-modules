@@ -1,0 +1,59 @@
+specVersion: v0.1.0
+package:
+  name: mantra_common
+  version: v0.0.1
+  url: https://github.com/streamingfast/substreams-foundational-modules/mantra-common
+  doc: |
+    Common Mantra Substreams modules to extract events and transactions with indexing
+    This package uses the Injective Foundational Modules, which share the Cosmos Block model.
+    
+    Use one of those optimized modules with a query string as a parameter:
+    * filtered_events
+    * filtered_event_groups
+
+    The query string will be used for the blockfilter as well as the actual filtering of the events/transactions
+
+    The following modules are also available for more specific filtering, but they do not use an index by default:
+    * filtered_events_by_attribute_value
+    * filtered_event_groups_by_attribute_value
+
+network: mantra-mainnet
+
+imports:
+  injective: https://spkg.io/streamingfast/injective-common-v0.2.2.spkg
+
+modules:
+  - name: all_events
+    use: injective:all_events
+
+  - name: all_transactions
+    use: injective:all_transactions
+
+  - name: index_events
+    use: injective:index_events
+  
+  - name: filtered_events
+    use: injective:filtered_events
+    blockFilter:
+      module: index_events
+      query:
+        params: true
+  
+  - name: filtered_event_groups
+    use: injective:filtered_event_groups
+    blockFilter:
+      module: index_events
+      query:
+        params: true
+
+  - name: filtered_events_by_attribute_value
+    use: injective:filtered_events_by_attribute_value
+  
+  - name: filtered_event_groups_by_attribute_value
+    use: injective:filtered_event_groups_by_attribute_value
+
+params:
+  filtered_events: "(type:message && attr:action)"
+  filtered_event_groups: "type:wasm && attr:_contract_address"
+  filtered_events_by_attribute_value: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
+  filtered_event_groups_by_attribute_value: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
