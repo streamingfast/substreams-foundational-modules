@@ -1,0 +1,43 @@
+specVersion: v0.1.0
+package:
+  name: mantra_common
+  version: v0.0.1
+  url: https://github.com/streamingfast/substreams-foundational-modules/mantra-common
+
+network: mantra-mainnet
+
+imports:
+  injective: https://spkg.io/streamingfast/injective-common-v0.2.3.spkg
+
+modules:
+  - name: all_events
+    use: injective:all_events
+
+  - name: index_events
+    use: injective:index_events
+  
+  - name: filtered_events
+    use: injective:filtered_events
+    blockFilter:
+      module: index_events
+      query:
+        params: true
+  
+  - name: filtered_event_groups
+    use: injective:filtered_event_groups
+    blockFilter:
+      module: index_events
+      query:
+        params: true
+
+  - name: filtered_events_by_attribute_value
+    use: injective:filtered_events_by_attribute_value
+  
+  - name: filtered_event_groups_by_attribute_value
+    use: injective:filtered_event_groups_by_attribute_value
+
+params:
+  filtered_events: "(type:message && attr:action)"
+  filtered_event_groups: "type:wasm && attr:_contract_address"
+  filtered_events_by_attribute_value: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
+  filtered_event_groups_by_attribute_value: "type:wasm && attr:_contract_address:inj1v77y5ttah96dc9qkcpc88ad7rce8n88e99t3m5"
