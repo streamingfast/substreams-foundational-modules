@@ -1,0 +1,41 @@
+specVersion: v0.1.0
+package:
+  name: solana_accounts_foundational
+  version: v0.0.1
+
+protobuf:
+  descriptorSets:
+    - module: buf.build/streamingfast/solana-accounts
+    - module: buf.build/streamingfast/substreams
+
+binaries:
+  default:
+    type: wasip1/tinygo-v1
+    file: ./main.wasm
+
+network: sol-mainnet
+
+modules:
+  - name: index_accounts
+    kind: blockIndex
+    inputs:
+      - source: sf.solana.type.v1.AccountBlock
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+    doc: |
+      `index_accounts` will index the accounts by their address and owner.
+
+  - name: filtered_accounts
+    kind: map
+    blockFilter:
+      module: index_accounts
+      query:
+        params: true
+    inputs:
+      - params: string
+      - source: sf.solana.type.v1.AccountBlock
+    output:
+      type: proto:sf.solana.type.v1.Accounts
+
+params:
+  filtered_accounts: "address:AwjomjhbNqkgEZN1ADvbEcTYsDfBuX4AKzNmxwgtKvxM"
