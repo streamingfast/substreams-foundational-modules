@@ -6,6 +6,7 @@ import (
 
 	v1 "github.com/streamingfast/substreams-foundational-modules/solana-accounts-common/pb/sf/solana/type/v1"
 	indexv1 "github.com/streamingfast/substreams-foundational-modules/solana-accounts-common/pb/sf/substreams/index/v1"
+	typev1 "github.com/streamingfast/substreams-foundational-modules/solana-accounts-common/pb/sf/substreams/solana/type/v1"
 	"github.com/streamingfast/substreams-foundational-modules/solana-accounts-common/sqe"
 
 	"github.com/mr-tron/base58"
@@ -17,7 +18,7 @@ func IndexAccounts(block *v1.AccountBlock) (*indexv1.Keys, error) {
 	}
 
 	accountMap := make(map[string]struct{})
-	for _, account := range block.Accounts.Accounts {
+	for _, account := range block.Accounts {
 		for _, key := range indexForAccount(account).Keys {
 			if _, exists := accountMap[key]; exists {
 				continue
@@ -31,12 +32,12 @@ func IndexAccounts(block *v1.AccountBlock) (*indexv1.Keys, error) {
 	return ix.Keys, nil
 }
 
-func FilteredAccounts(query string, block *v1.AccountBlock) (*v1.Accounts, error) {
-	filteredAccounts := &v1.Accounts{
+func FilteredAccounts(query string, block *v1.AccountBlock) (*typev1.FilteredAccounts, error) {
+	filteredAccounts := &typev1.FilteredAccounts{
 		Accounts: []*v1.Account{},
 	}
 
-	for _, account := range block.Accounts.Accounts {
+	for _, account := range block.Accounts {
 		ix := indexForAccount(account)
 		applies, err := applyQuery(query, ix)
 		if err != nil {

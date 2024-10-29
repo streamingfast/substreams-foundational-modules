@@ -5,22 +5,21 @@ import (
 	"testing"
 
 	v1 "github.com/streamingfast/substreams-foundational-modules/solana-accounts-common/pb/sf/solana/type/v1"
+	typev1 "github.com/streamingfast/substreams-foundational-modules/solana-accounts-common/pb/sf/substreams/solana/type/v1"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestIndexAccounts(t *testing.T) {
 	testBlock := &v1.AccountBlock{
-		Accounts: &v1.Accounts{
-			Accounts: []*v1.Account{
-				{
-					Address: base58Decode("bQbp"),
-					Owner:   base58Decode("a3cM"),
-				},
-				{
-					Address: base58Decode("emR8"),
-					Owner:   base58Decode("a3cM"),
-				},
+		Accounts: []*v1.Account{
+			{
+				Address: base58Decode("bQbp"),
+				Owner:   base58Decode("a3cM"),
+			},
+			{
+				Address: base58Decode("emR8"),
+				Owner:   base58Decode("a3cM"),
 			},
 		},
 	}
@@ -42,28 +41,26 @@ func TestIndexAccounts(t *testing.T) {
 
 func TestFilteredAccounts_AccountQuery(t *testing.T) {
 	testBlock := &v1.AccountBlock{
-		Accounts: &v1.Accounts{
-			Accounts: []*v1.Account{
-				{
-					Address: base58Decode("bQbp"),
-					Owner:   base58Decode("a3cM"),
-				},
-				{
-					Address: base58Decode("emR8"),
-					Owner:   base58Decode("a3cM"),
-				},
+		Accounts: []*v1.Account{
+			{
+				Address: base58Decode("bQbp"),
+				Owner:   base58Decode("a3cM"),
+			},
+			{
+				Address: base58Decode("emR8"),
+				Owner:   base58Decode("a3cM"),
 			},
 		},
 	}
 
 	type test struct {
 		query    string
-		expected *v1.Accounts
+		expected *typev1.FilteredAccounts
 	}
 	for _, tt := range []test{
 		{
 			query: "account:bQbp",
-			expected: &v1.Accounts{
+			expected: &typev1.FilteredAccounts{
 				Accounts: []*v1.Account{
 					{
 						Address: base58Decode("bQbp"),
@@ -74,7 +71,7 @@ func TestFilteredAccounts_AccountQuery(t *testing.T) {
 		},
 		{
 			query: "account:emR8",
-			expected: &v1.Accounts{
+			expected: &typev1.FilteredAccounts{
 				Accounts: []*v1.Account{
 					{
 						Address: base58Decode("emR8"),
@@ -85,7 +82,7 @@ func TestFilteredAccounts_AccountQuery(t *testing.T) {
 		},
 		{
 			query: "owner:a3cM",
-			expected: &v1.Accounts{
+			expected: &typev1.FilteredAccounts{
 				Accounts: []*v1.Account{
 					{
 						Address: base58Decode("bQbp"),
@@ -100,7 +97,7 @@ func TestFilteredAccounts_AccountQuery(t *testing.T) {
 		},
 		{
 			query: "owner:popo || account:bQbp",
-			expected: &v1.Accounts{
+			expected: &typev1.FilteredAccounts{
 				Accounts: []*v1.Account{
 					{
 						Address: base58Decode("bQbp"),
@@ -111,7 +108,7 @@ func TestFilteredAccounts_AccountQuery(t *testing.T) {
 		},
 		{
 			query: "owner:a3cM || account:popo",
-			expected: &v1.Accounts{
+			expected: &typev1.FilteredAccounts{
 				Accounts: []*v1.Account{
 					{
 						Address: base58Decode("bQbp"),
@@ -126,13 +123,13 @@ func TestFilteredAccounts_AccountQuery(t *testing.T) {
 		},
 		{
 			query: "owner:coco || account:popo",
-			expected: &v1.Accounts{
+			expected: &typev1.FilteredAccounts{
 				Accounts: []*v1.Account{},
 			},
 		},
 		{
 			query: "owner:a3cM && account:bQbp",
-			expected: &v1.Accounts{
+			expected: &typev1.FilteredAccounts{
 				Accounts: []*v1.Account{
 					{
 						Address: base58Decode("bQbp"),
