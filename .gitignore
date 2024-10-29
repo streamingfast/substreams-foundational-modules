@@ -2,3 +2,4 @@ target/
 *.spkg
 replay.log
 .DS_STORE
+*.wasm
