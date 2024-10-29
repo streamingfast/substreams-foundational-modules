@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/mr-tron/base58"
-	typev1 "github.com/streamingfast/substreams-foundational-modules/solana-accounts-common/pb/sf/solana/type/v1"
+	v1 "github.com/streamingfast/substreams-foundational-modules/solana-accounts-common/pb/sf/solana/type/v1"
 	indexv1 "github.com/streamingfast/substreams-foundational-modules/solana-accounts-common/pb/sf/substreams/index/v1"
 	"github.com/streamingfast/substreams-foundational-modules/solana-accounts-common/sqe"
+
+	"github.com/mr-tron/base58"
 )
 
-func IndexAccounts(block *typev1.AccountBlock) (*indexv1.Keys, error) {
+func IndexAccounts(block *v1.AccountBlock) (*indexv1.Keys, error) {
 	ix := &Index{
 		Keys: &indexv1.Keys{},
 	}
@@ -30,9 +31,9 @@ func IndexAccounts(block *typev1.AccountBlock) (*indexv1.Keys, error) {
 	return ix.Keys, nil
 }
 
-func FilteredAccounts(query string, block *typev1.AccountBlock) (*typev1.Accounts, error) {
-	filteredAccounts := &typev1.Accounts{
-		Accounts: []*typev1.Account{},
+func FilteredAccounts(query string, block *v1.AccountBlock) (*v1.Accounts, error) {
+	filteredAccounts := &v1.Accounts{
+		Accounts: []*v1.Account{},
 	}
 
 	for _, account := range block.Accounts.Accounts {
@@ -61,7 +62,7 @@ func applyQuery(query string, keys *indexv1.Keys) (bool, error) {
 	return sqe.KeysApply(q, keyQuerier), nil
 }
 
-func indexForAccount(account *typev1.Account) *indexv1.Keys {
+func indexForAccount(account *v1.Account) *indexv1.Keys {
 	keys := &indexv1.Keys{}
 
 	accountKey := "account:" + base58Encode(account.Address)
