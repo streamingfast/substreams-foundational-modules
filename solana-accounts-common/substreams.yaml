@@ -18,7 +18,8 @@ modules:
     output:
       type: proto:sf.substreams.index.v1.Keys
     doc: |
-      `index_accounts` will index the accounts by their address and owner.
+      `index_accounts` will index the accounts by their address and owner as given in the account block
+      ex: `account:AwjomjhbNqkgEZN1ADvbEcTYsDfBuX4AKzNmxwgtKvxM`, `owner:stk17KkSJ7amyTVpGBHgo3Kcz52GjkzKYXuDwsFSk95`      
 
   - name: filtered_accounts
     kind: map
@@ -32,5 +33,5 @@ modules:
     output:
       type: proto:sf.substreams.solana.type.v1.FilteredAccounts
 
-params:
+params: # Default parameters. You can override these parameters based on your needs.
   filtered_accounts: "address:AwjomjhbNqkgEZN1ADvbEcTYsDfBuX4AKzNmxwgtKvxM"
