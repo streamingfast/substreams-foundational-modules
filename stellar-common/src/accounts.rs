@@ -60,6 +60,12 @@ fn map_deleted_accounts(block: Block) -> Result<Accounts, substreams::errors::Er
         for operation_meta in decoded_transaction_meta.operations.as_vec() {
             for change in operation_meta.changes.0.as_vec() {
                 match change {
+                    // While this may be a way to determine deleted accounts,
+                    // parsing out the AccountMerge operation is more
+                    // straightforward. It's what we do in Horizon [1] to
+                    // generate an "AccountDeleted" side-effect.
+                    //
+                    // [1]: https://github.com/stellar/go/blob/e30ccf40d186845f2d3332a9ae9a0d01da9dcf7f/services/horizon/internal/ingest/processors/effects_processor.go#L845-L865
                     stellar_xdr::curr::LedgerEntryChange::Removed(ledger_key) => match ledger_key {
                         stellar_xdr::curr::LedgerKey::Account(ledger_key_account) => {
                             accounts.accounts.push(Account {

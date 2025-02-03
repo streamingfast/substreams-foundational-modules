@@ -28,6 +28,15 @@ fn map_issue_asset(block: Block) -> Result<Assets, substreams::errors::Error> {
                 // We listen on the ChangeTrust operation. This will tell us if a new asset was created
                 // or if an asset was updated (the trustline was updated).
                 // The sink running this piece of code, should ignore any asset that have already been created.
+                //
+                // In the above comment:
+                //
+                // > This will tell us if a new asset was created
+                //
+                // is not true. Assets are created (minted, come into being)
+                // only when the issuer actually makes a payment with that
+                // asset. Though the ChangeTrust can be a hint that it may be
+                // soon to exist, it does not mean it will.
                 stellar_xdr::curr::OperationBody::ChangeTrust(change_trust_op) => {
                     let asset_code = utils::match_change_trust_op_asset(&change_trust_op.line);
                     assets.assets.push(Asset {

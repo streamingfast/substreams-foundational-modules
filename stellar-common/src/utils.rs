@@ -69,6 +69,11 @@ pub fn decode_transaction_meta(result_meta_xdr: &Vec<u8>) -> Result<TransactionM
     let buf = Cursor::new(result_meta_xdr);
     let transaction_meta = TransactionMeta::read_xdr(&mut Limited::new(buf, Limits::none()));
     match transaction_meta {
+        // You should be aware that MetaV3 was introduced as part of Protocol
+        // 20, so any ledgers that you are replaying from before that upgrade
+        // date will have older TransactionMeta versions. This principle
+        // generally goes for anywhere you may see a "Vx" varation of a
+        // structure.
         Ok(TransactionMeta::V3(meta_v3)) => Ok(meta_v3),
         _ => panic!("Could not decode transaction meta"),
     }
@@ -108,6 +113,7 @@ pub fn match_change_trust_op_asset(change_trust_op_asset: &stellar_xdr::curr::Ch
 
 pub fn fetch_asset_issuer(asset: &stellar_xdr::curr::Asset) -> String {
     match asset {
+        // The native asset does not have an issuer and hence no source account.
         stellar_xdr::curr::Asset::Native => constants::XLM_SOURCE_ACCOUNT.to_string(),
         stellar_xdr::curr::Asset::CreditAlphanum4(credit) => credit.issuer.0.to_string(),
         stellar_xdr::curr::Asset::CreditAlphanum12(credit) => credit.issuer.0.to_string(),
@@ -116,6 +122,10 @@ pub fn fetch_asset_issuer(asset: &stellar_xdr::curr::Asset) -> String {
 
 pub fn fetch_change_trust_op_asset_issuer(change_trust_op_asset: &stellar_xdr::curr::ChangeTrustAsset) -> String {
     match change_trust_op_asset {
+        // The change trust asset *cannot* be native (it was included for
+        // backwards compatibility reasons with other asset management
+        // operations): you can safely treat it as an error case (it will never
+        // be a part of a successful transaction).
         stellar_xdr::curr::ChangeTrustAsset::Native => constants::XLM_SOURCE_ACCOUNT.to_string(),
         stellar_xdr::curr::ChangeTrustAsset::CreditAlphanum4(credit) => credit.issuer.0.to_string(),
         stellar_xdr::curr::ChangeTrustAsset::CreditAlphanum12(credit) => credit.issuer.0.to_string(),
