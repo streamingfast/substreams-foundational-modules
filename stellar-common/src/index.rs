@@ -15,7 +15,7 @@ fn index_transactions(transactions: Transactions) -> Result<Keys, substreams::er
                 match utils::decode_transaction(&transaction.result_xdr, &transaction.envelope_xdr)
                 {
                     Ok(trx) => trx,
-                    Err(_) => return None, // Skipping this transaction if decoding fails
+                    Err(_) => return None,
                 };
 
             Some(transaction_keys(trx))

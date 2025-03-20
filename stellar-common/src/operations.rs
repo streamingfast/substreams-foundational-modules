@@ -1,14 +1,12 @@
 use crate::{
-    index, pb::sf::{
-        stellar::r#type::v1::Block,
-        substreams::stellar::r#type::v1::{
-            operation::Op, AccountMerge, AllowTrust, ClaimClaimableBalance, Clawback,
-            ClawbackClaimableBalance, CreateAccount, CreateClaimableBalance,
-            CreatePassiveSellOffer, LiquidityPoolDeposit, LiquidityPoolWithdraw, ManageBuyOffer,
-            ManageSellOffer, Operation, Operations, PathPaymentStrictReceive,
-            PathPaymentStrictSend, Payment, SetTrustLineFlags, Transaction, Transactions,
-        },
-    }, utils
+    pb::sf::substreams::stellar::r#type::v1::{
+        operation::Op, AccountMerge, AllowTrust, ClaimClaimableBalance, Clawback,
+        ClawbackClaimableBalance, CreateAccount, CreateClaimableBalance, CreatePassiveSellOffer,
+        LiquidityPoolDeposit, LiquidityPoolWithdraw, ManageBuyOffer, ManageSellOffer, Operation,
+        Operations, PathPaymentStrictReceive, PathPaymentStrictSend, Payment, SetTrustLineFlags,
+        Transactions,
+    },
+    utils,
 };
 use core::panic;
 use std::collections::HashSet;

@@ -41,7 +41,7 @@ fn filtered_transactions(
                 match utils::decode_transaction(&transaction.result_xdr, &transaction.envelope_xdr)
                 {
                     Ok(trx) => trx,
-                    Err(_) => return None, // Skipping this transaction if decoding fails
+                    Err(_) => return None,
                 };
 
             let query = substreams::expr_matcher(&query);
