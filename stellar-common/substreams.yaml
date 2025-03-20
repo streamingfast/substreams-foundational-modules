@@ -82,7 +82,7 @@ modules:
       type: proto:sf.substreams.stellar.type.v1.Operations
 
 params:
-  filtered_operations: operation:payment || operation:create_account
+  filtered_operations: operation:liquidity_pool_deposit || operation:create_account
   filtered_transactions: source_account:GBTLMZIRRAYXQNT6AXGU7XVTWIOE7NES2AG2CGTPJPWRZMUWHEYAGFSC
 
 

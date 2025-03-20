@@ -11,16 +11,16 @@ use crate::{
 fn map_transactions(block: Block) -> Result<Transactions, substreams::errors::Error> {
     let transactions: Vec<Transaction> = block
         .transactions
-        .iter()
+        .into_iter()
         .filter(|transaction| !utils::transaction_failed(transaction.status))
         .map(|transaction| Transaction {
-            hash: transaction.hash.clone(),
+            hash: transaction.hash,
             status: transaction.status,
             created_at: transaction.created_at,
             application_order: transaction.application_order,
-            envelope_xdr: transaction.envelope_xdr.clone(),
-            result_meta_xdr: transaction.result_meta_xdr.clone(),
-            result_xdr: transaction.result_xdr.clone(),
+            envelope_xdr: transaction.envelope_xdr,
+            result_meta_xdr: transaction.result_meta_xdr,
+            result_xdr: transaction.result_xdr,
             block_number: block.number,
         })
         .collect();
