@@ -29,9 +29,60 @@ binaries:
 network: stellar-mainnet
 
 modules:
-  - name: map_operations
+  - name: map_transactions
     kind: map
     inputs:
       - source: sf.stellar.type.v1.Block
     output:
+      type: proto:sf.substreams.stellar.type.v1.Transactions
+
+  - name: index_transactions
+    kind: blockIndex
+    inputs:
+      - map: map_transactions
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+
+  - name: filtered_transactions
+    kind: map
+    inputs:
+      - params: string
+      - map: map_transactions
+    blockFilter:
+      module: index_transactions
+      query:
+        params: true
+    output:
+      type: proto:sf.substreams.stellar.type.v1.Transactions
+
+  - name: map_operations
+    kind: map
+    inputs:
+      - map: map_transactions
+    output:
       type: proto:sf.substreams.stellar.type.v1.Operations
+
+  - name: index_operations
+    kind: blockIndex
+    inputs:
+      - map: map_operations
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+  
+  - name: filtered_operations
+    kind: map
+    inputs:
+      - params: string
+      - map: map_operations
+    blockFilter:
+      module: index_operations
+      query:
+        params: true
+    output:
+      type: proto:sf.substreams.stellar.type.v1.Operations
+
+params:
+  filtered_operations: operation:payment || operation:create_account
+  filtered_transactions: source_account:GBTLMZIRRAYXQNT6AXGU7XVTWIOE7NES2AG2CGTPJPWRZMUWHEYAGFSC
+
+

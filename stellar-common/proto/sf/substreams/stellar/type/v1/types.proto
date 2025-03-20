@@ -2,6 +2,23 @@ syntax = "proto3";
 
 package sf.substreams.stellar.type.v1;
 
+import "google/protobuf/timestamp.proto";
+
+message Transactions {
+  repeated Transaction transactions = 1;
+}
+
+message Transaction {
+  bytes hash = 1;
+  int32 status = 2;
+  google.protobuf.Timestamp created_at = 3;
+  uint64 application_order = 4;
+  bytes envelope_xdr = 5;
+  bytes result_meta_xdr = 6;
+  bytes result_xdr = 7;
+  uint64 block_number = 8;
+}
+
 message Operations {
   repeated Operation operations = 1;
 }
