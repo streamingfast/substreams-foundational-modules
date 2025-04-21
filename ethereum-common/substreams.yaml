@@ -27,6 +27,7 @@ protobuf:
     - sf/substreams/rpc
     - sf/substreams/sink
     - sf/substreams/v1
+    - sf/ethereum/transform
     - google
 
 imports:
