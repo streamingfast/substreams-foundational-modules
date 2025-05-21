@@ -2305,7 +2305,7 @@ dependencies = [
  "prost 0.13.4",
  "prost-types 0.13.4",
  "sha2 0.10.8",
- "substreams 0.6.0",
+ "substreams",
 ]
 
 [[package]]
