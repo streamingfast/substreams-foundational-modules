@@ -3,7 +3,7 @@ name = "tron-common"
 version = "0.1.2"
 description = "Substreams showcasing the building blocks of TRON"
 edition = "2021"
-repository = "https://github.com/streamingfast/substreams-foundational-modules/tron-common"
+repository = "https://github.com/streamingfast/substreams-foundational-modules/tree/develop/tron-common"
 license = "Apache 2.0"
 
 [lib]

@@ -1,6 +1,6 @@
 specVersion: v0.1.0
 package:
-  url: https://github.com/streamingfast/substreams-foundational-modules/tron-common
+  url: https://github.com/streamingfast/substreams-foundational-modules/tree/develop/tron-common
   description: "Foundational module for TRON"
   image: ./tron.png
   name: tron_foundational
