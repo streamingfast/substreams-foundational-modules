@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: ethereum_common
-  version: v0.3.2
+  version: v0.3.3
   url: https://github.com/streamingfast/substreams-foundational-modules/ethereum-common
   doc: |
     common Ethereum substreams modules to extract events, calls, transactions with indexing
@@ -31,7 +31,7 @@ protobuf:
     - google
 
 imports:
-  ethereum: https://github.com/streamingfast/substreams-ethereum/releases/download/v0.10.4/substreams-ethereum-v0.10.4.spkg
+  ethereum: https://github.com/streamingfast/substreams-ethereum/releases/download/v0.10.5/substreams-ethereum-v0.10.5.spkg
 
 binaries:
   default:
