@@ -203,3 +203,16 @@ message Price {
   int32 n = 1;
   int32 d = 2;
 }
+
+// Events
+message Events {
+  repeated Event events = 1;
+}
+
+message Event {
+  string type = 1;
+  optional string contract_id = 2;
+  repeated string topics = 3;
+  string data = 4;
+}
+

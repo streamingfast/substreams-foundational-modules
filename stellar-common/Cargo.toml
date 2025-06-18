@@ -18,7 +18,9 @@ prost-types = { workspace = true }
 substreams = { workspace = true }
 anyhow = { workspace = true }
 base64 = { workspace = true }
-stellar-xdr = { version = "22.1", default-features = true, features = [] }
+stellar-xdr = { version = "22.1", default-features = true, features = ["serde", "alloc"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 
 [target.wasm32-unknown-unknown.dependencies]
 getrandom = { version = "0.2", features = ["custom"] }

@@ -3,7 +3,10 @@ use std::collections::HashSet;
 use stellar_xdr::curr::Transaction;
 use substreams::pb::sf::substreams::index::v1::Keys;
 
-use crate::{pb::sf::substreams::stellar::r#type::v1::Transactions, utils};
+use crate::{
+    pb::sf::substreams::stellar::r#type::v1::{Event, Events, Transactions},
+    utils,
+};
 
 #[substreams::handlers::map]
 fn index_transactions(transactions: Transactions) -> Result<Keys, substreams::errors::Error> {
@@ -24,7 +27,7 @@ fn index_transactions(transactions: Transactions) -> Result<Keys, substreams::er
         .collect();
 
     Ok(Keys {
-        keys: keys.into_iter().collect()
+        keys: keys.into_iter().collect(),
     })
 }
 
@@ -43,5 +46,30 @@ pub fn transaction_keys(trx: Transaction) -> Vec<String> {
         }
     }
 
-    return keys
+    return keys;
+}
+
+#[substreams::handlers::map]
+fn index_events(events: Events) -> Result<Keys, substreams::errors::Error> {
+    let mut keys: HashSet<String> = HashSet::new();
+
+    for event in events.events {
+        keys.extend(event_keys(&event));
+    }
+
+    Ok(Keys {
+        keys: keys.into_iter().collect(),
+    })
+}
+
+pub fn event_keys(event: &Event) -> Vec<String> {
+    let mut keys = Vec::new();
+
+    keys.push(format!("type:{}", event.r#type));
+
+    if let Some(contract_id) = &event.contract_id {
+        keys.push(format!("contract_id:{}", contract_id));
+    }
+
+    keys
 }
