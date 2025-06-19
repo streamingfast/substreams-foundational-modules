@@ -1,7 +1,7 @@
 use core::panic;
 use std::io::Cursor;
 use stellar_xdr::curr::{
-    AccountMergeResult, Asset as StellarAsset, Limited, Limits, Price as StellarPrice, ReadXdr, Transaction, TransactionEnvelope, TransactionMeta, TransactionResult, TransactionResultMeta, TransactionResultResult
+    AccountMergeResult, Asset as StellarAsset, Limited, Limits, Price as StellarPrice, ReadXdr, Transaction, TransactionEnvelope, TransactionMeta, TransactionResult, TransactionResultResult
 };
 
 use crate::pb::sf::substreams::stellar::r#type::v1::{
