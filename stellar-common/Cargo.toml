@@ -24,3 +24,6 @@ serde_json = "1.0"
 
 [target.wasm32-unknown-unknown.dependencies]
 getrandom = { version = "0.2", features = ["custom"] }
+
+[dev-dependencies]
+pretty_assertions = "1.4"

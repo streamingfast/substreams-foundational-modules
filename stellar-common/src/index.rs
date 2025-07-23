@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use stellar_xdr::curr::Transaction;
 use substreams::pb::sf::substreams::index::v1::Keys;
+use serde_json::Value;
 
 use crate::{
     pb::sf::substreams::stellar::r#type::v1::{Event, Events, Transactions},
@@ -69,6 +70,18 @@ pub fn event_keys(event: &Event) -> Vec<String> {
 
     if let Some(contract_id) = &event.contract_id {
         keys.push(format!("contract_id:{}", contract_id));
+    }
+
+    for topic in &event.topics {
+        if let Ok(parsed) = serde_json::from_str::<Value>(topic) {
+            if let Some(obj) = parsed.as_object() {
+                for (key, value) in obj {
+                    if let Some(string_value) = value.as_str() {
+                        keys.push(format!("topic:{}:{}", key, string_value));
+                    }
+                }
+            }
+        }
     }
 
     keys
