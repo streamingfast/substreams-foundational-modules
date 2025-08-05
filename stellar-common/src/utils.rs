@@ -1,8 +1,7 @@
 use core::panic;
 use std::io::Cursor;
 use stellar_xdr::curr::{
-    AccountMergeResult, Asset as StellarAsset, Limited, Limits, Price as StellarPrice, ReadXdr, Transaction,
-    TransactionEnvelope, TransactionResult, TransactionResultResult,
+    AccountMergeResult, Asset as StellarAsset, Limited, Limits, Price as StellarPrice, ReadXdr, Transaction, TransactionEnvelope, TransactionMeta, TransactionResult, TransactionResultResult
 };
 
 use crate::pb::sf::substreams::stellar::r#type::v1::{
@@ -40,6 +39,12 @@ pub fn decode_transaction_result(result_xdr: &Vec<u8>) -> Result<TransactionResu
     let buf = Cursor::new(result_xdr);
     let transaction_result = TransactionResult::read_xdr(&mut Limited::new(buf, Limits::none()));
     transaction_result
+}
+
+pub fn decode_transaction_meta(result_meta_xdr: &Vec<u8>) -> Result<TransactionMeta, stellar_xdr::curr::Error> {
+    let buf = Cursor::new(result_meta_xdr);
+    let transaction_meta = TransactionMeta::read_xdr(&mut Limited::new(buf, Limits::none()));
+    transaction_meta
 }
 
 pub fn decode_account_merge_result(transaction_result: &TransactionResult) -> Option<i64> {

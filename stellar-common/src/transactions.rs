@@ -12,16 +12,21 @@ fn map_transactions(block: Block) -> Result<Transactions, substreams::errors::Er
     let transactions: Vec<Transaction> = block
         .transactions
         .into_iter()
-        .filter(|transaction| !utils::transaction_failed(transaction.status))
-        .map(|transaction| Transaction {
-            hash: transaction.hash,
-            status: transaction.status,
-            created_at: transaction.created_at,
-            application_order: transaction.application_order,
-            envelope_xdr: transaction.envelope_xdr,
-            result_meta_xdr: transaction.result_meta_xdr,
-            result_xdr: transaction.result_xdr,
-            block_number: block.number,
+        .filter_map(|transaction| {
+            if utils::transaction_failed(transaction.status) {
+                return None;
+            }
+
+            Some(Transaction {
+                hash: transaction.hash,
+                status: transaction.status,
+                created_at: transaction.created_at,
+                application_order: transaction.application_order,
+                envelope_xdr: transaction.envelope_xdr,
+                result_meta_xdr: transaction.result_meta_xdr,
+                result_xdr: transaction.result_xdr,
+                block_number: block.number,
+            })
         })
         .collect();
 

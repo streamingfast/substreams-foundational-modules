@@ -80,9 +80,36 @@ modules:
         params: true
     output:
       type: proto:sf.substreams.stellar.type.v1.Operations
+  
+  - name: map_events
+    kind: map
+    inputs:
+      - params: string
+      - source: sf.stellar.type.v1.Block
+    output:
+      type: proto:sf.substreams.stellar.type.v1.Events
+  
+  - name: index_events
+    kind: blockIndex
+    inputs:
+      - map: map_events
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+  
+  - name: filtered_events
+    kind: map
+    inputs:
+      - params: string
+      - map: map_events
+    blockFilter:
+      module: index_events
+      query:
+        params: true
+    output:
+      type: proto:sf.substreams.stellar.type.v1.Events
 
 params:
   filtered_operations: operation:liquidity_pool_deposit || operation:create_account
   filtered_transactions: source_account:GBTLMZIRRAYXQNT6AXGU7XVTWIOE7NES2AG2CGTPJPWRZMUWHEYAGFSC
-
+  filtered_events: contract_id:adefce59aee52968f76061d494c2525b75659fa4296a65f499ef29e56477e496
 
