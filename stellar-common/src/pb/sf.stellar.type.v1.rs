@@ -9,6 +9,8 @@ pub struct Block {
     pub hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(message, optional, tag="3")]
     pub header: ::core::option::Option<Header>,
+    #[prost(int64, tag="4")]
+    pub version: i64,
     #[prost(message, repeated, tag="6")]
     pub transactions: ::prost::alloc::vec::Vec<Transaction>,
     #[prost(message, optional, tag="9")]
@@ -45,6 +47,24 @@ pub struct Transaction {
     pub result_meta_xdr: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="8")]
     pub result_xdr: ::prost::alloc::vec::Vec<u8>,
+    #[prost(message, optional, tag="9")]
+    pub events: ::core::option::Option<Events>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Events {
+    #[prost(bytes="vec", repeated, tag="1")]
+    pub diagnostic_events_xdr: ::prost::alloc::vec::Vec<::prost::alloc::vec::Vec<u8>>,
+    #[prost(bytes="vec", repeated, tag="2")]
+    pub transaction_events_xdr: ::prost::alloc::vec::Vec<::prost::alloc::vec::Vec<u8>>,
+    #[prost(message, repeated, tag="3")]
+    pub contract_events_xdr: ::prost::alloc::vec::Vec<ContractEvent>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ContractEvent {
+    #[prost(bytes="vec", repeated, tag="1")]
+    pub events: ::prost::alloc::vec::Vec<::prost::alloc::vec::Vec<u8>>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

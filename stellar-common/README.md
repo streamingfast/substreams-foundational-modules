@@ -92,3 +92,61 @@ modules:
 params:
     my_module: (operation:payment || operation:create_account)
 ```
+
+### map_events
+
+This module extracts Stellar Soroban contract events from transaction metadata. It decodes events from Soroban metadata and maps them to a structured format including:
+- Contract ID (if available)
+- Event type (Diagnostic, System, or Contract)
+- Topics (JSON-encoded topic data)
+- Data (JSON-encoded event data)
+
+### index_events
+
+This module creates a cache of events that allows filtering based on event properties and topic content.
+
+The indexing extracts keys from:
+- Event type: `type:Contract`, `type:System`, `type:Diagnostic`
+- Contract ID: `contract_id:abc123...`
+- Topic data: `topic:symbol:transfer`, `topic:address:CB7FKGSTHP...`
+
+You can use this module as a `blockFilter` to filter events:
+
+```yaml
+  - name: my_module
+    ...
+    blockFilter:
+      module: index_events
+      query:
+        string: (type:Contract && contract_id:abc123)
+```
+
+### filtered_events
+
+This module uses the `index_events` cache to filter events based on the specified query parameters.
+
+#### Topic Mapping to Keys
+
+Topics are parsed as JSON objects and their key-value pairs are mapped to searchable keys with the format `topic:{key}:{value}`. Only string values are indexed:
+
+- `{"symbol":"transfer"}` → `topic:symbol:transfer`
+- `{"address":"CB7FKGSTHP75ORTIZGGMVUTQLEMVTSEOI4QORQPCABJSGTAATDFCE2YV"}` → `topic:address:CB7FKGSTHP75ORTIZGGMVUTQLEMVTSEOI4QORQPCABJSGTAATDFCE2YV`
+- `{"string":"USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN"}` → `topic:string:USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN`
+
+Non-string values (numbers, booleans, arrays) are ignored during indexing. Invalid JSON topics are also skipped.
+
+You can directly _use_ this module to retrieve filtered events:
+
+```yaml
+modules:
+    - name: my_module
+      use: stellar_common:filtered_events
+
+params:
+    my_module: type:Contract && topic:symbol:transfer
+```
+
+Example queries:
+- Filter by contract and symbol: `contract_id:abc123 && topic:symbol:transfer`
+- Filter by multiple addresses: `topic:address:CB7FKGSTHP75ORTIZGGMVUTQLEMVTSEOI4QORQPCABJSGTAATDFCE2YV || topic:address:CB3JAPDEIMA3OOSALUHLYRGM2QTXGVD3EASALPFMVEU2POLLULJBT2XN`
+- Filter by event type: `type:Contract`
