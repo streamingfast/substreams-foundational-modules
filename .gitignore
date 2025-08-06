@@ -4,3 +4,5 @@ replay.log
 .DS_STORE
 *.wasm
 .idea
+build
+dist

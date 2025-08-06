@@ -1,0 +1,4 @@
+global:
+  language: rust
+  variant: substreams
+release:
