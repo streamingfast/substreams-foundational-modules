@@ -8,6 +8,9 @@ protobuf:
     - sf/solana/spl/foundational/v1/foundational.proto
   importPaths:
     - ./proto
+  excludePaths:
+    - google
+    - sf/substreams
 
 binaries:
   default:
