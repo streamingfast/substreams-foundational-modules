@@ -2064,6 +2064,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "solana-spl-owner-foundational-store"
+version = "0.1.0"
+dependencies = [
+ "prost 0.13.4",
+ "prost-types 0.13.4",
+ "substreams",
+]
+
+[[package]]
 name = "spki"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"

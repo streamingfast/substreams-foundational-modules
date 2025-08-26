@@ -6,6 +6,7 @@ members = [
     "ethereum-common",
     "solana-accounts-common",
     "solana-common",
+    "solana-spl-owner-foundational-store",
     "stellar-common",
     "testing",
     "tron-common",

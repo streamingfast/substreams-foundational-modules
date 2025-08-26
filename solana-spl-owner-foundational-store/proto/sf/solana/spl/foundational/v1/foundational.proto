@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package sf.solana.spl.foundational.v1;
+
+message AccountOwner {
+  bytes mint = 1;
+  bytes owner = 2;
+}

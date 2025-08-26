@@ -1,0 +1,19 @@
+specVersion: v0.1.0
+package:
+  name: solana-spl-owner-foundational-store
+  version: v0.1.0
+
+protobuf:
+  files:
+    - sf/solana/spl/foundational/v1/foundational.proto
+  importPaths:
+    - ./proto
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+
+modules: []
+
+network: solana
