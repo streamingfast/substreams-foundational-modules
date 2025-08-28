@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package sf.substreams.solana.spl.v1;
+
+message InitializedAccount {
+  string account = 1;
+  string mint_address = 2;
+  string owner = 3;
+}
+
+message AccountOwner {
+  bytes mint_address = 2;
+  bytes owner = 3;
+}

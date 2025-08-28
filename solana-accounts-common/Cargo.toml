@@ -13,12 +13,14 @@ crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = { workspace = true }
+bs58.workspace = true
 five8 = "0.2"
 num-bigint = { workspace = true }
 prost = { workspace = true }
 prost-types = { workspace = true }
 substreams = { workspace = true }
-substreams-solana = "0.14"
+substreams-solana = "0.14.1"
+substreams-solana-program-instructions = "0.2"
 
 [dev-dependencies]
 base64 = { workspace = true }

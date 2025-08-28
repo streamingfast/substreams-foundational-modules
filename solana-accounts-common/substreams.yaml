@@ -6,6 +6,9 @@ package:
   image: solana.png
   description: Foundational (common) module for fetching solana account changes
 
+imports:
+  solana_common: https://github.com/streamingfast/substreams-foundational-modules/releases/download/solana-common-v0.3.0/solana-common-v0.3.0.spkg
+
 binaries:
   default:
     type: wasm/rust-v1
@@ -15,16 +18,21 @@ network: solana-accounts-mainnet
 
 protobuf:
   files:
-    - type.proto
-  importPaths:
-    - ./proto/sf/substreams/solana/type/v1
+    - type/v1/type.proto
+    - spl/v1/initialized_account.proto
   descriptorSets:
+    - module: buf.build/streamingfast/substreams-foundational-store
     - localPath: ./descriptors/firehose-solana.binpb
     - localPath: ./descriptors/substreams.binpb
   excludePaths:
     - google
-    - sf/substreams/
+    - sf/substreams/internal
+    - sf/substreams/rpc
+    - sf/substreams/sink
+    - sf/substreams/v1
     - sf/firehose/
+  importPaths:
+    - ./proto/sf/substreams/solana
 
 modules:
   - name: index_accounts
@@ -48,6 +56,15 @@ modules:
       - source: sf.solana.type.v1.AccountBlock
     output:
       type: proto:sf.substreams.solana.type.v1.FilteredAccounts
+
+  - name: map_spl_initialized_account
+    kind: map
+    initialBlock: 31310775
+    inputs:
+      - params: string
+      - map: solana_common:transactions_by_programid_without_votes
+    output:
+      type: proto:sf.substreams.foundational_store.v1.Entries
 
 params: # Default parameters. You can override these parameters based on your needs.
   filtered_accounts: "owner:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"

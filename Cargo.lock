@@ -2041,12 +2041,14 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "base64",
+ "bs58 0.4.0",
  "five8",
  "num-bigint",
  "prost 0.13.4",
  "prost-types 0.13.4",
  "substreams",
  "substreams-solana",
+ "substreams-solana-program-instructions",
 ]
 
 [[package]]
@@ -2299,6 +2301,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d28bba84dc05f4644ef9d1505162c4628f8fce2436bb15c047d0df3911dad142"
 dependencies = [
  "bs58 0.4.0",
+]
+
+[[package]]
+name = "substreams-solana-program-instructions"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e0c565ef42584f4468df9b5146fb460ef46ec3d777642451ccff83c5032b390e"
+dependencies = [
+ "anyhow",
+ "num_enum",
+ "substreams",
 ]
 
 [[package]]
