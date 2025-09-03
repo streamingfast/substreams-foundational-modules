@@ -20,13 +20,6 @@ pub mod sf {
     pub mod substreams {
         include!("sf.substreams.rs");
         // @@protoc_insertion_point(sf.substreams)
-        pub mod foundational_store {
-            // @@protoc_insertion_point(attribute:sf.substreams.foundational_store.v1)
-            pub mod v1 {
-                include!("sf.substreams.foundational_store.v1.rs");
-                // @@protoc_insertion_point(sf.substreams.foundational_store.v1)
-            }
-        }
         pub mod index {
             // @@protoc_insertion_point(attribute:sf.substreams.index.v1)
             pub mod v1 {

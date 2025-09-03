@@ -1,3 +1,5 @@
+mod pb;
+
 use crate::pb::sf::substreams::foundational_store::v1::{Entries, Entry};
 use crate::pb::sf::substreams::solana::spl::v1::{AccountOwner, InitializedAccount};
 
@@ -62,7 +64,7 @@ fn map_spl_initialized_account(_params: String, transactions: solTransactions) -
         prost::Message::encode(&account_owner, &mut buf).unwrap();
 
         let any = Any {
-            type_url: "type.googleapis.com/sf.substreams.foundational_store.v1.Entry".to_string(),
+            type_url: "type.googleapis.com/sf.substreams.solana.spl.v1.AccountOwner".to_string(),
             value: buf,
         };
 

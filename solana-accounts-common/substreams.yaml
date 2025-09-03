@@ -21,7 +21,6 @@ protobuf:
     - type/v1/type.proto
     - spl/v1/initialized_account.proto
   descriptorSets:
-    - module: buf.build/streamingfast/substreams-foundational-store
     - localPath: ./descriptors/firehose-solana.binpb
     - localPath: ./descriptors/substreams.binpb
   excludePaths:
@@ -56,15 +55,6 @@ modules:
       - source: sf.solana.type.v1.AccountBlock
     output:
       type: proto:sf.substreams.solana.type.v1.FilteredAccounts
-
-  - name: map_spl_initialized_account
-    kind: map
-    initialBlock: 31310775
-    inputs:
-      - params: string
-      - map: solana_common:transactions_by_programid_without_votes
-    output:
-      type: proto:sf.substreams.foundational_store.v1.Entries
 
 params: # Default parameters. You can override these parameters based on your needs.
   filtered_accounts: "owner:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"

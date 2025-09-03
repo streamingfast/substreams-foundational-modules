@@ -4,6 +4,7 @@ members = [
     "antelope-common",
     "cosmos-common",
     "ethereum-common",
+    "solana/spl_initialized_account",
     "solana-accounts-common",
     "solana-common",
     "stellar-common",
