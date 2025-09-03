@@ -3,3 +3,10 @@ target/
 replay.log
 .DS_STORE
 *.wasm
+/ethereum-common/.idea/ethereum-common.iml
+/ethereum-common/.idea/vcs.xml
+/ethereum-common/.idea/workspace.xml
+/solana/spl_initialized_account/.idea/.gitignore
+/solana/spl_initialized_account/.idea/modules.xml
+/solana/spl_initialized_account/.idea/spl_initialized_account.iml
+/solana/spl_initialized_account/.idea/vcs.xml
