@@ -2,12 +2,15 @@ syntax = "proto3";
 
 package sf.substreams.solana.spl.v1;
 
+// Represents a newly initialized SPL token account with ownership details
 message InitializedAccount {
   string account = 1;
   string mint_address = 2;
   string owner = 3;
 }
 
+// Represents ownership relationship between a mint and its owner
+// Both in raw bytes
 message AccountOwner {
   bytes mint_address = 2;
   bytes owner = 3;
