@@ -7,12 +7,12 @@ package:
   description: Foundational (common) module for fetching solana account changes
 
 imports:
-  solana_common: https://github.com/streamingfast/substreams-foundational-modules/releases/download/solana-common-v0.3.0/solana-common-v0.3.0.spkg
+  solana_common: solana-common@v0.3.0
 
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/solana_accounts_common.wasm
+    file: ../../target/wasm32-unknown-unknown/release/solana_accounts_common.wasm
 
 network: solana-accounts-mainnet
 
