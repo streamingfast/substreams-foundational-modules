@@ -1,1 +1,0 @@
-spl_initialized_account

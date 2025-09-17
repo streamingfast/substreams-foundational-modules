@@ -2071,7 +2071,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "spl_initialized_account"
+name = "spl-initialized-account"
 version = "0.0.0"
 dependencies = [
  "anyhow",

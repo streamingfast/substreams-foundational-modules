@@ -3,7 +3,7 @@ mod pb;
 use crate::pb::sf::substreams::foundational_store::v1::{Entries, Entry};
 use crate::pb::sf::substreams::solana::spl::v1::{AccountOwner, InitializedAccount};
 
-use crate::pb::sol::transactions::v1::Transactions as solTransactions;
+use crate::pb::sol::transactions::v1::Transactions as SolanaTransactions;
 use prost::Message;
 use prost_types::Any;
 use substreams::errors::Error;
@@ -38,7 +38,7 @@ impl OutputInstructions {
 }
 
 #[substreams::handlers::map]
-fn map_spl_initialized_account(_params: String, transactions: solTransactions) -> Result<Entries, Error> {
+fn map_spl_initialized_account(_params: String, transactions: SolanaTransactions) -> Result<Entries, Error> {
     let mut initialized_accounts: Vec<InitializedAccount> = vec![];
     for confirmed_trx in transactions_owned(transactions) {
         let hash = bs58::encode(confirmed_trx.hash()).into_string();
@@ -80,7 +80,7 @@ fn map_spl_initialized_account(_params: String, transactions: solTransactions) -
 }
 
 /// Iterates over successful transactions in given block and take ownership.
-fn transactions_owned(transactions: solTransactions) -> impl Iterator<Item = ConfirmedTransaction> {
+fn transactions_owned(transactions: SolanaTransactions) -> impl Iterator<Item = ConfirmedTransaction> {
     transactions.transactions.into_iter().filter_map(|trx| -> Option<ConfirmedTransaction> {
         if let Some(meta) = &trx.meta {
             if meta.err.is_none() {

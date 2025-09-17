@@ -1,14 +1,14 @@
 specVersion: v0.1.0
 package:
-  name: spl_initialized_account
+  name: spl-initialized-account
   version: v0.1.2
-  url: https://github.com/streamingfast/substreams-foundational-modules/solana/spl_initialized_account
+  url: https://github.com/streamingfast/substreams-foundational-modules/solana/spl-initialized-account
   image: solana.png
 
 network: solana
 
 imports:
-  solana_common: https://github.com/streamingfast/substreams-foundational-modules/releases/download/solana-common-v0.3.0/solana-common-v0.3.0.spkg
+  solana_common: solana-common@v0.3.0
 
 protobuf:
   files:
