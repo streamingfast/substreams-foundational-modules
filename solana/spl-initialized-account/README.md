@@ -1,4 +1,4 @@
-# SPL Initialized Account Module
+# SPL Initialized Account
 
 This Substreams module tracks SPL token account initializations on Solana, extracting account-to-owner mappings. This is essential for resolving SPL token transfers since the transfer instructions don't contain owner information directly.
 

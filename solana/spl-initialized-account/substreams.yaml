@@ -2,7 +2,7 @@ specVersion: v0.1.0
 package:
   name: spl-initialized-account
   version: v0.1.2
-  url: https://github.com/streamingfast/substreams-foundational-modules/solana/spl-initialized-account
+  url: https://github.com/streamingfast/substreams-foundational-modules/tree/develop/solana/spl-initialized-account#spl-initialized-account
   image: solana.png
 
 network: solana
@@ -16,12 +16,12 @@ protobuf:
   descriptorSets:
     - module: buf.build/streamingfast/substreams-foundational-store
   excludePaths:
-#    - google
-#    - sf/substreams/internal
-#    - sf/substreams/rpc
-#    - sf/substreams/sink
-#    - sf/substreams/v1
-#    - sf/firehose/
+   - google
+   - sf/substreams/internal
+   - sf/substreams/rpc
+   - sf/substreams/sink
+   - sf/substreams/v1
+   - sf/firehose/
   importPaths:
     - ./proto
 

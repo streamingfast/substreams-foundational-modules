@@ -18,8 +18,7 @@ network: solana-accounts-mainnet
 
 protobuf:
   files:
-    - type/v1/type.proto
-    - spl/v1/initialized_account.proto
+    - sf/substreams/solana/type/v1/type.proto
   descriptorSets:
     - localPath: ./descriptors/firehose-solana.binpb
     - localPath: ./descriptors/substreams.binpb
@@ -31,7 +30,7 @@ protobuf:
     - sf/substreams/v1
     - sf/firehose/
   importPaths:
-    - ./proto/sf/substreams/solana
+    - ./proto
 
 modules:
   - name: index_accounts
