@@ -14,12 +14,12 @@ crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = { workspace = true }
-bs58 = "0.4"
+bs58 = { workspace = true }
 num-bigint = { workspace = true }
 prost = { workspace = true }
 prost-types = { workspace = true }
 substreams = { workspace = true }
-substreams-solana = "0.14"
+substreams-solana = "^0.14"
 
 [dev-dependencies]
 testing = { workspace = true }

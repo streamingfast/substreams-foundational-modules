@@ -45,7 +45,7 @@ fn map_spl_initialized_account(_params: String, transactions: SolanaTransactions
 
         let mut output_instructions = OutputInstructions::new(hash.clone());
 
-        for instruction in confirmed_trx.compiled_instructions() {
+        for instruction in confirmed_trx.walk_instructions() {
             process_instruction(&mut output_instructions, &instruction);
         }
 
@@ -108,32 +108,10 @@ fn process_instruction(output: &mut OutputInstructions, compile_instruction: &In
                 _ => {}
             }
         }
-        _ => {
-            process_inner_instruction(compile_instruction, trx_hash, compile_instruction.meta(), output);
-        }
+        _ => {}
     }
 }
 
-fn process_inner_instruction(
-    compile_instruction: &InstructionView,
-    trx_hash: &String,
-    meta: &substreams_solana::pb::sf::solana::r#type::v1::TransactionStatusMeta,
-    output: &mut OutputInstructions,
-) {
-    for inner in compile_instruction.inner_instructions() {
-        match inner.program_id().to_string().as_ref() {
-            SOLANA_TOKEN_PROGRAM_KEG | SOLANA_TOKEN_PROGRAM_ZQB => {
-                match process_token_instruction(output, &inner, meta) {
-                    Err(err) => {
-                        substreams::log::info!("Skipping unknown inner token instruction in tx {}: {}", trx_hash, err);
-                    }
-                    _ => {}
-                }
-            }
-            _ => {}
-        }
-    }
-}
 
 fn process_token_instruction(
     output: &mut OutputInstructions,
