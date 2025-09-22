@@ -20,3 +20,6 @@ prost-types = { workspace = true }
 substreams = { workspace = true }
 substreams-solana = "^0.14"
 substreams-solana-program-instructions = "0.2"
+
+[dev-dependencies]
+testing = { workspace = true }

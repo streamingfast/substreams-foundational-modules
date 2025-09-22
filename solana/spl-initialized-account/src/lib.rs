@@ -1,4 +1,5 @@
 mod pb;
+mod test;
 
 use crate::pb::sf::substreams::foundational_store::v1::{Entries, Entry};
 use crate::pb::sf::substreams::solana::spl::v1::AccountOwner;
@@ -20,6 +21,10 @@ fn map_spl_initialized_account(
     _params: String,
     transactions: SolanaTransactions,
 ) -> Result<Entries, Error> {
+    _map_spl_initialized_account(transactions)
+}
+
+pub fn _map_spl_initialized_account(transactions: SolanaTransactions) -> Result<Entries, Error> {
     let mut initialized_accounts: Vec<InitializedAccountEntry> = vec![];
     for confirmed_trx in transactions_owned(transactions) {
         for instruction in confirmed_trx.walk_instructions() {

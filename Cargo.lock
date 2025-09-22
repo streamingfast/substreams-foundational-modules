@@ -2081,6 +2081,7 @@ dependencies = [
  "substreams",
  "substreams-solana",
  "substreams-solana-program-instructions",
+ "testing",
 ]
 
 [[package]]
