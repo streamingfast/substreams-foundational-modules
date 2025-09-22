@@ -1,0 +1,22 @@
+[package]
+name = "spl-initialized-account"
+description = ""
+repository = "https://github.com/streamingfast/substreams-foundational-modules/tree/develop/solana/spl-initialized-account#spl-initialized-account"
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+anyhow = { workspace = true }
+bs58 = { workspace = true }
+prost = { workspace = true }
+prost-types = { workspace = true }
+substreams = { workspace = true }
+substreams-solana = "^0.14"
+substreams-solana-program-instructions = "0.2"
+

@@ -3,3 +3,4 @@ target/
 replay.log
 .DS_STORE
 *.wasm
+.idea

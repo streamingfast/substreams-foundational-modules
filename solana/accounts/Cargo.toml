@@ -1,0 +1,21 @@
+[package]
+name = "solana-accounts-common"
+description = "Substreams showcasing the building blocks of Solana Accounts"
+repository = "https://github.com/streamingfast/substreams-foundational-modules/solana-accounts-common"
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+five8 = "0.2"
+prost = { workspace = true }
+prost-types = { workspace = true }
+substreams = { workspace = true }
+
+[dev-dependencies]
+base64 = { workspace = true }
