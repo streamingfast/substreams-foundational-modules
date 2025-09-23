@@ -4,10 +4,13 @@ mod test;
 use crate::pb::sf::substreams::foundational_store::v1::{Entries, Entry};
 use crate::pb::sf::substreams::solana::spl::v1::AccountOwner;
 
+use borsh::BorshDeserialize;
+
 use crate::pb::sol::transactions::v1::Transactions as SolanaTransactions;
 use prost::Message;
 use prost_types::Any;
-use spl_token::instruction::TokenInstruction;
+use spl_token_2022::instruction::TokenInstruction;
+use spl_token_metadata_interface::instruction::TokenMetadataInstruction;
 use substreams::errors::Error;
 use substreams_solana::block_view::InstructionView;
 use substreams_solana::pb::sf::solana::r#type::v1::ConfirmedTransaction;
@@ -113,9 +116,20 @@ fn process_token_instruction(
     instruction: &InstructionView,
     _meta: &substreams_solana::pb::sf::solana::r#type::v1::TransactionStatusMeta,
 ) -> Result<(), Error> {
+
+    if instruction.data()[0] > 44 {
+        match TokenMetadataInstruction::unpack(instruction.data().as_slice()) {
+            Ok(_) => {
+                substreams::log::info!("Skipping metadata instruction");
+                return Ok(());
+            }
+            Err(_) => {}
+        }
+    }
+
     match TokenInstruction::unpack(&instruction.data()) {
         Err(err) => {
-            return Err(anyhow::anyhow!("unpacking token instruction: {}", err));
+            panic!("unpacking token instruction: {}", err);
         }
         Ok(token_instruction) => match token_instruction {
             TokenInstruction::InitializeAccount {} => {
