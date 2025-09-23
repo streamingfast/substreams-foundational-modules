@@ -7,11 +7,10 @@ use crate::pb::sf::substreams::solana::spl::v1::AccountOwner;
 use crate::pb::sol::transactions::v1::Transactions as SolanaTransactions;
 use prost::Message;
 use prost_types::Any;
+use spl_token::instruction::TokenInstruction;
 use substreams::errors::Error;
 use substreams_solana::block_view::InstructionView;
 use substreams_solana::pb::sf::solana::r#type::v1::ConfirmedTransaction;
-
-use substreams_solana_program_instructions::token_instruction_2022::TokenInstruction;
 
 pub const SOLANA_TOKEN_PROGRAM_KEG: &str = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 pub const SOLANA_TOKEN_PROGRAM_ZQB: &str = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
