@@ -3,7 +3,7 @@ package:
   name: spl-initialized-account
   version: v0.1.2
   description: Substreams module tracks SPL token account initializations on Solana and allow Foundational Store queries on it
-  url: https://github.com/streamingfast/substreams-foundational-modules/tree/develop/solana/spl-initialized-account#spl-initialized-account
+  url: https://github.com/streamingfast/substreams-foundational-modules/tree/develop/solana/spl-initialized-account#solana-spl-initialized-account-foundational-store
   image: solana.png
 
 network: solana
