@@ -1,17 +1,14 @@
 mod pb;
 mod test;
 
-use crate::pb::sf::substreams::foundational_store::v1::{Entries, Entry};
 use crate::pb::sf::substreams::solana::spl::v1::AccountOwner;
-
-use borsh::BorshDeserialize;
-
-use crate::pb::sol::transactions::v1::Transactions as SolanaTransactions;
+use crate::pb::sf::substreams::solana::v1::Transactions as SolanaTransactions;
 use prost::Message;
 use prost_types::Any;
 use spl_token_2022::instruction::TokenInstruction;
 use spl_token_metadata_interface::instruction::TokenMetadataInstruction;
 use substreams::errors::Error;
+use substreams::pb::sf::substreams::foundational_store::v1::{Entries, Entry};
 use substreams_solana::block_view::InstructionView;
 use substreams_solana::pb::sf::solana::r#type::v1::ConfirmedTransaction;
 
@@ -28,8 +25,12 @@ fn map_spl_initialized_account(
 
 pub fn _map_spl_initialized_account(transactions: SolanaTransactions) -> Result<Entries, Error> {
     let mut initialized_accounts: Vec<InitializedAccountEntry> = vec![];
-    for confirmed_trx in transactions_owned(transactions) {
-        for instruction in confirmed_trx.walk_instructions() {
+    for transaction in transactions.transactions {
+        if !transaction.is_successful() {
+            continue;
+        }
+
+        for instruction in transaction.walk_instructions() {
             process_instruction(&mut initialized_accounts, &instruction);
         }
     }
@@ -58,29 +59,6 @@ pub fn _map_spl_initialized_account(transactions: SolanaTransactions) -> Result<
     }
 
     Ok(Entries { entries })
-}
-
-/// Iterates over successful transactions in given block and take ownership.
-fn transactions_owned(
-    transactions: SolanaTransactions,
-) -> impl Iterator<Item = ConfirmedTransaction> {
-    transactions
-        .transactions
-        .into_iter()
-        .filter_map(|trx| -> Option<ConfirmedTransaction> {
-            if let Some(meta) = &trx.meta {
-                if meta.err.is_none() {
-                    // Convert between protobuf types by serializing and deserializing
-                    let mut buf = Vec::new();
-                    if Message::encode(&trx, &mut buf).is_ok() {
-                        if let Ok(converted) = ConfirmedTransaction::decode(&buf[..]) {
-                            return Some(converted);
-                        }
-                    }
-                }
-            }
-            None
-        })
 }
 
 fn process_instruction(
@@ -116,7 +94,6 @@ fn process_token_instruction(
     instruction: &InstructionView,
     _meta: &substreams_solana::pb::sf::solana::r#type::v1::TransactionStatusMeta,
 ) -> Result<(), Error> {
-
     if instruction.data()[0] > 44 {
         match TokenMetadataInstruction::unpack(instruction.data().as_slice()) {
             Ok(_) => {

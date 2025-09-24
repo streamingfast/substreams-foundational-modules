@@ -2,6 +2,7 @@ specVersion: v0.1.0
 package:
   name: spl-initialized-account
   version: v0.1.2
+  description: Substreams module tracks SPL token account initializations on Solana and allow Foundational Store queries on it
   url: https://github.com/streamingfast/substreams-foundational-modules/tree/develop/solana/spl-initialized-account#spl-initialized-account
   image: solana.png
 
@@ -17,11 +18,18 @@ protobuf:
     - module: buf.build/streamingfast/substreams-foundational-store
   excludePaths:
    - google
+   - sf/firehose/
+   - solana.proto
+   - sf/solana/type
+   - sf/substreams/foundational-store
+   - sf/substreams/index
    - sf/substreams/internal
+   - sf/substreams/options.proto
    - sf/substreams/rpc
    - sf/substreams/sink
    - sf/substreams/v1
-   - sf/firehose/
+   - instructions.proto
+   - transactions.proto
   importPaths:
     - ./proto
 
