@@ -25,3 +25,4 @@ spl-token-metadata-interface = "0.7.0"
 
 [dev-dependencies]
 testing = { workspace = true }
+pretty_assertions = { workspace = true }

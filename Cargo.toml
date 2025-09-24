@@ -31,6 +31,7 @@ prost = "0.13"
 prost-types = "0.13"
 substreams = "0.6"
 testing = { path = "./testing" }
+pretty_assertions = "1.2.1"
 
 [profile.release]
 lto = true

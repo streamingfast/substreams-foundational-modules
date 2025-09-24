@@ -1,16 +1,13 @@
 mod pb;
-mod test;
 
 use crate::pb::sf::substreams::solana::spl::v1::AccountOwner;
 use crate::pb::sf::substreams::solana::v1::Transactions as SolanaTransactions;
-use prost::Message;
 use prost_types::Any;
 use spl_token_2022::instruction::TokenInstruction;
 use spl_token_metadata_interface::instruction::TokenMetadataInstruction;
 use substreams::errors::Error;
 use substreams::pb::sf::substreams::foundational_store::v1::{Entries, Entry};
 use substreams_solana::block_view::InstructionView;
-use substreams_solana::pb::sf::solana::r#type::v1::ConfirmedTransaction;
 
 pub const SOLANA_TOKEN_PROGRAM_KEG: &str = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 pub const SOLANA_TOKEN_PROGRAM_ZQB: &str = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
@@ -146,4 +143,57 @@ struct InitializedAccountEntry {
     pub account: Vec<u8>,
     pub mint_address: Vec<u8>,
     pub owner: Vec<u8>,
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        _map_spl_initialized_account, pb::sf::substreams::solana::v1::Transactions,
+        SOLANA_TOKEN_PROGRAM_KEG, SOLANA_TOKEN_PROGRAM_ZQB,
+    };
+    use pretty_assertions::assert_eq;
+    use substreams_solana::pb::sf::solana::r#type::v1::Block;
+
+    #[test]
+    fn test_map_spl_initialized_account() {
+        let block: Block =
+            testing::read_block("./src/testdata/solana_mainnet_313000000.binpb.base64");
+
+        let filtered_transactions: Vec<_> = block
+            .transactions_owned()
+            .into_iter()
+            .filter(|trx| {
+                if let Some(transaction) = &trx.transaction {
+                    if let Some(message) = &transaction.message {
+                        return message.account_keys.iter().any(|key| {
+                            let key_str = bs58::encode(key).into_string();
+                            key_str == SOLANA_TOKEN_PROGRAM_KEG
+                                || key_str == SOLANA_TOKEN_PROGRAM_ZQB
+                        });
+                    }
+                }
+                false
+            })
+            .collect();
+
+        let result = _map_spl_initialized_account(Transactions {
+            transactions: filtered_transactions,
+        })
+        .expect("Failed to execute function");
+
+        assert_eq!(result.entries.len(), 187, "Unexpected number of entries");
+
+        for entry in result.entries {
+            assert!(!entry.key.is_empty(), "Entry key should not be empty");
+            assert!(entry.value.is_some(), "Entry value should not be None");
+
+            if let Some(value) = &entry.value {
+                assert_eq!(
+                    value.type_url, "type.googleapis.com/sf.substreams.solana.spl.v1.AccountOwner",
+                    "Type URL should match AccountOwner"
+                );
+                assert!(!value.value.is_empty(), "Value should not be empty");
+            }
+        }
+    }
 }
