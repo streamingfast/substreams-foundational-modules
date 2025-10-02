@@ -2,7 +2,7 @@ specVersion: v0.1.0
 package:
   name: ethereum_common
   version: v0.3.3
-  url: https://github.com/streamingfast/substreams-foundational-modules/ethereum-common
+  url: https://github.com/streamingfast/substreams-foundational-modules/tree/develop/ethereum/common
   doc: |
     common Ethereum substreams modules to extract events, calls, transactions with indexing
 

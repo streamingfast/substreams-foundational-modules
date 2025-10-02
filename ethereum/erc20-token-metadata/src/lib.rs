@@ -3,9 +3,9 @@ mod rpc;
 
 use pb::evm::erc20::metadata::v1 as original;
 use pb::sf::substreams::ethereum::erc20::v1::TokenMetadata;
-use pb::sf::substreams::ethereum::erc20::v1::{Entries, Entry};
 use prost::Message;
 use prost_types::Any;
+use substreams::pb::sf::substreams::foundational_store::v1::{Entries, Entry};
 
 #[substreams::handlers::map]
 fn metadata_to_foundational_store(
@@ -26,7 +26,8 @@ fn metadata_to_foundational_store(
         Message::encode(&token_metadata, &mut buf).unwrap();
 
         let any = Any {
-            type_url: "type.googleapis.com/sf.substreams.ethereum.erc20.v1.TokenMetadata".to_string(),
+            type_url: "type.googleapis.com/sf.substreams.ethereum.erc20.v1.TokenMetadata"
+                .to_string(),
             value: buf,
         };
 
@@ -45,8 +46,11 @@ fn metadata_to_foundational_store(
     }
 
     if !change_addresses.is_empty() {
-        let address_refs: Vec<&[u8]> = change_addresses.iter().map(|addr| addr.as_slice()).collect();
-        
+        let address_refs: Vec<&[u8]> = change_addresses
+            .iter()
+            .map(|addr| addr.as_slice())
+            .collect();
+
         // Batch RPC calls to get metadata
         let names = rpc::batch_name(&address_refs, 50);
         let symbols = rpc::batch_symbol(&address_refs, 50);

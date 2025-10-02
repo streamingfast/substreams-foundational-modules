@@ -5,6 +5,7 @@ plugins:
   out: src/pb
   opt:
     - file_descriptor_set=false
+    - extern_path=.sf.ethereum.type.v2=::substreams_ethereum::pb::sf::ethereum::type::v2
 
 - plugin: buf.build/community/neoeinstein-prost-crate:v0.4.1
   out: src/pb

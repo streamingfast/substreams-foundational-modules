@@ -2,7 +2,8 @@ specVersion: v0.1.0
 package:
   name: erc20-token-metadata
   version: v0.1.0
-  description: Token metadata module for Foundational Store (ERC20, ERC721, etc.)
+  description: ERC20 Token metadata module for Foundational Store
+  url: https://github.com/streamingfast/substreams-foundational-modules/tree/develop/ethereum/erc20-token-metadata
 
 imports:
   erc20_metadata: https://github.com/pinax-network/substreams-evm-tokens/releases/download/erc20-metadata-v0.2.1/evm-erc20-metadata-v0.2.1.spkg
@@ -14,11 +15,13 @@ binaries:
 
 protobuf:
   files:
-    - sf/substreams/ethereum/erc20/v1/foundational_store.proto
     - sf/substreams/ethereum/erc20/v1/token_metadata.proto
+  descriptorSets:
+    - module: buf.build/streamingfast/substreams-foundational-store
   importPaths:
     - ./proto
   excludePaths:
+    - evm
     - google
     - sf/substreams/v1
     - sf/substreams/sink
@@ -28,10 +31,10 @@ protobuf:
 modules:
   - name: metadata_to_foundational_store
     kind: map
-    doc: Convert token metadata to Foundational Store format
+    doc: Convert ERC20 Token metadata to Foundational Store format
     inputs:
       - map: erc20_metadata:map_events
     output:
-      type: proto:sf.substreams.ethereum.erc20.v1.Entries
+      type: proto:sf.substreams.foundational_store.v1.Entries
 
 network: mainnet
