@@ -3645,6 +3645,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "substreams_er20_token_metadata"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "ethabi",
+ "getrandom 0.2.15",
+ "hex-literal",
+ "num-bigint",
+ "num-traits",
+ "prost 0.13.4",
+ "prost-types 0.13.4",
+ "regex",
+ "substreams",
+ "substreams-ethereum",
+]
+
+[[package]]
 name = "subtle"
 version = "2.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

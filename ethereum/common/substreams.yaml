@@ -36,7 +36,7 @@ imports:
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/ethereum_common.wasm
+    file: ../../target/wasm32-unknown-unknown/release/ethereum_common.wasm
 
 modules:
   - name: all_events

@@ -1,0 +1,33 @@
+specVersion: v0.1.0
+package:
+  name: erc20_token_transfers_with_metadata
+  version: v0.1.0
+  description: map and enrich erc20 transfers with metadata by calling a foundational store
+
+imports:
+  token_metadata_store: https://github.com/Data-Nexus-Web3/token-metadata-foundational-store/releases/download/v0.1.0/evm-token-metadata-foundational-store-v0.1.0.spkg
+
+protobuf:
+  files:
+    - tokens-with-metadata.proto
+  importPaths:
+    - ./proto
+  excludePaths:
+    - sf/substreams
+    - google
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ../../target/wasm32-unknown-unknown/release/substreams.wasm
+
+modules:
+  - name: map_tokens_transfers
+    kind: map
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+      - foundational-store: erc20-token-metadata@v0.1.0
+    output:
+      type: proto:erc20.metadata.v1.TokenTransfers
+
+network: mainnet

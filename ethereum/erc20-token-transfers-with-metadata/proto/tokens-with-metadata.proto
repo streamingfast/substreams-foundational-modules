@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package erc20.metadata.v1;
+
+message TokenTransfer {
+  bytes token_address = 1;
+  TokenMeta metadata = 2;
+  bytes from = 3;
+  bytes to = 4;
+  string amount = 5;
+  uint64 block_number = 6;
+  string tx_hash = 7;
+  uint32 log_index = 8;
+}
+
+message TokenTransfers {
+  repeated TokenTransfer transfers = 1;
+}
+
+message TokenMeta {
+  string name = 1;
+  string symbol = 2;
+  int32 decimals = 3;
+}
