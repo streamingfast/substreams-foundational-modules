@@ -18,6 +18,12 @@ protobuf:
     - sf/substreams/ethereum/erc20/v1/token_metadata.proto
   importPaths:
     - ./proto
+  excludePaths:
+    - google
+    - sf/substreams/v1
+    - sf/substreams/sink
+    - sf/substreams/rpc
+    - sf/substreams/index
 
 modules:
   - name: metadata_to_foundational_store
