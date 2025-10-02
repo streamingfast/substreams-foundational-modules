@@ -1,0 +1,18 @@
+[package]
+name = "erc20_token_metadata"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+substreams = "0.6.1"
+substreams-ethereum = "0.10.6"
+substreams-abis = "0.4.5"
+prost = "0.13"
+prost-types = "0.13"
+
+[build-dependencies]
+prost-build = "0.13"
+anyhow = "1"
+substreams-ethereum = "0.10"

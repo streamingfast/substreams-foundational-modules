@@ -4,7 +4,7 @@ members = [
     "antelope-common",
     "cosmos-common",
     "ethereum/common",
-    "ethereum/erc20-token-transfers-with-metadata",
+    "ethereum/erc20-token-metadata",
     "solana/spl-initialized-account",
     "solana/accounts",
     "solana/common",

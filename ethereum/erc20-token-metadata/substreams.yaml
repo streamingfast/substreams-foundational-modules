@@ -1,0 +1,31 @@
+specVersion: v0.1.0
+package:
+  name: erc20-token-metadata
+  version: v0.1.0
+  description: Token metadata module for Foundational Store (ERC20, ERC721, etc.)
+
+imports:
+  erc20_metadata: https://github.com/pinax-network/substreams-evm-tokens/releases/download/erc20-metadata-v0.2.1/evm-erc20-metadata-v0.2.1.spkg
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ../../target/wasm32-unknown-unknown/release/erc20_token_metadata.wasm
+
+protobuf:
+  files:
+    - sf/substreams/ethereum/erc20/v1/foundational_store.proto
+    - sf/substreams/ethereum/erc20/v1/token_metadata.proto
+  importPaths:
+    - ./proto
+
+modules:
+  - name: metadata_to_foundational_store
+    kind: map
+    doc: Convert token metadata to Foundational Store format
+    inputs:
+      - map: erc20_metadata:map_events
+    output:
+      type: proto:sf.substreams.ethereum.erc20.v1.Entries
+
+network: mainnet
