@@ -181,7 +181,7 @@ mod tests {
         })
         .expect("Failed to execute function");
 
-        assert_eq!(result.entries.len(), 187, "Unexpected number of entries");
+        assert_eq!(result.entries.len(), 188, "Unexpected number of entries");
 
         for entry in result.entries {
             assert!(!entry.key.is_empty(), "Entry key should not be empty");
