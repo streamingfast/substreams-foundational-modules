@@ -1,5 +1,5 @@
 [package]
-name = "erc20_token_metadata"
+name = "erc20-token-metadata"
 edition = "2021"
 
 [lib]
