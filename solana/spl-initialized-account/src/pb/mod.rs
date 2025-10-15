@@ -10,6 +10,13 @@ pub mod sf {
         }
     }
     pub mod substreams {
+        pub mod foundational_store {
+            // @@protoc_insertion_point(attribute:sf.substreams.foundational_store.v1)
+            pub mod v1 {
+                include!("sf.substreams.foundational_store.v1.rs");
+                // @@protoc_insertion_point(sf.substreams.foundational_store.v1)
+            }
+        }
         pub mod solana {
             pub mod spl {
                 // @@protoc_insertion_point(attribute:sf.substreams.solana.spl.v1)
@@ -23,6 +30,15 @@ pub mod sf {
                 include!("sf.substreams.solana.v1.rs");
                 // @@protoc_insertion_point(sf.substreams.solana.v1)
             }
+        }
+    }
+}
+pub mod sol {
+    pub mod transactions {
+        // @@protoc_insertion_point(attribute:sol.transactions.v1)
+        pub mod v1 {
+            include!("sol.transactions.v1.rs");
+            // @@protoc_insertion_point(sol.transactions.v1)
         }
     }
 }
