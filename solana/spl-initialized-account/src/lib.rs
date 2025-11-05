@@ -1,12 +1,12 @@
 mod pb;
 
+use crate::pb::sf::substreams::foundational_store::model::v2::{SinkEntries, Entry, Key};
 use crate::pb::sf::substreams::solana::spl::v1::AccountOwner;
 use crate::pb::sf::substreams::solana::v1::Transactions as SolanaTransactions;
 use prost_types::Any;
 use spl_token_2022::instruction::TokenInstruction;
 use spl_token_metadata_interface::instruction::TokenMetadataInstruction;
 use substreams::errors::Error;
-use substreams::pb::sf::substreams::foundational_store::v1::{Entries, Entry};
 use substreams_solana::block_view::InstructionView;
 
 pub const SOLANA_TOKEN_PROGRAM_KEG: &str = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
@@ -16,11 +16,11 @@ pub const SOLANA_TOKEN_PROGRAM_ZQB: &str = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCX
 fn map_spl_initialized_account(
     _params: String,
     transactions: SolanaTransactions,
-) -> Result<Entries, Error> {
+) -> Result<SinkEntries, Error> {
     _map_spl_initialized_account(transactions)
 }
 
-pub fn _map_spl_initialized_account(transactions: SolanaTransactions) -> Result<Entries, Error> {
+pub fn _map_spl_initialized_account(transactions: SolanaTransactions) -> Result<SinkEntries, Error> {
     let mut initialized_accounts: Vec<InitializedAccountEntry> = vec![];
     for transaction in transactions.transactions {
         if !transaction.is_successful() {
@@ -44,7 +44,9 @@ pub fn _map_spl_initialized_account(transactions: SolanaTransactions) -> Result<
         prost::Message::encode(&account_owner, &mut buf).unwrap();
 
         let entry = Entry {
-            key: account,
+            key: Some(Key {
+                bytes: account.to_vec(),
+            }),
             value: Some(Any {
                 type_url: "type.googleapis.com/sf.substreams.solana.spl.v1.AccountOwner"
                     .to_string(),
@@ -55,7 +57,7 @@ pub fn _map_spl_initialized_account(transactions: SolanaTransactions) -> Result<
         entries.push(entry);
     }
 
-    Ok(Entries { entries })
+    Ok(SinkEntries { entries, if_not_exist: true })
 }
 
 fn process_instruction(
@@ -184,7 +186,6 @@ mod tests {
         assert_eq!(result.entries.len(), 188, "Unexpected number of entries");
 
         for entry in result.entries {
-            assert!(!entry.key.is_empty(), "Entry key should not be empty");
             assert!(entry.value.is_some(), "Entry value should not be None");
 
             if let Some(value) = &entry.value {

@@ -44,7 +44,7 @@ modules:
       - params: string
       - map: solana_common:transactions_by_programid_without_votes
     output:
-        type: proto:sf.substreams.foundational_store.v1.Entries
+        type: proto:sf.substreams.foundational_store.model.v2.SinkEntries
 
 params:
   solana_common:transactions_by_programid_without_votes: "program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA || program:TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
