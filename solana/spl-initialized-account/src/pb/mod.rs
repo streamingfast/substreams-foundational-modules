@@ -25,6 +25,11 @@ pub mod sf {
                     // @@protoc_insertion_point(sf.substreams.foundational_store.service.v2)
                 }
             }
+            // @@protoc_insertion_point(attribute:sf.substreams.foundational_store.v1)
+            pub mod v1 {
+                include!("sf.substreams.foundational_store.v1.rs");
+                // @@protoc_insertion_point(sf.substreams.foundational_store.v1)
+            }
         }
         pub mod solana {
             pub mod spl {
