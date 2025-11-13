@@ -99,13 +99,15 @@ fn process_token_instruction(
                 substreams::log::info!("Skipping metadata instruction");
                 return Ok(());
             }
-            Err(_) => {}
+            Err(_err) => {
+                return Ok(());
+            }
         }
     }
 
     match TokenInstruction::unpack(&instruction.data()) {
         Err(err) => {
-            panic!("unpacking token instruction: {}", err);
+            panic!("unpacking token instruction (first byte: 0x{:02x} {}): {}", instruction.data()[0], instruction.data()[0], err);
         }
         Ok(token_instruction) => match token_instruction {
             TokenInstruction::InitializeAccount {} => {
