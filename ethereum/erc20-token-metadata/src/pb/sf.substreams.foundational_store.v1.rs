@@ -15,8 +15,10 @@ pub struct GetRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetResponse {
+    #[prost(bool, tag="3")]
+    pub block_reached: bool,
     #[prost(enumeration="ResponseCode", tag="4")]
-    pub response: i32,
+    pub code: i32,
     #[prost(message, optional, tag="5")]
     pub value: ::core::option::Option<::prost_types::Any>,
 }
@@ -45,6 +47,8 @@ pub struct ResponseEntry {
 pub struct GetAllResponse {
     #[prost(message, repeated, tag="1")]
     pub entries: ::prost::alloc::vec::Vec<ResponseEntry>,
+    #[prost(bool, tag="2")]
+    pub block_reached: bool,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

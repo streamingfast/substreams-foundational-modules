@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: erc20-token-metadata
-  version: v0.1.0
+  version: v0.2.0
   description: ERC20 Token metadata module for Foundational Store
   url: https://github.com/streamingfast/substreams-foundational-modules/tree/develop/ethereum/erc20-token-metadata
 
@@ -35,6 +35,6 @@ modules:
     inputs:
       - map: erc20_metadata:map_events
     output:
-      type: proto:sf.substreams.foundational_store.v1.Entries
+      type: proto:sf.substreams.foundational_store.model.v2.SinkEntries
 
 network: mainnet

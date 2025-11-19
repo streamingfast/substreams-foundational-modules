@@ -90,7 +90,7 @@ name = "antelope-common"
 version = "0.5.0"
 dependencies = [
  "serde_json",
- "substreams",
+ "substreams 0.7.0",
  "substreams-antelope",
 ]
 
@@ -517,7 +517,7 @@ dependencies = [
  "criterion",
  "prost 0.13.4",
  "prost-types 0.13.4",
- "substreams",
+ "substreams 0.7.0",
  "testing",
 ]
 
@@ -564,7 +564,7 @@ dependencies = [
  "prost 0.13.4",
  "prost-types 0.13.4",
  "sha2 0.10.8",
- "substreams",
+ "substreams 0.7.0",
  "testing",
 ]
 
@@ -934,9 +934,9 @@ version = "0.1.0"
 dependencies = [
  "prost 0.13.4",
  "prost-types 0.13.4",
- "substreams",
+ "substreams 0.7.0",
  "substreams-abis",
- "substreams-ethereum",
+ "substreams-ethereum 0.11.1",
 ]
 
 [[package]]
@@ -1027,8 +1027,8 @@ dependencies = [
  "num-bigint",
  "prost 0.13.4",
  "prost-types 0.13.4",
- "substreams",
- "substreams-ethereum",
+ "substreams 0.7.0",
+ "substreams-ethereum 0.10.6",
  "testing",
 ]
 
@@ -2015,6 +2015,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "prost"
+version = "0.14.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7231bd9b3d3d33c86b58adbac74b5ec0ad9f496b19d22801d773636feaa95f3d"
+dependencies = [
+ "bytes",
+ "prost-derive 0.14.1",
+]
+
+[[package]]
 name = "prost-build"
 version = "0.11.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2051,6 +2061,26 @@ dependencies = [
  "prettyplease 0.2.29",
  "prost 0.13.4",
  "prost-types 0.13.4",
+ "regex",
+ "syn 2.0.96",
+ "tempfile",
+]
+
+[[package]]
+name = "prost-build"
+version = "0.14.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac6c3320f9abac597dcbc668774ef006702672474aad53c6d596b62e487b40b1"
+dependencies = [
+ "heck",
+ "itertools 0.12.1",
+ "log",
+ "multimap",
+ "once_cell",
+ "petgraph",
+ "prettyplease 0.2.29",
+ "prost 0.14.1",
+ "prost-types 0.14.1",
  "regex",
  "syn 2.0.96",
  "tempfile",
@@ -2096,6 +2126,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "prost-derive"
+version = "0.14.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9120690fafc389a67ba3803df527d0ec9cbbc9cc45e4cc20b332996dfb672425"
+dependencies = [
+ "anyhow",
+ "itertools 0.12.1",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.96",
+]
+
+[[package]]
 name = "prost-types"
 version = "0.11.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2120,6 +2163,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cc2f1e56baa61e93533aebc21af4d2134b70f66275e0fcdf3cbe43d77ff7e8fc"
 dependencies = [
  "prost 0.13.4",
+]
+
+[[package]]
+name = "prost-types"
+version = "0.14.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b9b4db3d6da204ed77bb26ba83b6122a73aeb2e87e25fbf7ad2e84c4ccbf8f72"
+dependencies = [
+ "prost 0.14.1",
 ]
 
 [[package]]
@@ -2570,7 +2622,7 @@ dependencies = [
  "five8",
  "prost 0.13.4",
  "prost-types 0.13.4",
- "substreams",
+ "substreams 0.7.0",
 ]
 
 [[package]]
@@ -2614,7 +2666,7 @@ dependencies = [
  "num-bigint",
  "prost 0.13.4",
  "prost-types 0.13.4",
- "substreams",
+ "substreams 0.7.0",
  "substreams-solana",
  "testing",
 ]
@@ -3219,7 +3271,7 @@ dependencies = [
  "prost-types 0.13.4",
  "spl-token-2022",
  "spl-token-metadata-interface",
- "substreams",
+ "substreams 0.7.0",
  "substreams-solana",
  "testing",
 ]
@@ -3527,7 +3579,7 @@ dependencies = [
  "serde",
  "serde_json",
  "stellar-xdr",
- "substreams",
+ "substreams 0.7.0",
 ]
 
 [[package]]
@@ -3580,22 +3632,45 @@ dependencies = [
  "prost 0.13.4",
  "prost-build 0.13.4",
  "prost-types 0.13.4",
- "substreams-macro",
+ "substreams-macro 0.6.3",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "substreams"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72f4b73d245d760af8ba1d2ddab91780cb2e65414c3396ba7c9764a6f025c4a4"
+dependencies = [
+ "anyhow",
+ "bigdecimal 0.3.1",
+ "hex",
+ "hex-literal",
+ "num-bigint",
+ "num-integer",
+ "num-traits",
+ "pad",
+ "pest",
+ "pest_derive",
+ "prost 0.13.4",
+ "prost-build 0.13.4",
+ "prost-types 0.13.4",
+ "substreams-macro 0.7.0",
  "thiserror 1.0.69",
 ]
 
 [[package]]
 name = "substreams-abis"
-version = "0.4.6"
+version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ea69eba5b9b2b7c31029bec5d2a2be6c2ecd5f7cab8d9cf951da8a38d44b8e6"
+checksum = "bb421508056b51fdaf2627442ec81042e8b35e613d84b398d023e233fd17ef30"
 dependencies = [
  "anyhow",
  "ethabi 18.0.0",
  "num-bigint",
- "prost-build 0.13.4",
- "substreams",
- "substreams-ethereum",
+ "prost-build 0.14.1",
+ "substreams 0.7.0",
+ "substreams-ethereum 0.11.1",
  "walkdir",
 ]
 
@@ -3605,7 +3680,7 @@ version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f534a6ac2ae7d81cf4b7ab1af9481ba9e122994c0d47b66a98278267799b1b2c"
 dependencies = [
- "substreams",
+ "substreams 0.6.3",
  "substreams-antelope-abigen",
  "substreams-antelope-core",
 ]
@@ -3636,7 +3711,7 @@ dependencies = [
  "prost 0.13.4",
  "prost-build 0.13.4",
  "prost-types 0.13.4",
- "substreams",
+ "substreams 0.6.3",
 ]
 
 [[package]]
@@ -3647,10 +3722,24 @@ checksum = "a2fc683b368e317c60064267dbddc5d8ce290ef00170eb74df8cdde7cda939f3"
 dependencies = [
  "getrandom 0.2.15",
  "num-bigint",
- "substreams",
- "substreams-ethereum-abigen",
- "substreams-ethereum-core",
- "substreams-ethereum-derive",
+ "substreams 0.6.3",
+ "substreams-ethereum-abigen 0.10.6",
+ "substreams-ethereum-core 0.10.6",
+ "substreams-ethereum-derive 0.10.6",
+]
+
+[[package]]
+name = "substreams-ethereum"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "80672540906a3f15be899c31691f03de85d5a6d2df9337bac32b6095137e2e64"
+dependencies = [
+ "getrandom 0.2.15",
+ "num-bigint",
+ "substreams 0.7.0",
+ "substreams-ethereum-abigen 0.11.1",
+ "substreams-ethereum-core 0.11.1",
+ "substreams-ethereum-derive 0.11.1",
 ]
 
 [[package]]
@@ -3666,7 +3755,24 @@ dependencies = [
  "prettyplease 0.1.25",
  "proc-macro2",
  "quote",
- "substreams-ethereum-core",
+ "substreams-ethereum-core 0.10.6",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "substreams-ethereum-abigen"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1e85370c0154dca139e0cb0ba657cf95f465b888cf283984561e982ceeb54483"
+dependencies = [
+ "anyhow",
+ "ethabi 17.2.0",
+ "heck",
+ "hex",
+ "prettyplease 0.1.25",
+ "proc-macro2",
+ "quote",
+ "substreams-ethereum-core 0.11.1",
  "syn 1.0.109",
 ]
 
@@ -3683,7 +3789,23 @@ dependencies = [
  "prost 0.13.4",
  "prost-build 0.11.9",
  "prost-types 0.13.4",
- "substreams",
+ "substreams 0.6.3",
+]
+
+[[package]]
+name = "substreams-ethereum-core"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "545beeae86cf15f0ed4cb0e3f315823f68fe64341948ca3d785d2f9ea6b7df7c"
+dependencies = [
+ "bigdecimal 0.3.1",
+ "ethabi 17.2.0",
+ "getrandom 0.2.15",
+ "num-bigint",
+ "prost 0.13.4",
+ "prost-build 0.11.9",
+ "prost-types 0.13.4",
+ "substreams 0.7.0",
 ]
 
 [[package]]
@@ -3698,7 +3820,23 @@ dependencies = [
  "num-bigint",
  "proc-macro2",
  "quote",
- "substreams-ethereum-abigen",
+ "substreams-ethereum-abigen 0.10.6",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "substreams-ethereum-derive"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c56a310b9cb56ffb6b18b1a902a7bdad56014846d0ded9b452709e4f7445ff8f"
+dependencies = [
+ "ethabi 17.2.0",
+ "heck",
+ "hex",
+ "num-bigint",
+ "proc-macro2",
+ "quote",
+ "substreams-ethereum-abigen 0.11.1",
  "syn 1.0.109",
 ]
 
@@ -3715,6 +3853,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "substreams-macro"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d13adb6281069af403be11e7c93ef0026250cc2692387446e4bc1cecda7a6e1d"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "substreams-solana"
 version = "0.14.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3722,7 +3872,7 @@ checksum = "9cbc996d518d0293db7749b534c189f0e2f02beebe1ccdc794efeaa5922c2598"
 dependencies = [
  "anyhow",
  "num_enum",
- "substreams",
+ "substreams 0.6.3",
  "substreams-solana-core",
  "substreams-solana-macro",
 ]
@@ -4013,7 +4163,7 @@ dependencies = [
  "prost 0.13.4",
  "prost-types 0.13.4",
  "sha2 0.10.8",
- "substreams",
+ "substreams 0.7.0",
 ]
 
 [[package]]

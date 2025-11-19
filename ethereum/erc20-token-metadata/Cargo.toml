@@ -16,5 +16,5 @@ crate-type = ["cdylib"]
 prost-types = { workspace = true }
 prost = { workspace = true }
 substreams = { workspace = true }
-substreams-ethereum = "0.10"
-substreams-abis = "0.4"
+substreams-ethereum = "0.11.1"
+substreams-abis = "0.7.2"

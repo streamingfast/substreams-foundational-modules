@@ -5,12 +5,12 @@ use pb::evm::erc20::metadata::v1 as original;
 use pb::sf::substreams::ethereum::erc20::v1::TokenMetadata;
 use prost::Message;
 use prost_types::Any;
-use substreams::pb::sf::substreams::foundational_store::v1::{Entries, Entry};
+use substreams::pb::sf::substreams::foundational_store::model::v2::{Entry, Key, SinkEntries};
 
 #[substreams::handlers::map]
 fn metadata_to_foundational_store(
     events: original::Events,
-) -> Result<Entries, substreams::errors::Error> {
+) -> Result<SinkEntries, substreams::errors::Error> {
     let mut entries = Vec::new();
 
     // For MetadataInitialize events, we can create TokenMetadata directly from the event
@@ -32,7 +32,9 @@ fn metadata_to_foundational_store(
         };
 
         let entry = Entry {
-            key: init.address,
+            key: Some(Key{
+                bytes: init.address
+            }),
             value: Some(any),
         };
 
@@ -79,7 +81,10 @@ fn metadata_to_foundational_store(
             };
 
             let entry = Entry {
-                key: address_bytes.clone(),
+                key: Some(Key{
+                    bytes: address_bytes.clone()
+                }),
+
                 value: Some(any),
             };
 
@@ -87,5 +92,8 @@ fn metadata_to_foundational_store(
         }
     }
 
-    Ok(Entries { entries })
+    Ok(SinkEntries {
+        entries,
+        if_not_exist: false,
+    })
 }
