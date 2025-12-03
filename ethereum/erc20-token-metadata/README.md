@@ -8,4 +8,4 @@ This project was created for use with the **Substreams Foundational Store** from
 
 The substream imports the [ERC20 Metadata substream created by Pinax](https://github.com/pinax-network/substreams-evm-tokens) for the [TokenAPI](https://token-api.thegraph.com/), extending it to output data in the Foundational Store format.
 
-> 📖 **[View the full documentation on substreams.dev](https://docs.substreams.dev/how-to-guides/foundational-stores/ethereum/erc20-token-metadata)**
+> 📖 **[View the full documentation on substreams.dev](https://docs.substreams.dev/how-to-guides/foundational-stores/erc20-token-metadata)**
