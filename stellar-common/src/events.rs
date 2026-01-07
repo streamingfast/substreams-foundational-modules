@@ -1,7 +1,7 @@
 use core::panic;
 
 use stellar_xdr::curr::{
-    ContractEventBody, ContractEventType, ContractEventV0, Hash, TransactionMeta,
+    ContractEventBody, ContractEventType, ContractEventV0, ContractId, TransactionMeta,
 };
 use substreams::Hex;
 
@@ -72,9 +72,9 @@ fn filtered_events(query: String, events: Events) -> Result<Events, substreams::
     })
 }
 
-fn map_contract_id(contract_id: &Option<Hash>) -> Option<String> {
+fn map_contract_id(contract_id: &Option<ContractId>) -> Option<String> {
     return match contract_id {
-        Some(hash) => Some(Hex::encode(hash)),
+        Some(contract_id) => Some(Hex::encode(contract_id.0.clone())),
         _ => None,
     };
 }
@@ -97,7 +97,7 @@ fn map_event_topics(body: &ContractEventV0) -> Vec<String> {
 fn map_event_data(body: &ContractEventV0) -> String {
     match serde_json::to_string(&body.data) {
         Ok(s) => s,
-        Err(_) => String::new()
+        Err(_) => String::new(),
     }
 }
 
@@ -117,7 +117,7 @@ mod tests {
         };
 
         let keys = event_keys(&event);
-        
+
         assert_eq!(keys.len(), 2);
         assert!(keys.contains(&"type:Contract".to_string()));
         assert!(keys.contains(&"contract_id:abcd1234".to_string()));
@@ -133,7 +133,7 @@ mod tests {
         };
 
         let keys = event_keys(&event);
-        
+
         assert_eq!(keys.len(), 1);
         assert!(keys.contains(&"type:System".to_string()));
     }
@@ -148,7 +148,7 @@ mod tests {
         };
 
         let keys = event_keys(&event);
-        
+
         assert_eq!(keys.len(), 2);
         assert!(keys.contains(&"type:Diagnostic".to_string()));
         assert!(keys.contains(&"contract_id:xyz789".to_string()));
@@ -164,7 +164,7 @@ mod tests {
         };
 
         let keys = event_keys(&event);
-        
+
         assert_eq!(keys.len(), 2);
         assert!(keys.contains(&"type:Contract".to_string()));
         assert!(keys.contains(&"contract_id:".to_string()));
@@ -177,22 +177,32 @@ mod tests {
             contract_id: Some("test_contract".to_string()),
             topics: vec![
                 "{\"symbol\":\"transfer\"}".to_string(),
-                "{\"address\":\"CB7FKGSTHP75ORTIZGGMVUTQLEMVTSEOI4QORQPCABJSGTAATDFCE2YV\"}".to_string(),
-                "{\"address\":\"CB3JAPDEIMA3OOSALUHLYRGM2QTXGVD3EASALPFMVEU2POLLULJBT2XN\"}".to_string(),
-                "{\"string\":\"USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN\"}".to_string(),
+                "{\"address\":\"CB7FKGSTHP75ORTIZGGMVUTQLEMVTSEOI4QORQPCABJSGTAATDFCE2YV\"}"
+                    .to_string(),
+                "{\"address\":\"CB3JAPDEIMA3OOSALUHLYRGM2QTXGVD3EASALPFMVEU2POLLULJBT2XN\"}"
+                    .to_string(),
+                "{\"string\":\"USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN\"}"
+                    .to_string(),
             ],
             data: "".to_string(),
         };
 
         let keys = event_keys(&event);
-        
+
         assert_eq!(keys.len(), 6);
         assert!(keys.contains(&"type:Contract".to_string()));
         assert!(keys.contains(&"contract_id:test_contract".to_string()));
         assert!(keys.contains(&"topic:symbol:transfer".to_string()));
-        assert!(keys.contains(&"topic:address:CB7FKGSTHP75ORTIZGGMVUTQLEMVTSEOI4QORQPCABJSGTAATDFCE2YV".to_string()));
-        assert!(keys.contains(&"topic:address:CB3JAPDEIMA3OOSALUHLYRGM2QTXGVD3EASALPFMVEU2POLLULJBT2XN".to_string()));
-        assert!(keys.contains(&"topic:string:USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN".to_string()));
+        assert!(keys.contains(
+            &"topic:address:CB7FKGSTHP75ORTIZGGMVUTQLEMVTSEOI4QORQPCABJSGTAATDFCE2YV".to_string()
+        ));
+        assert!(keys.contains(
+            &"topic:address:CB3JAPDEIMA3OOSALUHLYRGM2QTXGVD3EASALPFMVEU2POLLULJBT2XN".to_string()
+        ));
+        assert!(keys.contains(
+            &"topic:string:USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN"
+                .to_string()
+        ));
     }
 
     #[test]
@@ -203,18 +213,21 @@ mod tests {
             topics: vec![
                 "{\"symbol\":\"transfer\"}".to_string(),
                 "invalid json".to_string(),
-                "{\"address\":\"CB7FKGSTHP75ORTIZGGMVUTQLEMVTSEOI4QORQPCABJSGTAATDFCE2YV\"}".to_string(),
+                "{\"address\":\"CB7FKGSTHP75ORTIZGGMVUTQLEMVTSEOI4QORQPCABJSGTAATDFCE2YV\"}"
+                    .to_string(),
             ],
             data: "".to_string(),
         };
 
         let keys = event_keys(&event);
-        
+
         assert_eq!(keys.len(), 4);
         assert!(keys.contains(&"type:Contract".to_string()));
         assert!(keys.contains(&"contract_id:test_contract".to_string()));
         assert!(keys.contains(&"topic:symbol:transfer".to_string()));
-        assert!(keys.contains(&"topic:address:CB7FKGSTHP75ORTIZGGMVUTQLEMVTSEOI4QORQPCABJSGTAATDFCE2YV".to_string()));
+        assert!(keys.contains(
+            &"topic:address:CB7FKGSTHP75ORTIZGGMVUTQLEMVTSEOI4QORQPCABJSGTAATDFCE2YV".to_string()
+        ));
     }
 
     #[test]
@@ -232,7 +245,7 @@ mod tests {
         };
 
         let keys = event_keys(&event);
-        
+
         assert_eq!(keys.len(), 3);
         assert!(keys.contains(&"type:Contract".to_string()));
         assert!(keys.contains(&"contract_id:test_contract".to_string()));
@@ -249,7 +262,7 @@ mod tests {
         };
 
         let keys = event_keys(&event);
-        
+
         assert_eq!(keys.len(), 1);
         assert!(keys.contains(&"type:System".to_string()));
     }

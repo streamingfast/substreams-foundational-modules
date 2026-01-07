@@ -1,10 +1,10 @@
 specVersion: v0.1.0
 package:
   url: https://github.com/streamingfast/substreams-foundational-modules/stellar-common
-  description: "Foundational module for Stellar"
+  description: "Foundational module for Stellar, with stellar-xdr v25.0.0"
   image: ./stellar.png
   name: stellar_foundational
-  version: v0.4.0
+  version: v0.5.0
 
 protobuf:
   files:
@@ -109,4 +109,3 @@ params:
   filtered_operations: operation:liquidity_pool_deposit || operation:create_account
   filtered_transactions: source_account:GBTLMZIRRAYXQNT6AXGU7XVTWIOE7NES2AG2CGTPJPWRZMUWHEYAGFSC
   filtered_events: contract_id:adefce59aee52968f76061d494c2525b75659fa4296a65f499ef29e56477e496
-
