@@ -6,3 +6,4 @@ replay.log
 .idea
 build
 dist
+/.claude

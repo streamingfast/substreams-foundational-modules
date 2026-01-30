@@ -1,1 +1,85 @@
-substreams-v0.3.3.yaml
+specVersion: v0.1.0
+package:
+  name: "solana_common"
+  version: v0.4.0
+  image: ./solana.png
+
+network: solana
+
+imports:
+  solana: https://github.com/streamingfast/firehose-solana/releases/download/v1.3.0/solana-v0.1.5.spkg
+
+protobuf:
+  importPaths:
+    - ./proto
+  files:
+    - sf/substreams/solana/v1/transactions.proto
+  excludePaths:
+    - sf/substreams/rpc
+    - sf/substreams/v1
+    - sf/substreams/sink
+    - sf/substreams/index
+    - sf/substreams/index/v1
+    - google
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ../../target/wasm32-unknown-unknown/release/solana_common.wasm
+
+modules:
+  - name: blocks_without_votes
+    kind: map
+    inputs:
+      - source: sf.solana.type.v1.Block
+    output:
+      type: proto:sf.solana.type.v1.Block
+    doc: |
+      `blocks_without_votes` allows you to consume a full Solana Block without Vote instructions (`Vote111111111111111111111111111111111111111`).
+      If you consume it on HISTORICAL data (+1000 blocks from HEAD), you will be reading from the StreamingFast cache, thus saving costs on the amount of TB read.
+
+  - name: program_ids_without_votes
+    kind: blockIndex
+    inputs:
+      - map: blocks_without_votes
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+    doc: |
+      `program_ids_without_votes` creates a _cache_ to efficiently retrieve instructions based on the program ID.
+      For example, the following sets keys for the Token program:
+      * program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+
+  - name: program_ids_and_accounts_without_votes
+    kind: blockIndex
+    inputs:
+      - map: blocks_without_votes
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+
+  - name: transactions_by_programid_without_votes
+    kind: map
+    inputs:
+      - params: string
+      - map: blocks_without_votes
+    blockFilter:
+      module: program_ids_without_votes
+      query:
+        params: true
+    output:
+      type: proto:sf.substreams.solana.v1.Transactions
+
+  - name: transactions_by_programid_and_account_without_votes
+    kind: map
+    inputs:
+      - params: string
+      - map: blocks_without_votes
+    blockFilter:
+      module: program_ids_and_accounts_without_votes
+      query:
+        params: true
+    output:
+      type: proto:sf.substreams.solana.v1.Transactions
+
+params: # Default parameters for the filter modules. You can override these parameters based on your needs.
+  transactions_by_programid_without_votes: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy"
+  transactions_by_programid_and_account_without_votes: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy || (account:Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD && program:FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH)"
