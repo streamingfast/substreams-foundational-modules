@@ -87,8 +87,120 @@ Based on the benchmarks, the most expensive operations are:
 2. Walking all instructions - Cache results if used multiple times
 3. Expression matching with complex queries - Simplify queries when possible
 
+## Memory Allocation Profiling
+
+To see memory allocations during benchmarks, you have three options:
+
+### Option 1: DHAT Heap Profiler (Most Detailed)
+
+Run the dedicated memory benchmark:
+
+```bash
+cargo bench --bench memory_benchmarks
+```
+
+This will:
+- Show allocation statistics for each operation
+- Generate a `dhat-heap.json` file with detailed profiling data
+- View the results at: https://nnethercote.github.io/dh_view/dh_view.html
+
+The DHAT profiler shows:
+- Total allocations and deallocations
+- Memory leaks
+- Peak memory usage
+- Allocation hotspots
+- Lifetimes of allocations
+
+### Option 2: Criterion with Allocation Counter
+
+Run benchmarks with built-in allocation counting:
+
+```bash
+cargo bench --bench criterion_with_alloc_counter
+```
+
+This will display allocation statistics in stderr:
+- Bytes allocated per iteration
+- Number of allocations per iteration
+- Bytes deallocated per iteration
+- Number of deallocations per iteration
+
+Example output:
+```
+block_clone stats (avg per iteration):
+  Bytes allocated: 524288
+  Bytes deallocated: 524288
+  Allocations: 128
+  Deallocations: 128
+```
+
+### Option 3: Valgrind/Massif (Linux only)
+
+For system-level memory profiling:
+
+```bash
+# Install valgrind (Linux)
+sudo apt-get install valgrind
+
+# Run with massif
+valgrind --tool=massif --massif-out-file=massif.out \
+  cargo bench --bench solana_common_benchmarks -- --profile-time=5
+
+# Visualize results
+ms_print massif.out
+```
+
+### Option 4: Heaptrack (Linux only)
+
+For graphical memory profiling:
+
+```bash
+# Install heaptrack
+sudo apt-get install heaptrack
+
+# Run benchmarks under heaptrack
+heaptrack cargo bench --bench solana_common_benchmarks
+
+# Open GUI to analyze
+heaptrack_gui heaptrack.*.gz
+```
+
+### Option 5: Instruments (macOS only)
+
+For macOS users:
+
+```bash
+# Build benchmarks
+cargo bench --bench solana_common_benchmarks --no-run
+
+# Find the binary path
+find target/release -name "solana_common_benchmarks*" -type f
+
+# Run with Instruments
+instruments -t "Allocations" path/to/benchmark/binary -- --bench
+```
+
+## Interpreting Memory Results
+
+When analyzing memory allocations:
+
+1. **Total bytes allocated** - How much memory the operation needs
+2. **Allocation count** - Number of separate allocations (fewer is often better)
+3. **Peak memory** - Maximum memory used at any point
+4. **Memory retained** - Memory that isn't deallocated (potential leaks)
+
+### Common Optimization Strategies
+
+Based on allocation profiling:
+
+- **Reduce cloning**: Use references or `Cow` types where possible
+- **Pre-allocate collections**: Use `Vec::with_capacity()` if size is known
+- **Avoid string allocations**: Use `&str` instead of `String` when possible
+- **Batch allocations**: Allocate once and reuse rather than repeated small allocations
+
 ## Dependencies
 
 The benchmarks require:
 - `criterion = "0.5"` with HTML reports enabled
+- `dhat = "0.3"` for memory profiling
 - Test data files must be present in `src/testdata/`

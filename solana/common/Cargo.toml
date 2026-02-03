@@ -24,7 +24,16 @@ substreams-solana = "^0.14.3"
 [dev-dependencies]
 testing = { workspace = true }
 criterion = { version = "0.5", features = ["html_reports"] }
+dhat = "0.3"
 
 [[bench]]
 name = "solana_common_benchmarks"
+harness = false
+
+[[bench]]
+name = "memory_benchmarks"
+harness = false
+
+[[bench]]
+name = "criterion_with_alloc_counter"
 harness = false
