@@ -12,7 +12,7 @@ fn transactions_by_programid_without_votes(
 }
 
 /// _transactions_by_programid_without_votes is equal to [transactions_by_programid_without_votes] but exists only for unit testing purposes.
-fn _transactions_by_programid_without_votes(
+pub fn _transactions_by_programid_without_votes(
     query: String,
     block: Block,
 ) -> Result<Transactions, substreams::errors::Error> {
@@ -39,7 +39,7 @@ fn transactions_by_programid_and_account_without_votes(
 }
 
 /// transactions_by_programid_and_account_without_votes is equal to [transactions_by_programid_and_account_without_votes] but exists only for unit testing purposes.
-fn _transactions_by_programid_and_account_without_votes(
+pub fn _transactions_by_programid_and_account_without_votes(
     query: String,
     block: Block,
 ) -> Result<Transactions, substreams::errors::Error> {

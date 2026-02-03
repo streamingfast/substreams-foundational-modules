@@ -23,3 +23,8 @@ substreams-solana = "^0.14.3"
 
 [dev-dependencies]
 testing = { workspace = true }
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "solana_common_benchmarks"
+harness = false

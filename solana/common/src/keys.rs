@@ -3,7 +3,7 @@ use substreams_solana::{base58, pb::sf::solana::r#type::v1::ConfirmedTransaction
 /// transaction_program_and_account_keys returns an iterator of keys extracted from a transaction. It will
 /// emit the account keys from the transaction message, the loaded writable addresses, the loaded readonly
 /// addresses, and the program ids from the instructions.
-pub(crate) fn transaction_program_and_account_keys(
+pub fn transaction_program_and_account_keys(
     trx: &ConfirmedTransaction,
 ) -> impl Iterator<Item = String> + '_ {
     let meta = trx.meta.as_ref().unwrap();
