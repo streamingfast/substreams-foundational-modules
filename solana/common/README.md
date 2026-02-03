@@ -2,7 +2,15 @@
 
 The **Solana Common Modules** Substreams contains a set of modules that allow you to easily retrieve basic information from the Solana blockchain, such as transactions or instructions.
 
-The `substreams-v0.3.0.yaml` file defines all the different modules available, and also provides you with documentation about the usage of every module.
+The `substreams.yaml` file defines all the different modules available, and also provides you with documentation about the usage of every module.
+
+# What's new ? 
+
+## v0.4.0
+
+- Added the new field 'costUnits' under transactionsStatusMeta, added a bit after block `363312000`
+- Requires reprocessing all blocks to get this new field (no 'use:' field in this release)
+- Minor performance improvements (~5%)
 
 # Using this module to speed up a substreams
 
@@ -14,7 +22,7 @@ In your substreams.yaml,
 
 ```
 imports:
-  sol: https://spkg.io/streamingfast/solana-common-v0.3.0.spkg
+  sol: https://spkg.io/streamingfast/solana-common-v0.4.0.spkg
 ```
 
 2. Replace any `source: sf.solana.type.v1.Block` input with `map: sol:blocks_without_votes` (you will be getting the same protobuf object, but with some vote-related transactions already pruned)
@@ -47,7 +55,7 @@ In your substreams.yaml,
 
 ```
 imports:
-  sol: https://spkg.io/streamingfast/solana-common-v0.3.0.spkg
+  sol: https://spkg.io/streamingfast/solana-common-v0.4.0.spkg
 ```
 
 2. Set one of `transactions_by_programid_without_votes` or `transactions_by_programid_and_account_without_votes` (along with `source: sf.substreams.v1.Clock` if you need slot number/ID/timestamp) as your module input, ex:
