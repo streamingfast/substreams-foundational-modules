@@ -30,7 +30,7 @@ hex = "0.4.3"
 num-bigint = "0.4"
 prost = "0.13"
 prost-types = "0.13"
-substreams = "0.7.0"
+substreams = "0.7.4"
 testing = { path = "./testing" }
 pretty_assertions = "1.2.1"
 

@@ -16,7 +16,7 @@ pub fn _transactions_by_programid_without_votes(
     query: String,
     block: Block,
 ) -> Result<Transactions, substreams::errors::Error> {
-    let query = substreams::expr_matcher(&query);
+    let query = substreams::sqe::expr_matcher(&query);
 
     let mut transactions = Transactions {
         transactions: block.transactions,
