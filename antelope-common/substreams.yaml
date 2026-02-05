@@ -4,21 +4,17 @@ package:
   image: ./antelope.png
   version: v0.5.0
   url: https://github.com/streamingfast/substreams-foundational-modules/antelope-common
-  doc: |
-    common Antelope substreams modules to extract transactions with indexing
+  description: Foundational modules for Antelope to extract transactions and actions with indexing and filtering
 
-    Use one of those optimized modules with a query string as a parameter:
-    * filtered_transactions
-    * filtered_actions
-    * filtered_transactions_extra
-    * filtered_actions_extra
-
-    The query string will be used for the blockfilter as well as the actual filtering of actions/transactions
+network: eos-mainnet
 
 protobuf:
   files:
   importPaths:
     - ./proto
+  excludePaths:
+    - google
+    - sf/substreams/
 
 imports:
   antelope: https://github.com/pinax-network/firehose-antelope/releases/download/v0.0.5/antelope-v0.0.5.spkg

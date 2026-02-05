@@ -3,16 +3,7 @@ package:
   name: ethereum_common
   version: v0.3.3
   url: https://github.com/streamingfast/substreams-foundational-modules/tree/develop/ethereum/common
-  doc: |
-    common Ethereum substreams modules to extract events, calls, transactions with indexing
-
-    Use one of those optimized modules with a query string as a parameter:
-    * filtered_events
-    * filtered_calls
-    * filtered_transactions
-    * filtered_events_and_calls
-
-    The query string will be used for the blockfilter as well as the actual filtering of the events/calls/transactions
+  description: Substreams Foundational Modules for Ethereum containing indexes and filtered datasets for events and calls.
 
 protobuf:
   files:
@@ -163,6 +154,8 @@ modules:
       Supported operators are: logical or `||`, logical and `&&` and parenthesis: `()`
       Addresses and signatures to match must be written as 0x-prefixed hexadecimal, lowercase, prefixed by `evt_addr:`, `evt_sig:`, `call_to:`, `call_from:` or `call_method:`.
       Example: evt_sig:0x9bb8f83800000000000000000000000000000000000000000000000000000000 || (call_method:0xa9059cbb && call_to:0xdac17f958d2ee523a2206206994597c13d831ec7)
+
+network: ethereum-mainnet
 
 params:
   filtered_events: "evt_sig:0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31"

@@ -1,6 +1,7 @@
+#[allow(dead_code)]
 mod pb;
 
-use crate::pb::sf::substreams::foundational_store::model::v2::{SinkEntries, Entry, Key};
+use crate::pb::sf::substreams::foundational_store::model::v2::{Entry, Key, SinkEntries};
 use crate::pb::sf::substreams::solana::spl::v1::AccountOwner;
 use crate::pb::sf::substreams::solana::v1::Transactions as SolanaTransactions;
 use prost_types::Any;
@@ -20,7 +21,9 @@ fn map_spl_initialized_account(
     _map_spl_initialized_account(transactions)
 }
 
-pub fn _map_spl_initialized_account(transactions: SolanaTransactions) -> Result<SinkEntries, Error> {
+pub fn _map_spl_initialized_account(
+    transactions: SolanaTransactions,
+) -> Result<SinkEntries, Error> {
     let mut initialized_accounts: Vec<InitializedAccountEntry> = vec![];
     for transaction in transactions.transactions {
         if !transaction.is_successful() {
@@ -57,7 +60,10 @@ pub fn _map_spl_initialized_account(transactions: SolanaTransactions) -> Result<
         entries.push(entry);
     }
 
-    Ok(SinkEntries { entries, if_not_exist: true })
+    Ok(SinkEntries {
+        entries,
+        if_not_exist: true,
+    })
 }
 
 fn process_instruction(
@@ -107,7 +113,12 @@ fn process_token_instruction(
 
     match TokenInstruction::unpack(&instruction.data()) {
         Err(err) => {
-            panic!("unpacking token instruction (first byte: 0x{:02x} {}): {}", instruction.data()[0], instruction.data()[0], err);
+            panic!(
+                "unpacking token instruction (first byte: 0x{:02x} {}): {}",
+                instruction.data()[0],
+                instruction.data()[0],
+                err
+            );
         }
         Ok(token_instruction) => match token_instruction {
             TokenInstruction::InitializeAccount {} => {

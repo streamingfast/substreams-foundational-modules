@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 mod pb;
 mod rpc;
 
@@ -32,8 +33,8 @@ fn metadata_to_foundational_store(
         };
 
         let entry = Entry {
-            key: Some(Key{
-                bytes: init.address
+            key: Some(Key {
+                bytes: init.address,
             }),
             value: Some(any),
         };
@@ -81,8 +82,8 @@ fn metadata_to_foundational_store(
             };
 
             let entry = Entry {
-                key: Some(Key{
-                    bytes: address_bytes.clone()
+                key: Some(Key {
+                    bytes: address_bytes.clone(),
                 }),
 
                 value: Some(any),

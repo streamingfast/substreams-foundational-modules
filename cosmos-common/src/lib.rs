@@ -1,6 +1,6 @@
+#[allow(dead_code)]
 mod pb;
 
-use core::panic;
 use std::collections::HashMap;
 
 use crate::pb::sf::cosmos::r#type::v2::Block;

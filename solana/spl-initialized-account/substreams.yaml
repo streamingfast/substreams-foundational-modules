@@ -15,7 +15,7 @@ protobuf:
   files:
     - sf/substreams/solana/spl/v1/initialized_account.proto
   descriptorSets:
-    - module: buf.build/streamingfast/substreams-foundational-store
+    - module: buf.build/streamingfast/substreams-foundational-store@f3ab5976b9ba4f9bac28b26271fca7d7
   excludePaths:
    - google
    - sf/firehose/

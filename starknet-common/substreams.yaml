@@ -2,6 +2,8 @@ specVersion: v0.1.0
 package:
   name: starknet_foundational
   version: v0.1.3
+  url: https://github.com/streamingfast/substreams-foundational-modules/starknet-common
+  description: Foundational modules for Starknet to extract transactions with indexing and filtering
 
 protobuf:
   files:

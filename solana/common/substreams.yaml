@@ -2,6 +2,8 @@ specVersion: v0.1.0
 package:
   name: "solana_common"
   version: v0.4.0
+  url: https://github.com/streamingfast/substreams-foundational-modules/solana/common
+  description: Foundational modules for Solana to extract transactions with indexing and filtering
   image: ./solana.png
 
 network: solana

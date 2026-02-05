@@ -37,15 +37,6 @@ fn index_events_and_calls(events: Events, calls: Calls) -> Result<Keys, Error> {
 #[substreams::handlers::map]
 fn filtered_events_and_calls(
     query: String,
-    events: Events,
-    calls: Calls,
-) -> Result<EventsAndCalls, Error> {
-    _filtered_events_and_calls(query, events, calls)
-}
-
-/// _filtered_events_and_calls is equal to [filtered_events_and_calls] but exists only for unit testing purposes.
-fn _filtered_events_and_calls(
-    query: String,
     mut events: Events,
     mut calls: Calls,
 ) -> Result<EventsAndCalls, Error> {
@@ -74,11 +65,6 @@ fn _filtered_events_and_calls(
 
 #[substreams::handlers::map]
 fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Error> {
-    _filtered_transactions(query, block)
-}
-
-/// _filtered_transactions is equal to [filtered_transactions] but exists only for unit testing purposes.
-fn _filtered_transactions(query: String, block: Block) -> Result<Transactions, Error> {
     let mut events: HashMap<String, Vec<&Log>> = HashMap::new();
     block.logs().for_each(|log| {
         let k = Hex::encode(&log.receipt.transaction.hash);
@@ -91,7 +77,7 @@ fn _filtered_transactions(query: String, block: Block) -> Result<Transactions, E
         calls.entry(k).or_default().push(call.call);
     });
 
-    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
+    let matcher = substreams::expr_matcher(&query);
 
     let filtered: Vec<Transaction> = block
         .transaction_traces
@@ -158,12 +144,12 @@ pub mod tests {
             testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
 
         // When
-        let result = _filtered_events_and_calls(
+        let result = substreams::testing::map!(filtered_events_and_calls(
             "evt_addr:0x6b175474e89094c44da98b954eedeac495271d0f || call_method:0x029b2f34"
                 .to_owned(),
-            _all_events(block.clone()).unwrap(),
-            _all_calls(block).unwrap(),
-        )
+            substreams::testing::map!(all_events(block.clone())).unwrap(),
+            substreams::testing::map!(all_calls(block)).unwrap(),
+        ))
         .expect("Failed to execute function");
 
         // Expect
@@ -191,11 +177,11 @@ pub mod tests {
             testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
 
         // When
-        let result = _filtered_transactions(
+        let result = substreams::testing::map!(filtered_transactions(
             "evt_addr:0x6b175474e89094c44da98b954eedeac495271d0f || call_method:0x029b2f34"
                 .to_owned(),
             block,
-        )
+        ))
         .expect("Failed to execute function");
 
         // Expect

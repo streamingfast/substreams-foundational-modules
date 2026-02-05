@@ -1,5 +1,3 @@
-use core::panic;
-
 use stellar_xdr::curr::{
     ContractEventBody, ContractEventType, ContractEventV0, ContractId, TransactionMeta,
 };

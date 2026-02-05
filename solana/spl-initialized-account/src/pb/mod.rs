@@ -31,6 +31,20 @@ pub mod sf {
                 // @@protoc_insertion_point(sf.substreams.foundational_store.v1)
             }
         }
+        pub mod index {
+            // @@protoc_insertion_point(attribute:sf.substreams.index.v1)
+            pub mod v1 {
+                include!("sf.substreams.index.v1.rs");
+                // @@protoc_insertion_point(sf.substreams.index.v1)
+            }
+        }
+        pub mod internal {
+            // @@protoc_insertion_point(attribute:sf.substreams.internal.v2)
+            pub mod v2 {
+                include!("sf.substreams.internal.v2.rs");
+                // @@protoc_insertion_point(sf.substreams.internal.v2)
+            }
+        }
         pub mod solana {
             pub mod spl {
                 // @@protoc_insertion_point(attribute:sf.substreams.solana.spl.v1)
@@ -44,6 +58,11 @@ pub mod sf {
                 include!("sf.substreams.solana.v1.rs");
                 // @@protoc_insertion_point(sf.substreams.solana.v1)
             }
+        }
+        // @@protoc_insertion_point(attribute:sf.substreams.v1)
+        pub mod v1 {
+            include!("sf.substreams.v1.rs");
+            // @@protoc_insertion_point(sf.substreams.v1)
         }
     }
 }

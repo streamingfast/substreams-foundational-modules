@@ -3,8 +3,7 @@ package:
   name: common
   version: v0.1.0
   url: https://github.com/streamingfast/substreams-foundational-modules/common
-  doc: |
-    Substreams modules common to all the supported chains
+  description: Common Substreams modules for all supported chains
 
 binaries:
   default:

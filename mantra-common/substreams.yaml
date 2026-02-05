@@ -3,6 +3,7 @@ package:
   name: mantra_common
   version: v0.1.1
   url: https://github.com/streamingfast/substreams-foundational-modules/mantra-common
+  description: Foundational modules for Mantra to extract events with indexing and filtering
 
 network: mantra-mainnet
 

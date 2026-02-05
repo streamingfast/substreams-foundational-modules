@@ -3,6 +3,7 @@ package:
   name: injective_common
   version: v0.2.5
   url: https://github.com/streamingfast/substreams-foundational-modules/injective-common
+  description: Foundational modules for Injective to extract events with indexing and filtering
 
 network: injective-mainnet
 

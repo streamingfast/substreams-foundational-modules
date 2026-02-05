@@ -17,13 +17,12 @@ protobuf:
   files:
     - sf/substreams/ethereum/erc20/v1/token_metadata.proto
   descriptorSets:
-    - module: buf.build/streamingfast/substreams-foundational-store
+    - module: buf.build/streamingfast/substreams-foundational-store@f3ab5976b9ba4f9bac28b26271fca7d7
   importPaths:
     - ./proto
   excludePaths:
     - evm
     - google
-    - sf/substreams/v1
     - sf/substreams/sink
     - sf/substreams/rpc
     - sf/substreams/index
@@ -37,4 +36,4 @@ modules:
     output:
       type: proto:sf.substreams.foundational_store.model.v2.SinkEntries
 
-network: mainnet
+network: ethereum-mainnet

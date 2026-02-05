@@ -4,7 +4,7 @@ build:
 
 .PHONY: package
 package:
-	@projects=$$(find . -mindepth 1 -maxdepth 1 -type d | grep -Ev '(.git|target|testing)' | grep "$(PROJECT)"); \
+	@projects=$$(find . -name 'substreams.yaml' -not -path './.git/*' -not -path './target/*' | xargs -n1 dirname | grep "$(PROJECT)"); \
 	for project in $$projects; do \
 		set -e ; \
 		echo "Substreams packing $$project..."; \

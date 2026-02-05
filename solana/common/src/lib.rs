@@ -1,6 +1,7 @@
 mod block;
 mod index;
 mod keys;
+#[allow(dead_code)]
 pub mod pb;
 mod transaction;
 

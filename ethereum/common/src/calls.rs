@@ -8,11 +8,6 @@ use substreams_ethereum::pb::eth::v2::Block;
 
 #[substreams::handlers::map]
 fn all_calls(blk: Block) -> Result<Calls, Error> {
-    _all_calls(blk)
-}
-
-/// _all_calls is equal to [all_calls] but exists only for unit testing purposes.
-pub fn _all_calls(blk: Block) -> Result<Calls, Error> {
     let clock = Clock {
         timestamp: Some(blk.header.unwrap().timestamp.unwrap()),
         id: Hex::encode(&blk.hash),
@@ -53,12 +48,7 @@ fn index_calls(calls: Calls) -> Result<Keys, Error> {
 }
 
 #[substreams::handlers::map]
-fn filtered_calls(query: String, calls: Calls) -> Result<Calls, Error> {
-    _filtered_calls(query, calls)
-}
-
-/// _filtered_calls is equal to [filtered_calls] but exists only for unit testing purposes.
-fn _filtered_calls(query: String, mut calls: Calls) -> Result<Calls, Error> {
+fn filtered_calls(query: String, mut calls: Calls) -> Result<Calls, Error> {
     let matcher = substreams::expr_matcher(&query);
 
     calls.calls.retain(|call| {
@@ -100,7 +90,8 @@ pub mod tests {
     fn test_all_calls() {
         let block = testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
 
-        let result = _all_calls(block).expect("Failed to execute function");
+        let result =
+            substreams::testing::map!(all_calls(block)).expect("Failed to execute function");
         assert_eq!(result.calls.len(), 670);
     }
 
@@ -111,10 +102,10 @@ pub mod tests {
             testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
 
         // When
-        let result = _filtered_calls(
+        let result = substreams::testing::map!(filtered_calls(
             "call_from:0x5acc84a3e955bdd76467d3348077d003f00ffb97".to_owned(),
-            _all_calls(block).unwrap(),
-        )
+            substreams::testing::map!(all_calls(block)).unwrap(),
+        ))
         .expect("Failed to execute function");
 
         // Expect
