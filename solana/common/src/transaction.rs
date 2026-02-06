@@ -8,14 +8,6 @@ fn transactions_by_programid_without_votes(
     query: String,
     block: Block,
 ) -> Result<Transactions, substreams::errors::Error> {
-    _transactions_by_programid_without_votes(query, block)
-}
-
-/// _transactions_by_programid_without_votes is equal to [transactions_by_programid_without_votes] but exists only for unit testing purposes.
-pub fn _transactions_by_programid_without_votes(
-    query: String,
-    block: Block,
-) -> Result<Transactions, substreams::errors::Error> {
     let query = substreams::sqe::expr_matcher(&query);
 
     let mut transactions = Transactions {
@@ -34,14 +26,6 @@ pub fn _transactions_by_programid_without_votes(
 
 #[substreams::handlers::map]
 fn transactions_by_programid_and_account_without_votes(
-    query: String,
-    block: Block,
-) -> Result<Transactions, substreams::errors::Error> {
-    _transactions_by_programid_and_account_without_votes(query, block)
-}
-
-/// transactions_by_programid_and_account_without_votes is equal to [transactions_by_programid_and_account_without_votes] but exists only for unit testing purposes.
-pub fn _transactions_by_programid_and_account_without_votes(
     query: String,
     block: Block,
 ) -> Result<Transactions, substreams::errors::Error> {
@@ -71,10 +55,10 @@ mod tests {
         let block = testing::read_block("./src/testdata/solana_mainnet_313000000.binpb.base64");
 
         // When
-        let result = _transactions_by_programid_without_votes(
+        let result = substreams::testing::map!(transactions_by_programid_without_votes(
             "program:whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc".to_owned(),
             block,
-        )
+        ))
         .expect("Failed to execute function");
 
         // Expect
@@ -95,10 +79,10 @@ mod tests {
         let block = testing::read_block("./src/testdata/solana_mainnet_313000000.binpb.base64");
 
         // When
-        let result = _transactions_by_programid_and_account_without_votes(
+        let result = substreams::testing::map!(transactions_by_programid_and_account_without_votes(
             "program:whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc && account:5qrvgpvr55Eo7c5bBcwopdiQ6TpvceiRm42yjHTbtDvc".to_owned(),
             block,
-        )
+        ))
         .expect("Failed to execute function");
 
         // Expect
@@ -148,10 +132,10 @@ mod tests {
             testing::read_block("./src/testdata/solana_mainnet_318251413.binpb.base64");
 
         // When
-        let result = _transactions_by_programid_and_account_without_votes(
+        let result = substreams::testing::map!(transactions_by_programid_and_account_without_votes(
             "program:JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4 && account:3EsvvyqporKr5DVpzWsdYCphpXqXnQBMQLGNwSH5MmRE".to_owned(),
             block.clone(),
-        )
+        ))
         .expect("Failed to execute function");
 
         // Expect

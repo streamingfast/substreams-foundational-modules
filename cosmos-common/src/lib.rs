@@ -13,11 +13,6 @@ use substreams::pb::sf::substreams::index::v1::Keys;
 
 #[substreams::handlers::map]
 pub fn all_events(block: Block) -> Result<EventList, Error> {
-    _all_events(block)
-}
-
-/// _all_events is equal to [all_events] but exists only for unit testing purposes.
-pub fn _all_events(block: Block) -> Result<EventList, Error> {
     // Mutable list to add the output of the Substreams
     let mut events: Vec<Event> = Vec::new();
 
@@ -78,11 +73,6 @@ fn index_events(events: EventList) -> Result<Keys, Error> {
 
 #[substreams::handlers::map]
 fn filtered_events(query: String, events: EventList) -> Result<EventList, Error> {
-    _filtered_events(query, events)
-}
-
-/// _filtered_events is equal to [filtered_events] but exists only for unit testing purposes.
-fn _filtered_events(query: String, events: EventList) -> Result<EventList, Error> {
     let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
 
     let filtered: Vec<Event> = events
@@ -114,11 +104,6 @@ fn _filtered_events(query: String, events: EventList) -> Result<EventList, Error
 
 #[substreams::handlers::map]
 fn filtered_event_groups(query: String, events: EventList) -> Result<EventList, Error> {
-    _filtered_event_groups(query, events)
-}
-
-/// _filtered_event_groups is equal to [filtered_event_groups] but exists only for unit testing purposes.
-fn _filtered_event_groups(query: String, events: EventList) -> Result<EventList, Error> {
     let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
 
     let matching_trx_hashes = events
@@ -160,14 +145,6 @@ fn filtered_events_by_attribute_value(
     query: String,
     events: EventList,
 ) -> Result<EventList, Error> {
-    _filtered_events_by_attribute_value(query, events)
-}
-
-/// _filtered_events_by_attribute_value is equal to [filtered_events_by_attribute_value] but exists only for unit testing purposes.
-fn _filtered_events_by_attribute_value(
-    query: String,
-    events: EventList,
-) -> Result<EventList, Error> {
     let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
 
     let filtered: Vec<Event> = events
@@ -200,14 +177,6 @@ fn _filtered_events_by_attribute_value(
 
 #[substreams::handlers::map]
 fn filtered_event_groups_by_attribute_value(
-    query: String,
-    events: EventList,
-) -> Result<EventList, Error> {
-    _filtered_event_groups_by_attribute_value(query, events)
-}
-
-/// _filtered_event_groups_by_attribute_value is equal to [filtered_event_groups_by_attribute_value] but exists only for unit testing purposes.
-fn _filtered_event_groups_by_attribute_value(
     query: String,
     events: EventList,
 ) -> Result<EventList, Error> {
@@ -265,7 +234,8 @@ mod tests {
         let block = testing::read_block("./src/testdata/injective_mainnet_103863031.binpb.base64");
 
         // When
-        let result = _filtered_events("type:transfer".to_owned(), _all_events(block).unwrap());
+        let all_events = substreams::testing::map!(all_events(block)).unwrap();
+        let result = substreams::testing::map!(filtered_events("type:transfer".to_owned(), all_events));
 
         // Expect
         let result_events = result.unwrap().events;
@@ -282,8 +252,9 @@ mod tests {
         let block = testing::read_block("./src/testdata/injective_mainnet_103863031.binpb.base64");
 
         // When
+        let all_events = substreams::testing::map!(all_events(block)).unwrap();
         let result =
-            _filtered_event_groups("type:transfer".to_owned(), _all_events(block).unwrap());
+            substreams::testing::map!(filtered_event_groups("type:transfer".to_owned(), all_events));
 
         // Expect
         let result_events = result.unwrap().events;
@@ -310,10 +281,11 @@ mod tests {
         let block = testing::read_block("./src/testdata/injective_mainnet_103863031.binpb.base64");
 
         // When
-        let result = _filtered_events_by_attribute_value(
+        let all_events = substreams::testing::map!(all_events(block)).unwrap();
+        let result = substreams::testing::map!(filtered_events_by_attribute_value(
             "type:transfer && attr:sender:inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk".to_owned(),
-            _all_events(block).unwrap(),
-        );
+            all_events,
+        ));
 
         // Expect
         let result_events = result.unwrap().events;
@@ -340,10 +312,11 @@ mod tests {
         let block = testing::read_block("./src/testdata/injective_mainnet_103863031.binpb.base64");
 
         // When
-        let result = _filtered_event_groups_by_attribute_value(
+        let all_events = substreams::testing::map!(all_events(block)).unwrap();
+        let result = substreams::testing::map!(filtered_event_groups_by_attribute_value(
             "type:transfer && attr:sender".to_owned(),
-            _all_events(block).unwrap(),
-        );
+            all_events,
+        ));
 
         // Expect
         let result_events = result.unwrap().events;

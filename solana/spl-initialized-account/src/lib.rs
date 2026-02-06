@@ -18,12 +18,6 @@ fn map_spl_initialized_account(
     _params: String,
     transactions: SolanaTransactions,
 ) -> Result<SinkEntries, Error> {
-    _map_spl_initialized_account(transactions)
-}
-
-pub fn _map_spl_initialized_account(
-    transactions: SolanaTransactions,
-) -> Result<SinkEntries, Error> {
     let mut initialized_accounts: Vec<InitializedAccountEntry> = vec![];
     for transaction in transactions.transactions {
         if !transaction.is_successful() {
@@ -163,7 +157,7 @@ struct InitializedAccountEntry {
 #[cfg(test)]
 mod tests {
     use crate::{
-        _map_spl_initialized_account, pb::sf::substreams::solana::v1::Transactions,
+        __impl_map_spl_initialized_account, pb::sf::substreams::solana::v1::Transactions,
         SOLANA_TOKEN_PROGRAM_KEG, SOLANA_TOKEN_PROGRAM_ZQB,
     };
     use pretty_assertions::assert_eq;
@@ -191,9 +185,9 @@ mod tests {
             })
             .collect();
 
-        let result = _map_spl_initialized_account(Transactions {
+        let result = substreams::testing::map!(map_spl_initialized_account("".to_string(), Transactions {
             transactions: filtered_transactions,
-        })
+        }))
         .expect("Failed to execute function");
 
         assert_eq!(result.entries.len(), 188, "Unexpected number of entries");
