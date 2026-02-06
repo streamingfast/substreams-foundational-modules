@@ -49,7 +49,7 @@ fn filtered_transactions(
                     Err(_) => return None,
                 };
 
-            let query = substreams::expr_matcher(&query);
+            let query = substreams::sqe::expr_matcher(&query);
 
             match query.matches_keys(&index::transaction_keys(trx)) {
                 true => return Some(transaction),

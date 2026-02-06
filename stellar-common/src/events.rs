@@ -54,7 +54,7 @@ fn map_events(transactions: Transactions) -> Result<Events, substreams::errors::
 
 #[substreams::handlers::map]
 fn filtered_events(query: String, events: Events) -> Result<Events, substreams::errors::Error> {
-    let query = substreams::expr_matcher(&query);
+    let query = substreams::sqe::expr_matcher(&query);
 
     let filtered_events: Vec<Event> = events
         .events

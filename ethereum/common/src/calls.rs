@@ -49,7 +49,7 @@ fn index_calls(calls: Calls) -> Result<Keys, Error> {
 
 #[substreams::handlers::map]
 fn filtered_calls(query: String, mut calls: Calls) -> Result<Calls, Error> {
-    let matcher = substreams::expr_matcher(&query);
+    let matcher = substreams::sqe::expr_matcher(&query);
 
     calls.calls.retain(|call| {
         let keys = call_keys(call.call.as_ref().unwrap());

@@ -26,7 +26,7 @@ fn filtered_transactions(
     query: String,
     mut transactions: Transactions,
 ) -> Result<Transactions, substreams::errors::Error> {
-    let matcher = substreams::expr_matcher(&query);
+    let matcher = substreams::sqe::expr_matcher(&query);
 
     transactions
         .transactions

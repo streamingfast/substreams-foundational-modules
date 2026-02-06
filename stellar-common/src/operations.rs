@@ -288,7 +288,7 @@ fn filtered_operations(
     query: String,
     operations: Operations,
 ) -> Result<Operations, substreams::errors::Error> {
-    let query = substreams::expr_matcher(&query);
+    let query = substreams::sqe::expr_matcher(&query);
 
     let filtered_operations: Vec<Operation> = operations
         .operations

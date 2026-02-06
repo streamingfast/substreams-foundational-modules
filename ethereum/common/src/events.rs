@@ -50,7 +50,7 @@ fn index_events(events: Events) -> Result<Keys, Error> {
 
 #[substreams::handlers::map]
 fn filtered_events(query: String, mut events: Events) -> Result<Events, Error> {
-    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
+    let matcher = substreams::sqe::expr_matcher(&query);
 
     events.events.retain(|event| {
         let keys = evt_keys(event.log.as_ref().unwrap());

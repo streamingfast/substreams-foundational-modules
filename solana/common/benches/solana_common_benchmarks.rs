@@ -68,7 +68,7 @@ fn bench_transactions_by_programid(c: &mut Criterion) {
 
     c.bench_function("transactions_by_programid_without_votes", |b| {
         b.iter(|| {
-            let query = substreams::expr_matcher(black_box(query_str));
+            let query = substreams::sqe::expr_matcher(black_box(query_str));
             let mut transactions = block.transactions.clone();
 
             transactions.retain(|trx| {
@@ -88,7 +88,7 @@ fn bench_transactions_by_programid_and_account(c: &mut Criterion) {
 
     c.bench_function("transactions_by_programid_and_account", |b| {
         b.iter(|| {
-            let query = substreams::expr_matcher(black_box(query_str));
+            let query = substreams::sqe::expr_matcher(black_box(query_str));
             let mut transactions = block.transactions.clone();
 
             transactions.retain(|trx| {

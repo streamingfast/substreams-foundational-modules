@@ -75,7 +75,8 @@ fn main() {
     // Benchmark 3: Transaction filtering by program ID
     println!("\n3. Transaction filtering by program ID:");
     let stats_before = dhat::HeapStats::get();
-    let query = substreams::expr_matcher("program:whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc");
+    let query =
+        substreams::sqe::expr_matcher("program:whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc");
     let mut transactions = block.transactions.clone();
     transactions.retain(|trx| {
         trx.walk_instructions()

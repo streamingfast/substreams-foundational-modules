@@ -38,7 +38,7 @@ fn filtered_accounts(
     mut account_block: AccountBlock,
 ) -> Result<FilteredAccounts, substreams::errors::Error> {
     let mut accounts = account_block.accounts;
-    let expr_matcher = substreams::expr_matcher(&query);
+    let expr_matcher = substreams::sqe::expr_matcher(&query);
 
     let mut buf = [0u8; 44];
     accounts.retain(|account| {

@@ -73,7 +73,7 @@ fn index_events(events: EventList) -> Result<Keys, Error> {
 
 #[substreams::handlers::map]
 fn filtered_events(query: String, events: EventList) -> Result<EventList, Error> {
-    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
+    let matcher = substreams::sqe::expr_matcher(&query);
 
     let filtered: Vec<Event> = events
         .events
@@ -104,7 +104,7 @@ fn filtered_events(query: String, events: EventList) -> Result<EventList, Error>
 
 #[substreams::handlers::map]
 fn filtered_event_groups(query: String, events: EventList) -> Result<EventList, Error> {
-    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
+    let matcher = substreams::sqe::expr_matcher(&query);
 
     let matching_trx_hashes = events
         .events
@@ -145,7 +145,7 @@ fn filtered_events_by_attribute_value(
     query: String,
     events: EventList,
 ) -> Result<EventList, Error> {
-    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
+    let matcher = substreams::sqe::expr_matcher(&query);
 
     let filtered: Vec<Event> = events
         .events
@@ -180,7 +180,7 @@ fn filtered_event_groups_by_attribute_value(
     query: String,
     events: EventList,
 ) -> Result<EventList, Error> {
-    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
+    let matcher = substreams::sqe::expr_matcher(&query);
 
     let matching_trx_hashes = events
         .events
@@ -235,7 +235,8 @@ mod tests {
 
         // When
         let all_events = substreams::testing::map!(all_events(block)).unwrap();
-        let result = substreams::testing::map!(filtered_events("type:transfer".to_owned(), all_events));
+        let result =
+            substreams::testing::map!(filtered_events("type:transfer".to_owned(), all_events));
 
         // Expect
         let result_events = result.unwrap().events;
@@ -253,8 +254,10 @@ mod tests {
 
         // When
         let all_events = substreams::testing::map!(all_events(block)).unwrap();
-        let result =
-            substreams::testing::map!(filtered_event_groups("type:transfer".to_owned(), all_events));
+        let result = substreams::testing::map!(filtered_event_groups(
+            "type:transfer".to_owned(),
+            all_events
+        ));
 
         // Expect
         let result_events = result.unwrap().events;

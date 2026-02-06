@@ -40,7 +40,7 @@ fn filtered_events_and_calls(
     mut events: Events,
     mut calls: Calls,
 ) -> Result<EventsAndCalls, Error> {
-    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
+    let matcher = substreams::sqe::expr_matcher(&query);
 
     calls.calls.retain(|call| {
         let keys = call_keys(call.call.as_ref().unwrap());
@@ -77,7 +77,7 @@ fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Er
         calls.entry(k).or_default().push(call.call);
     });
 
-    let matcher = substreams::expr_matcher(&query);
+    let matcher = substreams::sqe::expr_matcher(&query);
 
     let filtered: Vec<Transaction> = block
         .transaction_traces
