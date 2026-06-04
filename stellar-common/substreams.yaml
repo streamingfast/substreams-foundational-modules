@@ -81,8 +81,7 @@ modules:
   - name: map_events
     kind: map
     inputs:
-      - params: string
-      - source: sf.stellar.type.v1.Block
+      - map: map_transactions
     output:
       type: proto:sf.substreams.stellar.type.v1.Events
 
