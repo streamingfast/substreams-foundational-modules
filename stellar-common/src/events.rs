@@ -1,47 +1,44 @@
-use stellar_xdr::curr::{
-    ContractEventBody, ContractEventType, ContractEventV0, ContractId, TransactionMeta,
+use std::io::Cursor;
+use stellar_xdr::{
+    ContractEvent as XdrContractEvent, ContractEventBody, ContractEventType, ContractEventV0,
+    ContractId, Limited, Limits, ReadXdr,
 };
 use substreams::Hex;
 
 use crate::{
     index::event_keys,
-    pb::sf::substreams::stellar::r#type::v1::{Event, Events, Transactions},
-    utils::decode_transaction_meta,
+    pb::sf::{
+        stellar::r#type::v1::Block,
+        substreams::stellar::r#type::v1::{Event, Events},
+    },
+    utils::transaction_failed,
 };
 
 #[substreams::handlers::map]
-fn map_events(transactions: Transactions) -> Result<Events, substreams::errors::Error> {
-    let contract_events = transactions
+fn map_events(block: Block) -> Result<Events, substreams::errors::Error> {
+    let contract_events = block
         .transactions
         .into_iter()
-        .filter_map(|transaction| {
-            let meta = match decode_transaction_meta(&transaction.result_meta_xdr) {
-                Ok(meta) => meta,
-                Err(e) => {
-                    substreams::log::info!("Skipping transaction: decode error: {}", e);
-                    return None;
-                }
-            };
-
-            match meta {
-                TransactionMeta::V3(v3) => v3.soroban_meta.map(|soroban_meta| soroban_meta.events),
-                _ => None,
-            }
-        })
+        .filter(|transaction| !transaction_failed(transaction.status))
+        .filter_map(|transaction| transaction.events)
         .flat_map(|events| {
             events
-                .iter()
-                .map(|event| {
-                    let body = match &event.body {
-                        ContractEventBody::V0(contract_event_v0) => contract_event_v0,
-                    };
-
-                    Event {
-                        contract_id: map_contract_id(&event.contract_id),
-                        r#type: map_event_type(event.type_),
-                        topics: map_event_topics(&body),
-                        data: map_event_data(&body),
-                    }
+                .contract_events_xdr
+                .into_iter()
+                .flat_map(|contract_event_group| {
+                    contract_event_group
+                        .events
+                        .into_iter()
+                        .filter_map(|event_bytes| {
+                            match decode_contract_event(&event_bytes) {
+                                Ok(event) => Some(event),
+                                Err(e) => {
+                                    substreams::log::info!("Skipping event: decode error: {}", e);
+                                    None
+                                }
+                            }
+                        })
+                        .collect::<Vec<Event>>()
                 })
                 .collect::<Vec<Event>>()
         })
@@ -49,6 +46,22 @@ fn map_events(transactions: Transactions) -> Result<Events, substreams::errors::
 
     Ok(Events {
         events: contract_events,
+    })
+}
+
+fn decode_contract_event(bytes: &[u8]) -> Result<Event, stellar_xdr::Error> {
+    let buf = Cursor::new(bytes);
+    let event = XdrContractEvent::read_xdr(&mut Limited::new(buf, Limits::none()))?;
+
+    let body = match &event.body {
+        ContractEventBody::V0(v0) => v0,
+    };
+
+    Ok(Event {
+        contract_id: map_contract_id(&event.contract_id),
+        r#type: map_event_type(event.type_),
+        topics: map_event_topics(body),
+        data: map_event_data(body),
     })
 }
 

@@ -43,8 +43,6 @@ pub struct Transaction {
     pub application_order: u64,
     #[prost(bytes="vec", tag="6")]
     pub envelope_xdr: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="7")]
-    pub result_meta_xdr: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="8")]
     pub result_xdr: ::prost::alloc::vec::Vec<u8>,
     #[prost(message, optional, tag="9")]

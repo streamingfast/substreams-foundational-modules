@@ -9,14 +9,13 @@ message Transactions {
 }
 
 message Transaction {
-  bytes hash = 1;
-  int32 status = 2;
-  google.protobuf.Timestamp created_at = 3;
-  uint64 application_order = 4;
-  bytes envelope_xdr = 5;
-  bytes result_meta_xdr = 6;
-  bytes result_xdr = 7;
-  uint64 block_number = 8;
+  bytes                     hash              = 1;
+  int32                     status            = 2;
+  google.protobuf.Timestamp created_at        = 3;
+  uint64                    application_order = 4;
+  bytes                     envelope_xdr      = 5;
+  bytes                     result_xdr        = 7;
+  uint64                    block_number      = 8;
 }
 
 message Operations {
@@ -25,178 +24,178 @@ message Operations {
 
 message Operation {
   oneof op {
-    CreateAccount create_account = 1;
-    AccountMerge account_merge = 2;
-    Payment payment = 3;
-    CreateClaimableBalance create_claimable_balance = 4;
-    ClaimClaimableBalance claim_claimable_balance = 5;
-    Clawback clawback = 6;
-    ClawbackClaimableBalance clawback_claimable_balance = 7;
-    AllowTrust allow_trust = 8;
-    SetTrustLineFlags set_trust_line_flags = 9;
-    LiquidityPoolDeposit liquidity_pool_deposit = 10;
-    LiquidityPoolWithdraw liquidity_pool_withdraw = 11;
-    ManageBuyOffer manage_buy_offer = 12;
-    ManageSellOffer manage_sell_offer = 13;
-    CreatePassiveSellOffer create_passive_sell_offer = 14;
-    PathPaymentStrictSend path_payment_strict_send = 15;
+    CreateAccount            create_account              = 1;
+    AccountMerge             account_merge               = 2;
+    Payment                  payment                     = 3;
+    CreateClaimableBalance   create_claimable_balance    = 4;
+    ClaimClaimableBalance    claim_claimable_balance     = 5;
+    Clawback                 clawback                    = 6;
+    ClawbackClaimableBalance clawback_claimable_balance  = 7;
+    AllowTrust               allow_trust                 = 8;
+    SetTrustLineFlags        set_trust_line_flags        = 9;
+    LiquidityPoolDeposit     liquidity_pool_deposit      = 10;
+    LiquidityPoolWithdraw    liquidity_pool_withdraw     = 11;
+    ManageBuyOffer           manage_buy_offer            = 12;
+    ManageSellOffer          manage_sell_offer           = 13;
+    CreatePassiveSellOffer   create_passive_sell_offer   = 14;
+    PathPaymentStrictSend    path_payment_strict_send    = 15;
     PathPaymentStrictReceive path_payment_strict_receive = 16;
   }
 }
 
 message CreateAccount {
-  string trx_hash = 1;
-  uint64 ledger_sequence = 2;
-  string destination = 3;
-  int64 starting_balance = 5;
+  string trx_hash         = 1;
+  uint64 ledger_sequence  = 2;
+  string destination      = 3;
+  int64  starting_balance = 5;
 }
 
 message AccountMerge {
-  string trx_hash = 1;
+  string trx_hash        = 1;
   uint64 ledger_sequence = 2;
-  string account = 3;
-  int64 amount = 4;
+  string account         = 3;
+  int64  amount          = 4;
 }
 
 message Payment {
-  string trx_hash = 1;
+  string trx_hash        = 1;
   uint64 ledger_sequence = 2;
-  string destination = 3;
-  Asset asset = 4;
-  int64 amount = 5;
+  string destination     = 3;
+  Asset  asset           = 4;
+  int64  amount          = 5;
 }
 
 message CreateClaimableBalance {
-  string trx_hash = 1;
-  uint64 ledger_sequence = 2;
-  Asset asset = 3;
-  int64 amount = 4;
-  repeated string claimants = 5; // limited to 10 claimants
+  string          trx_hash        = 1;
+  uint64          ledger_sequence = 2;
+  Asset           asset           = 3;
+  int64           amount          = 4;
+  repeated string claimants       = 5; // limited to 10 claimants
 }
 
 message ClaimClaimableBalance {
-  string trx_hash = 1;
+  string trx_hash        = 1;
   uint64 ledger_sequence = 2;
-  string balance_id = 3;
+  string balance_id      = 3;
 }
 
 message Clawback {
-  string trx_hash = 1;
+  string trx_hash        = 1;
   uint64 ledger_sequence = 2;
-  Asset asset = 3;
-  string from = 4;
-  int64 amount = 5;
+  Asset  asset           = 3;
+  string from            = 4;
+  int64  amount          = 5;
 }
 
 message ClawbackClaimableBalance {
-  string trx_hash = 1;
+  string trx_hash        = 1;
   uint64 ledger_sequence = 2;
-  string balance_id = 3;
+  string balance_id      = 3;
 }
 
 message AllowTrust {
-  string trx_hash = 1;
+  string trx_hash        = 1;
   uint64 ledger_sequence = 2;
-  string trustor = 3;
-  string asset = 4;
-  uint32 authorize = 5;
+  string trustor         = 3;
+  string asset           = 4;
+  uint32 authorize       = 5;
 }
 
 message SetTrustLineFlags {
-  string trx_hash = 1;
+  string trx_hash        = 1;
   uint64 ledger_sequence = 2;
-  string trustor = 3;
-  Asset asset = 4;
-  uint32 clear_flags = 5;
-  uint32 set_flags = 6;
+  string trustor         = 3;
+  Asset  asset           = 4;
+  uint32 clear_flags     = 5;
+  uint32 set_flags       = 6;
 }
 
 message LiquidityPoolDeposit {
-  string trx_hash = 1;
-  uint64 ledger_sequence = 2;
+  string trx_hash          = 1;
+  uint64 ledger_sequence   = 2;
   string liquidity_pool_id = 3;
-  int64 max_amount_a = 4;
-  int64 max_amount_b = 5;
-  Price min_price = 6;
-  Price max_price = 7;
+  int64  max_amount_a      = 4;
+  int64  max_amount_b      = 5;
+  Price  min_price         = 6;
+  Price  max_price         = 7;
 }
 
 message LiquidityPoolWithdraw {
-  string trx_hash = 1;
-  uint64 ledger_sequence = 2;
+  string trx_hash          = 1;
+  uint64 ledger_sequence   = 2;
   string liquidity_pool_id = 3;
-  int64 amount = 4;
-  int64 min_amount_a = 5;
-  int64 min_amount_b = 6;
+  int64  amount            = 4;
+  int64  min_amount_a      = 5;
+  int64  min_amount_b      = 6;
 }
 
 message ManageBuyOffer {
-  string trx_hash = 1;
+  string trx_hash        = 1;
   uint64 ledger_sequence = 2;
-  Asset selling = 3;
-  Asset buying = 4;
-  int64 buy_amount = 5;
-  Price price = 6;
-  int64 offer_id = 7;
+  Asset  selling         = 3;
+  Asset  buying          = 4;
+  int64  buy_amount      = 5;
+  Price  price           = 6;
+  int64  offer_id        = 7;
 }
 
 message ManageSellOffer {
-  string trx_hash = 1;
+  string trx_hash        = 1;
   uint64 ledger_sequence = 2;
-  Asset selling = 3;
-  Asset buying = 4;
-  int64 amount = 5;
-  Price price = 6;
-  int64 offer_id = 7;
+  Asset  selling         = 3;
+  Asset  buying          = 4;
+  int64  amount          = 5;
+  Price  price           = 6;
+  int64  offer_id        = 7;
 }
 
 message CreatePassiveSellOffer {
-  string trx_hash = 1;
+  string trx_hash        = 1;
   uint64 ledger_sequence = 2;
-  Asset selling = 3;
-  Asset buying = 4;
-  int64 amount = 5;
-  Price price = 6;
+  Asset  selling         = 3;
+  Asset  buying          = 4;
+  int64  amount          = 5;
+  Price  price           = 6;
 }
 
 message PathPaymentStrictSend {
-  string trx_hash = 1;
-  uint64 ledger_sequence = 2;
-  Asset send_asset = 3;
-  int64 send_amount = 4;
-  string destination = 5;
-  Asset dest_asset = 6;
-  int64 dest_min = 7;
-  repeated Asset path = 8; // limited to 5 hops
+  string         trx_hash        = 1;
+  uint64         ledger_sequence = 2;
+  Asset          send_asset      = 3;
+  int64          send_amount     = 4;
+  string         destination     = 5;
+  Asset          dest_asset      = 6;
+  int64          dest_min        = 7;
+  repeated Asset path            = 8; // limited to 5 hops
 }
 
 message PathPaymentStrictReceive {
-  string trx_hash = 1;
-  uint64 ledger_sequence = 2;
-  Asset send_asset = 3;
-  int64 send_max = 4;
-  string destination = 5;
-  Asset dest_asset = 6;
-  int64 dest_amount = 7;
-  repeated Asset path = 8; // limited to 5 hops
+  string         trx_hash        = 1;
+  uint64         ledger_sequence = 2;
+  Asset          send_asset      = 3;
+  int64          send_max        = 4;
+  string         destination     = 5;
+  Asset          dest_asset      = 6;
+  int64          dest_amount     = 7;
+  repeated Asset path            = 8; // limited to 5 hops
 }
 
 message Asset {
   oneof asset {
-    string native = 1;
-    CreditAlphaNum4 credit_alpha_num4 = 2;
+    string           native             = 1;
+    CreditAlphaNum4  credit_alpha_num4  = 2;
     CreditAlphaNum12 credit_alpha_num12 = 3;
   }
 }
 
 message CreditAlphaNum4 {
   string asset_code = 1;
-  string issuer = 2;
+  string issuer     = 2;
 }
 
 message CreditAlphaNum12 {
   string asset_code = 1;
-  string issuer = 2;
+  string issuer     = 2;
 }
 
 message Price {
@@ -210,9 +209,8 @@ message Events {
 }
 
 message Event {
-  string type = 1;
+  string          type        = 1;
   optional string contract_id = 2;
-  repeated string topics = 3;
-  string data = 4;
+  repeated string topics      = 3;
+  string          data        = 4;
 }
-

@@ -1,7 +1,7 @@
 use core::panic;
 use std::io::Cursor;
-use stellar_xdr::curr::{
-    AccountMergeResult, Asset as StellarAsset, Limited, Limits, Price as StellarPrice, ReadXdr, Transaction, TransactionEnvelope, TransactionMeta, TransactionResult, TransactionResultResult
+use stellar_xdr::{
+    AccountMergeResult, Asset as StellarAsset, Limited, Limits, Price as StellarPrice, ReadXdr, Transaction, TransactionEnvelope, TransactionResult, TransactionResultResult
 };
 
 use crate::pb::sf::substreams::stellar::r#type::v1::{
@@ -35,24 +35,18 @@ pub fn decode_transaction(
     return Ok(trx_v1.tx);
 }
 
-pub fn decode_transaction_result(result_xdr: &Vec<u8>) -> Result<TransactionResult, stellar_xdr::curr::Error> {
+pub fn decode_transaction_result(result_xdr: &Vec<u8>) -> Result<TransactionResult, stellar_xdr::Error> {
     let buf = Cursor::new(result_xdr);
     let transaction_result = TransactionResult::read_xdr(&mut Limited::new(buf, Limits::none()));
     transaction_result
 }
 
-pub fn decode_transaction_meta(result_meta_xdr: &Vec<u8>) -> Result<TransactionMeta, stellar_xdr::curr::Error> {
-    let buf = Cursor::new(result_meta_xdr);
-    let transaction_meta = TransactionMeta::read_xdr(&mut Limited::new(buf, Limits::none()));
-    transaction_meta
-}
-
 pub fn decode_account_merge_result(transaction_result: &TransactionResult) -> Option<i64> {
     match &transaction_result.result {
-        stellar_xdr::curr::TransactionResultResult::TxSuccess(operation_results) => {
+        stellar_xdr::TransactionResultResult::TxSuccess(operation_results) => {
             for operation_result in operation_results.as_vec() {
-                if let stellar_xdr::curr::OperationResult::OpInner(
-                    stellar_xdr::curr::OperationResultTr::AccountMerge(account_merge_result),
+                if let stellar_xdr::OperationResult::OpInner(
+                    stellar_xdr::OperationResultTr::AccountMerge(account_merge_result),
                 ) = operation_result
                 {
                     if let AccountMergeResult::Success(value) = account_merge_result {
@@ -66,7 +60,7 @@ pub fn decode_account_merge_result(transaction_result: &TransactionResult) -> Op
     }
 }
 
-fn decode_transaction_envelope(envelope_xdr: &Vec<u8>) -> Result<TransactionEnvelope, stellar_xdr::curr::Error> {
+fn decode_transaction_envelope(envelope_xdr: &Vec<u8>) -> Result<TransactionEnvelope, stellar_xdr::Error> {
     let buf = Cursor::new(envelope_xdr);
     let transaction_envelope = TransactionEnvelope::read_xdr(&mut Limited::new(buf, Limits::none()));
     transaction_envelope

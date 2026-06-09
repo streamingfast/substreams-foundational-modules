@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use stellar_xdr::curr::Transaction;
+use stellar_xdr::Transaction;
 use substreams::pb::sf::substreams::index::v1::Keys;
 use serde_json::Value;
 
