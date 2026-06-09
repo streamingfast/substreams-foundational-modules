@@ -29,7 +29,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
             .iter()
             .for_each(|operation| match &operation.body {
                 // Create account: https://stellar.expert/explorer/testnet/tx/8191ad23e96b7426fd6692cd0cf402e85067ea2ce40c97c6a6562bfffe71a0b2
-                stellar_xdr::curr::OperationBody::CreateAccount(create_account_op) => {
+                stellar_xdr::OperationBody::CreateAccount(create_account_op) => {
                     operations.operations.push(Operation {
                         op: Some(Op::CreateAccount(CreateAccount {
                             trx_hash: hash.clone(),
@@ -40,7 +40,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                     });
                 }
                 // Merge Account: https://stellar.expert/explorer/testnet/tx/2bab87af23a13fbe40c363dd326767bb85b00692a3428906f080f2a2a80423c6
-                stellar_xdr::curr::OperationBody::AccountMerge(muxed_account) => {
+                stellar_xdr::OperationBody::AccountMerge(muxed_account) => {
                     let result_xdr = match utils::decode_transaction_result(&transaction.result_xdr)
                     {
                         Ok(result) => result,
@@ -60,7 +60,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         None => return,
                     }
                 }
-                stellar_xdr::curr::OperationBody::Payment(payment) => {
+                stellar_xdr::OperationBody::Payment(payment) => {
                     operations.operations.push(Operation {
                         op: Some(Op::Payment(Payment {
                             trx_hash: hash.clone(),
@@ -71,7 +71,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         })),
                     });
                 }
-                stellar_xdr::curr::OperationBody::CreateClaimableBalance(create_claim_balance) => {
+                stellar_xdr::OperationBody::CreateClaimableBalance(create_claim_balance) => {
                     operations.operations.push(Operation {
                         op: Some(Op::CreateClaimableBalance(CreateClaimableBalance {
                             trx_hash: hash.clone(),
@@ -82,7 +82,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                                 .claimants
                                 .iter()
                                 .flat_map(|claimant| match claimant {
-                                    stellar_xdr::curr::Claimant::ClaimantTypeV0(claimant_v0) => {
+                                    stellar_xdr::Claimant::ClaimantTypeV0(claimant_v0) => {
                                         Some(claimant_v0.destination.to_string())
                                     }
                                 })
@@ -90,7 +90,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         })),
                     });
                 }
-                stellar_xdr::curr::OperationBody::ClaimClaimableBalance(claim_claim_balance) => {
+                stellar_xdr::OperationBody::ClaimClaimableBalance(claim_claim_balance) => {
                     operations.operations.push(Operation {
                         op: Some(Op::ClaimClaimableBalance(ClaimClaimableBalance {
                             trx_hash: hash.clone(),
@@ -99,7 +99,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         })),
                     });
                 }
-                stellar_xdr::curr::OperationBody::Clawback(clawback) => {
+                stellar_xdr::OperationBody::Clawback(clawback) => {
                     operations.operations.push(Operation {
                         op: Some(Op::Clawback(Clawback {
                             trx_hash: hash.clone(),
@@ -110,7 +110,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         })),
                     });
                 }
-                stellar_xdr::curr::OperationBody::ClawbackClaimableBalance(
+                stellar_xdr::OperationBody::ClawbackClaimableBalance(
                     clawback_claimable_balance,
                 ) => {
                     operations.operations.push(Operation {
@@ -121,7 +121,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         })),
                     });
                 }
-                stellar_xdr::curr::OperationBody::AllowTrust(allow_trust) => {
+                stellar_xdr::OperationBody::AllowTrust(allow_trust) => {
                     operations.operations.push(Operation {
                         op: Some(Op::AllowTrust(AllowTrust {
                             trx_hash: hash.clone(),
@@ -132,7 +132,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         })),
                     });
                 }
-                stellar_xdr::curr::OperationBody::SetTrustLineFlags(set_trust_line_flags) => {
+                stellar_xdr::OperationBody::SetTrustLineFlags(set_trust_line_flags) => {
                     operations.operations.push(Operation {
                         op: Some(Op::SetTrustLineFlags(SetTrustLineFlags {
                             trx_hash: hash.clone(),
@@ -144,7 +144,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         })),
                     });
                 }
-                stellar_xdr::curr::OperationBody::LiquidityPoolDeposit(liquidity_pool_deposit) => {
+                stellar_xdr::OperationBody::LiquidityPoolDeposit(liquidity_pool_deposit) => {
                     operations.operations.push(Operation {
                         op: Some(Op::LiquidityPoolDeposit(LiquidityPoolDeposit {
                             trx_hash: hash.clone(),
@@ -160,7 +160,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         })),
                     });
                 }
-                stellar_xdr::curr::OperationBody::LiquidityPoolWithdraw(
+                stellar_xdr::OperationBody::LiquidityPoolWithdraw(
                     liquidity_pool_withdraw,
                 ) => {
                     operations.operations.push(Operation {
@@ -177,7 +177,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         })),
                     });
                 }
-                stellar_xdr::curr::OperationBody::ManageBuyOffer(manage_buy_offer) => {
+                stellar_xdr::OperationBody::ManageBuyOffer(manage_buy_offer) => {
                     operations.operations.push(Operation {
                         op: Some(Op::ManageBuyOffer(ManageBuyOffer {
                             trx_hash: hash.clone(),
@@ -190,7 +190,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         })),
                     });
                 }
-                stellar_xdr::curr::OperationBody::ManageSellOffer(manage_sell_offer) => {
+                stellar_xdr::OperationBody::ManageSellOffer(manage_sell_offer) => {
                     operations.operations.push(Operation {
                         op: Some(Op::ManageSellOffer(ManageSellOffer {
                             trx_hash: hash.clone(),
@@ -203,7 +203,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         })),
                     });
                 }
-                stellar_xdr::curr::OperationBody::CreatePassiveSellOffer(create_passive_sell) => {
+                stellar_xdr::OperationBody::CreatePassiveSellOffer(create_passive_sell) => {
                     operations.operations.push(Operation {
                         op: Some(Op::CreatePassiveSellOffer(CreatePassiveSellOffer {
                             trx_hash: hash.clone(),
@@ -215,7 +215,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         })),
                     });
                 }
-                stellar_xdr::curr::OperationBody::PathPaymentStrictSend(
+                stellar_xdr::OperationBody::PathPaymentStrictSend(
                     path_payment_strict_send,
                 ) => {
                     operations.operations.push(Operation {
@@ -239,7 +239,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         })),
                     });
                 }
-                stellar_xdr::curr::OperationBody::PathPaymentStrictReceive(
+                stellar_xdr::OperationBody::PathPaymentStrictReceive(
                     path_payment_strict_receive,
                 ) => {
                     operations.operations.push(Operation {

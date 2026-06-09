@@ -23,7 +23,6 @@ fn map_transactions(block: Block) -> Result<Transactions, substreams::errors::Er
                 created_at: transaction.created_at,
                 application_order: transaction.application_order,
                 envelope_xdr: transaction.envelope_xdr,
-                result_meta_xdr: transaction.result_meta_xdr,
                 result_xdr: transaction.result_xdr,
                 block_number: block.number,
             })

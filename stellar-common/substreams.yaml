@@ -12,7 +12,8 @@ protobuf:
   importPaths:
     - ./proto/sf/substreams/stellar/type/v1
   descriptorSets:
-    - localPath: ./descriptors/firehose-stellar.binpb
+    - module: buf.build/streamingfast/firehose-stellar
+      version: v1.0.6
   excludePaths:
     - google
     - sf/substreams/
@@ -81,7 +82,7 @@ modules:
   - name: map_events
     kind: map
     inputs:
-      - map: map_transactions
+      - source: sf.stellar.type.v1.Block
     output:
       type: proto:sf.substreams.stellar.type.v1.Events
 
