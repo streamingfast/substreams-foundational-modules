@@ -4,7 +4,7 @@ package:
   description: "Foundational module for Stellar, with stellar-xdr v25.0.0"
   image: ./stellar.png
   name: stellar_foundational
-  version: v0.5.0
+  version: v0.6.0
 
 protobuf:
   files:

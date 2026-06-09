@@ -7,3 +7,4 @@ replay.log
 build
 dist
 /.claude
+.worktrees/

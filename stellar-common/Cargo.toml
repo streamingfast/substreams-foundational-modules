@@ -1,6 +1,6 @@
 [package]
 name = "stellar-common"
-version = "0.4.0"
+version = "0.6.0"
 description = "Substreams showcasing the building blocks of Stellar"
 edition = "2021"
 repository = "https://github.com/streamingfast/substreams-foundational-modules/tree/develop/stellar-common#stellar-foundational-modules"
