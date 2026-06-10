@@ -4,24 +4,38 @@ package sf.substreams.stellar.type.v1;
 
 import "google/protobuf/timestamp.proto";
 
+// Transactions is a list of Transaction messages extracted from a single Stellar ledger (block).
 message Transactions {
   repeated Transaction transactions = 1;
 }
 
+// Transaction represents a single Stellar transaction from a successfully processed ledger.
+// Failed transactions are excluded.
 message Transaction {
+  // Raw transaction hash bytes.
   bytes                     hash              = 1;
+  // Transaction status from sf.stellar.type.v1.TransactionStatus: 0=UNKNOWN, 1=SUCCESS, 2=FAILED.
+  // Only SUCCESS (1) transactions are present in this output.
   int32                     status            = 2;
+  // Timestamp of the ledger that included this transaction.
   google.protobuf.Timestamp created_at        = 3;
+  // Position of this transaction within the ledger (1-based).
   uint64                    application_order = 4;
+  // Raw XDR-encoded transaction envelope bytes.
   bytes                     envelope_xdr      = 5;
+  // Raw XDR-encoded transaction result bytes.
   bytes                     result_xdr        = 7;
+  // Ledger sequence number (block number) that included this transaction.
   uint64                    block_number      = 8;
 }
 
+// Operations is a list of Operation messages extracted from a single Stellar ledger (block).
 message Operations {
   repeated Operation operations = 1;
 }
 
+// Operation represents a single Stellar operation decoded from a transaction.
+// Only a subset of operation types are supported; see the oneof variants below.
 message Operation {
   oneof op {
     CreateAccount            create_account              = 1;
@@ -203,14 +217,22 @@ message Price {
   int32 d = 2;
 }
 
-// Events
+// Events is a list of Event messages extracted from a single Stellar ledger (block).
 message Events {
   repeated Event events = 1;
 }
 
+// Event represents a single Soroban contract event emitted during transaction execution.
+// Failed transactions are excluded.
 message Event {
+  // Event type: one of "Contract", "System", or "Diagnostic".
   string          type        = 1;
+  // Hex-encoded contract ID that emitted the event. Absent for system/diagnostic events.
   optional string contract_id = 2;
+  // Event topics as JSON strings. Each element is the JSON representation of an XDR ScVal,
+  // e.g. `{"symbol":"transfer"}` or `{"address":"G..."}`.
   repeated string topics      = 3;
+  // Event data as a JSON string — the JSON representation of the XDR ScVal event payload,
+  // e.g. `{"i128":{"hi":0,"lo":1000000}}`.
   string          data        = 4;
 }
