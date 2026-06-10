@@ -1,10 +1,10 @@
 specVersion: v0.1.0
 package:
   url: https://github.com/streamingfast/substreams-foundational-modules/stellar-common
-  description: "Foundational module for Stellar, with stellar-xdr v25.0.0"
+  description: "Foundational module for Stellar, with stellar-xdr v27.0.0"
   image: ./stellar.png
   name: stellar_foundational
-  version: v0.6.0
+  version: v0.6.1
 
 protobuf:
   files:

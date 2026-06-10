@@ -4,6 +4,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). See [MAINTAINERS.md](./MAINTAINERS.md)
 for instructions to keep up to date.
 
+## v0.6.1
+
+### Fixed
+
+- Fix Substreams package description noting that `stellar-xdr` is now at `27.0`.
+
 ## v0.6.0
 
 ### Fixed
