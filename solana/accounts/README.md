@@ -9,7 +9,8 @@ This package allows filtered access to a stream of account changes based on the 
 
 ## Example response:
 
-note: the response is in bytes, we represented the address and owner in base54 and the data in hex for the sake of clarity.
+> [!NOTE]
+> The underlying Protobuf model is in bytes, the answer getting out of developer tools like `substreams run/gui` shows addresses in base58 and the data in hex for easier interpretation.
 
 ```
 [
