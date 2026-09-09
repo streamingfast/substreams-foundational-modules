@@ -19,8 +19,8 @@ fn map_events(block: Block) -> Result<Events, substreams::errors::Error> {
     let contract_events = block
         .transactions
         .into_iter()
-        .filter(|transaction| !transaction_failed(transaction.status))
-        .filter_map(|transaction| transaction.events)
+        .filter(|transaction| !transaction_failed(transaction.status.to_i32()))
+        .filter_map(|transaction| transaction.events.into_option())
         .flat_map(|events| {
             events
                 .contract_events_xdr

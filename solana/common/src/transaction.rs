@@ -89,8 +89,8 @@ mod tests {
         result.transactions.into_iter().for_each(|transaction| {
             let mut matched = true;
 
-            if let Some(tx) = transaction.transaction.as_ref() {
-                if let Some(msg) = tx.message.as_ref() {
+            if let Some(tx) = transaction.transaction.as_option() {
+                if let Some(msg) = tx.message.as_option() {
                     if !msg.account_keys.iter().any(|acct| {
                         base58::encode(acct) == "5qrvgpvr55Eo7c5bBcwopdiQ6TpvceiRm42yjHTbtDvc"
                     }) {
@@ -154,8 +154,8 @@ mod tests {
                     matched = false;
                 }
 
-                if let Some(tx) = transaction.transaction.as_ref() {
-                    if let Some(msg) = tx.message.as_ref() {
+                if let Some(tx) = transaction.transaction.as_option() {
+                    if let Some(msg) = tx.message.as_option() {
                         if !msg
                             .account_keys
                             .iter()

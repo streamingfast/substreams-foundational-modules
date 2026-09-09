@@ -4,12 +4,12 @@ use anyhow::Ok;
 use substreams::errors::Error;
 use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
-use substreams_ethereum::pb::eth::v2::Block;
+use substreams_ethereum::pb::eth::v2::{Block, TransactionTraceStatus};
 
 #[substreams::handlers::map]
 fn all_events(blk: Block) -> Result<Events, Error> {
     let clock = Clock {
-        timestamp: Some(blk.header.unwrap().timestamp.unwrap()),
+        timestamp: blk.header.timestamp.clone(),
         id: Hex::encode(&blk.hash),
         number: blk.number,
     };
@@ -17,19 +17,19 @@ fn all_events(blk: Block) -> Result<Events, Error> {
     let events: Vec<Event> = blk
         .transaction_traces
         .into_iter()
-        .filter(|tx| tx.status == 1)
-        .map(|tx| (tx.receipt.unwrap_or_default().logs, tx.hash))
+        .filter(|tx| tx.status == TransactionTraceStatus::Succeeded)
+        .map(|tx| (tx.receipt.into_option().unwrap_or_default().logs, tx.hash))
         .flat_map(|(log, hash)| {
             log.into_iter().map(move |l| Event {
                 tx_hash: Hex::encode(&hash),
-                log: Some(l),
+                log: l.into(),
             })
         })
         .collect();
 
     Ok(Events {
         events: events,
-        clock: Some(clock),
+        clock: clock.into(),
     })
 }
 
@@ -38,7 +38,7 @@ fn index_events(events: Events) -> Result<Keys, Error> {
     let mut keys = Keys::default();
 
     events.events.into_iter().for_each(|e| {
-        if let Some(log) = e.log {
+        if let Some(log) = e.log.as_option() {
             evt_keys(&log).into_iter().for_each(|k| {
                 keys.keys.push(k);
             });
@@ -53,7 +53,7 @@ fn filtered_events(query: String, mut events: Events) -> Result<Events, Error> {
     let matcher = substreams::sqe::expr_matcher(&query);
 
     events.events.retain(|event| {
-        let keys = evt_keys(event.log.as_ref().unwrap());
+        let keys = evt_keys(&event.log);
         let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
 
         matcher.matches_keys(&keys)
@@ -96,7 +96,7 @@ pub mod tests {
         // Expect
         assert!(result.events.len() > 0);
         result.events.iter().for_each(|e| {
-            let address: &Vec<u8> = &e.log.as_ref().unwrap().address;
+            let address: &Vec<u8> = &e.log.address;
 
             assert_eq!(
                 Hex::encode(address),

@@ -78,16 +78,16 @@ pub fn create_asset(asset: &StellarAsset) -> Asset {
             out_asset.asset = Some(EnumAsset::Native("XLM".to_string()));
         }
         StellarAsset::CreditAlphanum4(credit) => {
-            out_asset.asset = Some(EnumAsset::CreditAlphaNum4(CreditAlphaNum4 {
+            out_asset.asset = Some(EnumAsset::CreditAlphaNum4(Box::new(CreditAlphaNum4 {
                 asset_code: credit.asset_code.to_string(),
                 issuer: credit.issuer.0.to_string(),
-            }));
+            })));
         }
         StellarAsset::CreditAlphanum12(credit) => {
-            out_asset.asset = Some(EnumAsset::CreditAlphaNum12(CreditAlphaNum12 {
+            out_asset.asset = Some(EnumAsset::CreditAlphaNum12(Box::new(CreditAlphaNum12 {
                 asset_code: credit.asset_code.to_string(),
                 issuer: credit.issuer.0.to_string(),
-            }));
+            })));
         }
     }
 

@@ -1,5 +1,5 @@
 use substreams::errors::Error;
-use crate::pb::sf::substreams::v1::Clock;
+use substreams::pb::sf::substreams::Clock;
 
 #[substreams::handlers::map]
 pub fn map_clocks(clock: Clock) -> Result<Clock, Error> {

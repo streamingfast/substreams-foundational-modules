@@ -4,12 +4,12 @@ use anyhow::Ok;
 use substreams::errors::Error;
 use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
-use substreams_ethereum::pb::eth::v2::Block;
+use substreams_ethereum::pb::eth::v2::{Block, TransactionTraceStatus};
 
 #[substreams::handlers::map]
 fn all_calls(blk: Block) -> Result<Calls, Error> {
     let clock = Clock {
-        timestamp: Some(blk.header.unwrap().timestamp.unwrap()),
+        timestamp: blk.header.timestamp.clone(),
         id: Hex::encode(&blk.hash),
         number: blk.number,
     };
@@ -17,19 +17,19 @@ fn all_calls(blk: Block) -> Result<Calls, Error> {
     let calls: Vec<Call> = blk
         .transaction_traces
         .into_iter()
-        .filter(|tx| tx.status == 1)
+        .filter(|tx| tx.status == TransactionTraceStatus::Succeeded)
         .map(|tx| (tx.calls, tx.hash))
         .flat_map(|(call, hash)| {
             call.into_iter().map(move |c| Call {
                 tx_hash: Hex::encode(&hash),
-                call: Some(c),
+                call: c.into(),
             })
         })
         .collect();
 
     Ok(Calls {
         calls: calls,
-        clock: Some(clock),
+        clock: clock.into(),
     })
 }
 
@@ -38,7 +38,7 @@ fn index_calls(calls: Calls) -> Result<Keys, Error> {
     let mut keys = Keys::default();
 
     calls.calls.into_iter().for_each(|call| {
-        if let Some(call) = &call.call {
+        if let Some(call) = call.call.as_option() {
             call_keys(call).into_iter().for_each(|k| {
                 keys.keys.push(k);
             });
@@ -52,7 +52,7 @@ fn filtered_calls(query: String, mut calls: Calls) -> Result<Calls, Error> {
     let matcher = substreams::sqe::expr_matcher(&query);
 
     calls.calls.retain(|call| {
-        let keys = call_keys(call.call.as_ref().unwrap());
+        let keys = call_keys(&call.call);
         let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
 
         matcher.matches_keys(&keys)
@@ -110,7 +110,7 @@ pub mod tests {
 
         // Expect
         result.calls.iter().for_each(|c| {
-            let caller = &c.call.as_ref().unwrap().caller;
+            let caller = &c.call.caller;
 
             assert_eq!(
                 Hex::encode(&caller),

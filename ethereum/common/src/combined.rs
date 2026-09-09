@@ -9,6 +9,7 @@ use std::collections::HashMap;
 use substreams::errors::Error;
 use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
+use substreams_ethereum::pb::eth::v2::TransactionTraceStatus;
 use substreams_ethereum::pb::eth::v2::{Block, Call as ethCall, Log};
 
 #[substreams::handlers::map]
@@ -16,7 +17,7 @@ fn index_events_and_calls(events: Events, calls: Calls) -> Result<Keys, Error> {
     let mut keys = Keys::default();
 
     events.events.into_iter().for_each(|e| {
-        if let Some(log) = e.log {
+        if let Some(log) = e.log.as_option() {
             evt_keys(&log).into_iter().for_each(|k| {
                 keys.keys.push(k);
             });
@@ -24,7 +25,7 @@ fn index_events_and_calls(events: Events, calls: Calls) -> Result<Keys, Error> {
     });
 
     calls.calls.into_iter().for_each(|call| {
-        if let Some(call) = &call.call {
+        if let Some(call) = call.call.as_option() {
             call_keys(call).into_iter().for_each(|k| {
                 keys.keys.push(k);
             });
@@ -43,14 +44,14 @@ fn filtered_events_and_calls(
     let matcher = substreams::sqe::expr_matcher(&query);
 
     calls.calls.retain(|call| {
-        let keys = call_keys(call.call.as_ref().unwrap());
+        let keys = call_keys(&call.call);
         let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
 
         matcher.matches_keys(&keys)
     });
 
     events.events.retain(|event| {
-        let keys = evt_keys(event.log.as_ref().unwrap());
+        let keys = evt_keys(&event.log);
         let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
 
         matcher.matches_keys(&keys)
@@ -82,7 +83,7 @@ fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Er
     let filtered: Vec<Transaction> = block
         .transaction_traces
         .iter()
-        .filter(|tx| tx.status == 1)
+        .filter(|tx| tx.status == TransactionTraceStatus::Succeeded)
         .filter(|tt| {
             let mut matched = false;
             let hash = Hex::encode(&tt.hash);
@@ -114,22 +115,22 @@ fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Er
         .map(|tt| {
             let hash = Hex::encode(&tt.hash);
             Transaction {
-                trace: Some(tt.to_owned()),
+                trace: tt.to_owned().into(),
                 tx_hash: hash,
             }
         })
         .collect();
 
-    let clock = Some(Clock {
-        timestamp: Some(block.header.unwrap().timestamp.unwrap()),
+    let clock = Clock {
+        timestamp: block.header.timestamp.clone(),
         id: Hex::encode(&block.hash),
         number: block.number,
-    });
+    };
 
     Ok(Transactions {
         transactions: filtered,
-        clock: clock,
-        detail_level: block.detail_level,
+        clock: clock.into(),
+        detail_level: block.detail_level.to_i32().into(),
     })
 }
 
@@ -155,7 +156,7 @@ pub mod tests {
         // Expect
         assert!(result.events.len() > 0);
         result.events.iter().for_each(|e| {
-            let address: &Vec<u8> = &e.log.as_ref().unwrap().address;
+            let address: &Vec<u8> = &e.log.address;
 
             assert_eq!(
                 Hex::encode(address),
@@ -164,7 +165,7 @@ pub mod tests {
         });
 
         result.calls.iter().for_each(|c| {
-            let input_bytes = &c.call.as_ref().unwrap().input;
+            let input_bytes = &c.call.input;
 
             assert_eq!(Hex::encode(&input_bytes[..4]), "029b2f34");
         });
@@ -193,7 +194,7 @@ pub mod tests {
                 t.tx_hash == "0x1fa0d8efe5b3eececcb77df26075312f55355ce924d9a7f39362defb5d8fc424"
             })
             .for_each(|t| {
-                t.trace.unwrap().logs_with_calls().for_each(|lc| {
+                t.trace.logs_with_calls().for_each(|lc| {
                     let input_bytes = &lc.1.as_ref().input;
 
                     assert_eq!(

@@ -13,8 +13,9 @@ categories.workspace = true
 crate-type = ["cdylib"]
 
 [dependencies]
-prost-types = { workspace = true }
-prost = { workspace = true }
+buffa = { workspace = true }
+buffa-types = { workspace = true }
+buffa-descriptor = { workspace = true }
 substreams = { workspace = true }
-substreams-ethereum = "0.11.1"
+substreams-ethereum = { workspace = true }
 substreams-abis = "0.7.2"

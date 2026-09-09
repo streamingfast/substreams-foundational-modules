@@ -6,8 +6,8 @@ use substreams_solana::{base58, pb::sf::solana::r#type::v1::ConfirmedTransaction
 pub fn transaction_program_and_account_keys(
     trx: &ConfirmedTransaction,
 ) -> impl Iterator<Item = String> + '_ {
-    let meta = trx.meta.as_ref().unwrap();
-    let message = trx.transaction.as_ref().unwrap().message.as_ref().unwrap();
+    let meta = &trx.meta;
+    let message = &trx.transaction.message;
 
     message
         .account_keys
@@ -33,8 +33,8 @@ pub fn transaction_program_and_account_keys(
 /// Optimized version that collects keys into a pre-allocated vector
 /// to reduce allocations in hot paths
 pub(crate) fn transaction_program_and_account_keys_vec(trx: &ConfirmedTransaction) -> Vec<String> {
-    let meta = trx.meta.as_ref().unwrap();
-    let message = trx.transaction.as_ref().unwrap().message.as_ref().unwrap();
+    let meta = &trx.meta;
+    let message = &trx.transaction.message;
 
     // Pre-calculate capacity to avoid reallocations
     let account_count = message.account_keys.len()
@@ -89,8 +89,8 @@ mod tests {
         let mut result = transaction_program_and_account_keys(confirmed_transaction);
 
         // Expected
-        if let Some(tx) = confirmed_transaction.transaction.as_ref() {
-            if let Some(msg) = tx.message.as_ref() {
+        if let Some(tx) = confirmed_transaction.transaction.as_option() {
+            if let Some(msg) = tx.message.as_option() {
                 msg.account_keys.iter().for_each(|acct| {
                     assert_eq!(
                         result.any(|index| index == format!("account:{}", base58::encode(acct))),

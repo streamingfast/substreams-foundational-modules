@@ -1,11 +1,10 @@
-#[allow(dead_code)]
+#[allow(dead_code, unused_imports)]
 mod pb;
 mod rpc;
 
+use buffa_types::google::protobuf::Any;
 use pb::evm::erc20::metadata::v1 as original;
 use pb::sf::substreams::ethereum::erc20::v1::TokenMetadata;
-use prost::Message;
-use prost_types::Any;
 use substreams::pb::sf::substreams::foundational_store::model::v2::{Entry, Key, SinkEntries};
 
 #[substreams::handlers::map]
@@ -23,20 +22,17 @@ fn metadata_to_foundational_store(
             decimals: init.decimals,
         };
 
-        let mut buf = Vec::new();
-        Message::encode(&token_metadata, &mut buf).unwrap();
-
-        let any = Any {
-            type_url: "type.googleapis.com/sf.substreams.ethereum.erc20.v1.TokenMetadata"
-                .to_string(),
-            value: buf,
-        };
+        let any = Any::pack(
+            &token_metadata,
+            "type.googleapis.com/sf.substreams.ethereum.erc20.v1.TokenMetadata",
+        );
 
         let entry = Entry {
-            key: Some(Key {
+            key: Key {
                 bytes: init.address,
-            }),
-            value: Some(any),
+            }
+            .into(),
+            value: any.into(),
         };
 
         entries.push(entry);
@@ -73,20 +69,18 @@ fn metadata_to_foundational_store(
                 decimals: decimals_val,
             };
 
-            let mut buf = Vec::new();
-            Message::encode(&token_metadata, &mut buf).unwrap();
-
-            let any = Any {
-                type_url: "type.googleapis.com/evm.token.metadata.v1.TokenMetadata".to_string(),
-                value: buf,
-            };
+            let any = Any::pack(
+                &token_metadata,
+                "type.googleapis.com/evm.token.metadata.v1.TokenMetadata",
+            );
 
             let entry = Entry {
-                key: Some(Key {
+                key: Key {
                     bytes: address_bytes.clone(),
-                }),
+                }
+                .into(),
 
-                value: Some(any),
+                value: any.into(),
             };
 
             entries.push(entry);

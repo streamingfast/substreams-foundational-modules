@@ -1,4 +1,4 @@
-#[allow(dead_code)]
+#[allow(dead_code, unused_imports)]
 mod pb;
 
 use std::collections::HashMap;
@@ -23,7 +23,7 @@ pub fn all_events(block: Block) -> Result<EventList, Error> {
     // block events are the combination of BeginBlockEvents and EndBlockEvents
     events.extend(block.events.into_iter().map(|event| {
         return Event {
-            event: Some(event),
+            event: event.into(),
             transaction_hash: "".to_string(),
         };
     }));
@@ -36,7 +36,7 @@ pub fn all_events(block: Block) -> Result<EventList, Error> {
             .into_iter()
             .map(|event| {
                 return Event {
-                    event: Some(event),
+                    event: event.into(),
                     transaction_hash: tx_hash.clone(),
                 };
             })
@@ -47,11 +47,12 @@ pub fn all_events(block: Block) -> Result<EventList, Error> {
 
     Ok(EventList {
         events: events,
-        clock: Some(Clock {
+        clock: Clock {
             id: hex::encode(block.hash),
             number: block.height as u64,
             timestamp: block.time,
-        }),
+        }
+        .into(),
     })
 }
 
@@ -60,7 +61,7 @@ fn index_events(events: EventList) -> Result<Keys, Error> {
     let mut keys = Keys::default();
 
     events.events.into_iter().for_each(|e| {
-        if let Some(ev) = e.event {
+        if let Some(ev) = e.event.into_option() {
             keys.keys.push(format!("type:{}", ev.r#type));
             ev.attributes.into_iter().for_each(|attr| {
                 keys.keys.push(format!("attr:{}", attr.key));
@@ -79,7 +80,7 @@ fn filtered_events(query: String, events: EventList) -> Result<EventList, Error>
         .events
         .into_iter()
         .filter(|e| {
-            if let Some(ev) = &e.event {
+            if let Some(ev) = e.event.as_option() {
                 let mut keys = Vec::new();
                 keys.push(format!("type:{}", ev.r#type.clone()));
                 ev.attributes.iter().for_each(|attr| {
@@ -110,7 +111,7 @@ fn filtered_event_groups(query: String, events: EventList) -> Result<EventList, 
         .events
         .iter()
         .filter(|e| {
-            if let Some(ev) = &e.event {
+            if let Some(ev) = e.event.as_option() {
                 let mut keys = Vec::new();
                 keys.push(format!("type:{}", ev.r#type.clone()));
                 ev.attributes.iter().for_each(|attr| {
@@ -151,7 +152,7 @@ fn filtered_events_by_attribute_value(
         .events
         .into_iter()
         .filter(|e| {
-            if let Some(ev) = &e.event {
+            if let Some(ev) = e.event.as_option() {
                 let mut keys = Vec::new();
                 keys.push(format!("type:{}", ev.r#type.clone()));
                 ev.attributes.iter().for_each(|attr| {
@@ -186,7 +187,7 @@ fn filtered_event_groups_by_attribute_value(
         .events
         .iter()
         .filter(|e| {
-            if let Some(ev) = &e.event {
+            if let Some(ev) = e.event.as_option() {
                 let mut keys = Vec::new();
                 keys.push(format!("type:{}", ev.r#type.clone()));
                 ev.attributes.iter().for_each(|attr| {
@@ -244,7 +245,7 @@ mod tests {
         assert!(result_events.len() > 0);
         result_events
             .iter()
-            .for_each(|event| assert_eq!(event.event.as_ref().unwrap().r#type, "transfer"));
+            .for_each(|event| assert_eq!(event.event.r#type, "transfer"));
     }
 
     #[test]
@@ -264,7 +265,7 @@ mod tests {
 
         assert!(result_events.len() > 0);
         result_events.iter().for_each(|event| {
-            let inner_event = event.event.as_ref().unwrap();
+            let inner_event = &event.event;
 
             if inner_event.r#type == "transfer" {
                 assert_eq!(
@@ -295,7 +296,7 @@ mod tests {
 
         assert!(result_events.len() > 0);
         result_events.iter().for_each(|event| {
-            let inner_event = event.event.as_ref().unwrap();
+            let inner_event = &event.event;
 
             assert_eq!(inner_event.r#type, "transfer");
             assert_eq!(
@@ -326,7 +327,7 @@ mod tests {
 
         assert!(result_events.len() > 0);
         result_events.iter().for_each(|event| {
-            let inner_event = event.event.as_ref().unwrap();
+            let inner_event = &event.event;
 
             if inner_event.r#type == "transfer" {
                 assert_eq!(

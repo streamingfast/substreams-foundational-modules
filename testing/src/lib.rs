@@ -1,7 +1,7 @@
 use std::fs;
 
 use base64::{prelude::BASE64_STANDARD, Engine};
-use prost::Message;
+use buffa::Message;
 
 pub fn read_block<B: Message + Default>(filename: &str) -> B {
     let encoded = fs::read_to_string(filename).expect("Failed to read file");
@@ -9,5 +9,5 @@ pub fn read_block<B: Message + Default>(filename: &str) -> B {
         .decode(&encoded)
         .expect("Failed to decode base64");
 
-    B::decode(&*raw_bytes).expect("Not able to decode Block")
+    B::decode_from_slice(&raw_bytes).expect("Not able to decode Block")
 }

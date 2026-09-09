@@ -29,7 +29,7 @@ fn criterion_benchmark(c: &mut Criterion) {
 
         for count in [100, 200, 400, 800, 1600, 3200, 6400, 12800].iter() {
             let calls = create_calls(*count, &FROM_ADDRESSES, &TO_ADDRESSES);
-            let mut calls_buffer = prost::Message::encode_to_vec(&calls);
+            let mut calls_buffer = buffa::Message::encode_to_vec(&calls);
             let calls_ptr = calls_buffer.as_mut_ptr();
             let calls_len = calls_buffer.len();
 
@@ -48,18 +48,19 @@ fn criterion_benchmark(c: &mut Criterion) {
 fn create_calls(n: usize, from_addresses: &[[u8; 20]], to_addresses: &[[u8; 20]]) -> Calls {
     let mut calls = Calls {
         calls: Vec::with_capacity(n),
-        clock: Some(ethereum_common::pb::sf::substreams::v1::Clock {
-            timestamp: Some(prost_types::Timestamp::default()),
+        clock: ethereum_common::pb::sf::substreams::v1::Clock {
+            timestamp: buffa_types::google::protobuf::Timestamp::default().into(),
             id: "0x".to_string(),
             number: 0,
-        }),
+        }
+        .into(),
     };
 
     for _ in 0..n {
         calls
             .calls
             .push(ethereum_common::pb::sf::substreams::ethereum::v1::Call {
-                call: Some(::substreams_ethereum::pb::eth::v2::Call {
+                call: ::substreams_ethereum::pb::eth::v2::Call {
                     caller: from_addresses[n % from_addresses.len()].to_vec(),
                     address: to_addresses[n % to_addresses.len()].to_vec(),
                     input: hex!("").to_vec(),
@@ -67,7 +68,8 @@ fn create_calls(n: usize, from_addresses: &[[u8; 20]], to_addresses: &[[u8; 20]]
                     balance_changes: balance_changes(5),
                     gas_changes: gas_changes(15),
                     ..Default::default()
-                }),
+                }
+                .into(),
                 tx_hash: "0x".to_string(),
             });
     }
@@ -99,7 +101,8 @@ fn gas_changes(n: usize) -> Vec<::substreams_ethereum::pb::eth::v2::GasChange> {
         gas_changes.push(::substreams_ethereum::pb::eth::v2::GasChange {
             old_value: 10291212,
             new_value: 291212,
-            reason: 10,
+            reason: ::substreams_ethereum::pb::eth::v2::gas_change::Reason::REASON_EXT_CODE_COPY
+                .into(),
             ordinal: 0,
         });
     }
@@ -113,12 +116,14 @@ fn balance_changes(n: usize) -> Vec<::substreams_ethereum::pb::eth::v2::BalanceC
     for _ in 0..n {
         balance_changes.push(::substreams_ethereum::pb::eth::v2::BalanceChange {
             address: hex!("720cd16b011b987da3518fbf38c3071d4f0d1495").to_vec(),
-            old_value: Some(BigInt {
+            old_value: BigInt {
                 bytes: hex!("0de0b6b3a7640000").to_vec(),
-            }),
-            new_value: Some(BigInt {
+            }
+            .into(),
+            new_value: BigInt {
                 bytes: hex!("12b3a7640000").to_vec(),
-            }),
+            }
+            .into(),
             ..Default::default()
         });
     }

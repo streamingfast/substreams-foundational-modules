@@ -12,12 +12,12 @@ fn map_transactions(clock: Clock, block: Block) -> Result<Transactions, substrea
     let transactions: Vec<Transaction> = block
         .transactions
         .into_iter()
-        .filter(|tx| !utils::transaction_failed(tx.code))
+        .filter(|tx| !utils::transaction_failed(tx.code.to_i32()))
         .collect();
 
     Ok(Transactions {
         transactions,
-        clock: Some(clock),
+        clock: clock.into(),
     })
 }
 

@@ -6,19 +6,14 @@ static VOTE_INSTRUCTION: [u8; 32] = b58!("Vote1111111111111111111111111111111111
 #[substreams::handlers::map]
 fn blocks_without_votes(mut block: Block) -> Result<Block, substreams::errors::Error> {
     block.transactions.retain(|trx| {
-        let meta = match trx.meta.as_ref() {
-            Some(meta) => meta,
-            None => return false,
-        };
-        if meta.err.is_some() {
+        if trx.meta.is_unset() || trx.transaction.is_unset() || trx.transaction.message.is_unset() {
+            return false;
+        }
+        if trx.meta.err.is_set() {
             return false;
         }
 
-        let transaction = match trx.transaction.as_ref() {
-            Some(transaction) => transaction,
-            None => return false,
-        };
-        let message = transaction.message.as_ref().expect("Message is missing");
+        let message = &trx.transaction.message;
 
         // Retain only transactions that do **not** contain a vote instruction
         !message.account_keys.iter().any(|v| v == &VOTE_INSTRUCTION)
@@ -36,7 +31,8 @@ mod tests {
         let block = testing::read_block("./src/testdata/solana_mainnet_313000000.binpb.base64");
 
         // When
-        let result = substreams::testing::map!(blocks_without_votes(block)).expect("Failed to execute function");
+        let result = substreams::testing::map!(blocks_without_votes(block))
+            .expect("Failed to execute function");
 
         // Expect
         result.transactions().for_each(|t| {
