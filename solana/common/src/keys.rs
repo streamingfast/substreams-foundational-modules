@@ -1,3 +1,4 @@
+use substreams_solana::block_view::lazy::LazyTransaction;
 use substreams_solana::{base58, pb::sf::solana::r#type::v1::ConfirmedTransaction};
 
 /// transaction_program_and_account_keys returns an iterator of keys extracted from a transaction. It will
@@ -33,32 +34,15 @@ pub fn transaction_program_and_account_keys(
         }))
 }
 
-/// Optimized version that collects keys into a pre-allocated vector
-/// to reduce allocations in hot paths.
-///
-/// Yields no keys for a transaction with no meta, transaction or message, as above.
-pub(crate) fn transaction_program_and_account_keys_vec(trx: &ConfirmedTransaction) -> Vec<String> {
-    let meta = &trx.meta;
-    let message = &trx.transaction.message;
+/// The lazy counterpart of [`transaction_program_and_account_keys`], collecting
+/// the same keys in the same order.
+pub(crate) fn lazy_transaction_program_and_account_keys_vec(trx: &LazyTransaction<'_>) -> Vec<String> {
+    let resolved = trx.resolved_accounts();
 
-    // Pre-calculate capacity to avoid reallocations
-    let account_count = message.account_keys.len()
-        + meta.loaded_writable_addresses.len()
-        + meta.loaded_readonly_addresses.len();
-
-    // Estimate instruction count (most transactions have 1-10 instructions)
     let estimated_instruction_count = 10;
-    let estimated_capacity = account_count + estimated_instruction_count;
+    let mut keys = Vec::with_capacity(resolved.len() + estimated_instruction_count);
 
-    let mut keys = Vec::with_capacity(estimated_capacity);
-
-    // Process all account keys
-    for acct in message
-        .account_keys
-        .iter()
-        .chain(meta.loaded_writable_addresses.iter())
-        .chain(meta.loaded_readonly_addresses.iter())
-    {
+    for acct in resolved {
         let encoded = base58::encode(acct);
         let mut key = String::with_capacity(8 + encoded.len());
         key.push_str("account:");
@@ -66,8 +50,10 @@ pub(crate) fn transaction_program_and_account_keys_vec(trx: &ConfirmedTransactio
         keys.push(key);
     }
 
-    // Process all program IDs
-    for inst in trx.walk_instructions() {
+    let Ok(instructions) = trx.walk_instructions() else {
+        return keys;
+    };
+    for inst in instructions {
         let program_id = inst.program_id().to_string();
         let mut key = String::with_capacity(8 + program_id.len());
         key.push_str("program:");

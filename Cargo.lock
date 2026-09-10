@@ -3458,7 +3458,7 @@ dependencies = [
 [[package]]
 name = "substreams-solana"
 version = "0.15.0"
-source = "git+https://github.com/streamingfast/substreams-solana?branch=feature%2Fbuffa#26902e96ebfcb03fe0401c20198ea11f09f7fac4"
+source = "git+https://github.com/streamingfast/substreams-solana?branch=feature%2Fbuffa#2b571cbe2a2e0a3d418518f9c5d5cf0605c2f9ff"
 dependencies = [
  "substreams-solana-core",
  "substreams-solana-macro",
@@ -3467,7 +3467,7 @@ dependencies = [
 [[package]]
 name = "substreams-solana-core"
 version = "0.15.0"
-source = "git+https://github.com/streamingfast/substreams-solana?branch=feature%2Fbuffa#26902e96ebfcb03fe0401c20198ea11f09f7fac4"
+source = "git+https://github.com/streamingfast/substreams-solana?branch=feature%2Fbuffa#2b571cbe2a2e0a3d418518f9c5d5cf0605c2f9ff"
 dependencies = [
  "bs58 0.4.0",
  "buffa",
@@ -3477,7 +3477,7 @@ dependencies = [
 [[package]]
 name = "substreams-solana-macro"
 version = "0.15.0"
-source = "git+https://github.com/streamingfast/substreams-solana?branch=feature%2Fbuffa#26902e96ebfcb03fe0401c20198ea11f09f7fac4"
+source = "git+https://github.com/streamingfast/substreams-solana?branch=feature%2Fbuffa#2b571cbe2a2e0a3d418518f9c5d5cf0605c2f9ff"
 dependencies = [
  "bs58 0.4.0",
 ]
