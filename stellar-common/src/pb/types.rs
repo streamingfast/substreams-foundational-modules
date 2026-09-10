@@ -748,14 +748,12 @@ impl ::buffa::Message for Operation {
                     __buffa::oneof::operation::Op::CreateAccount(ref mut existing),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::CreateAccount(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::CreateAccount(val),
                     );
                 }
             }
@@ -768,14 +766,12 @@ impl ::buffa::Message for Operation {
                     __buffa::oneof::operation::Op::AccountMerge(ref mut existing),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::AccountMerge(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::AccountMerge(val),
                     );
                 }
             }
@@ -788,14 +784,12 @@ impl ::buffa::Message for Operation {
                     __buffa::oneof::operation::Op::Payment(ref mut existing),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::Payment(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::Payment(val),
                     );
                 }
             }
@@ -810,14 +804,12 @@ impl ::buffa::Message for Operation {
                     ),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::CreateClaimableBalance(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::CreateClaimableBalance(val),
                     );
                 }
             }
@@ -832,14 +824,12 @@ impl ::buffa::Message for Operation {
                     ),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::ClaimClaimableBalance(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::ClaimClaimableBalance(val),
                     );
                 }
             }
@@ -852,14 +842,12 @@ impl ::buffa::Message for Operation {
                     __buffa::oneof::operation::Op::Clawback(ref mut existing),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::Clawback(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::Clawback(val),
                     );
                 }
             }
@@ -874,14 +862,12 @@ impl ::buffa::Message for Operation {
                     ),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::ClawbackClaimableBalance(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::ClawbackClaimableBalance(val),
                     );
                 }
             }
@@ -894,14 +880,12 @@ impl ::buffa::Message for Operation {
                     __buffa::oneof::operation::Op::AllowTrust(ref mut existing),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::AllowTrust(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::AllowTrust(val),
                     );
                 }
             }
@@ -914,14 +898,12 @@ impl ::buffa::Message for Operation {
                     __buffa::oneof::operation::Op::SetTrustLineFlags(ref mut existing),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::SetTrustLineFlags(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::SetTrustLineFlags(val),
                     );
                 }
             }
@@ -934,14 +916,12 @@ impl ::buffa::Message for Operation {
                     __buffa::oneof::operation::Op::LiquidityPoolDeposit(ref mut existing),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::LiquidityPoolDeposit(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::LiquidityPoolDeposit(val),
                     );
                 }
             }
@@ -956,14 +936,12 @@ impl ::buffa::Message for Operation {
                     ),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::LiquidityPoolWithdraw(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::LiquidityPoolWithdraw(val),
                     );
                 }
             }
@@ -976,14 +954,12 @@ impl ::buffa::Message for Operation {
                     __buffa::oneof::operation::Op::ManageBuyOffer(ref mut existing),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::ManageBuyOffer(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::ManageBuyOffer(val),
                     );
                 }
             }
@@ -996,14 +972,12 @@ impl ::buffa::Message for Operation {
                     __buffa::oneof::operation::Op::ManageSellOffer(ref mut existing),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::ManageSellOffer(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::ManageSellOffer(val),
                     );
                 }
             }
@@ -1018,14 +992,12 @@ impl ::buffa::Message for Operation {
                     ),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::CreatePassiveSellOffer(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::CreatePassiveSellOffer(val),
                     );
                 }
             }
@@ -1040,14 +1012,12 @@ impl ::buffa::Message for Operation {
                     ),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::PathPaymentStrictSend(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::PathPaymentStrictSend(val),
                     );
                 }
             }
@@ -1062,14 +1032,12 @@ impl ::buffa::Message for Operation {
                     ),
                 ) = self.op
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.op = ::core::option::Option::Some(
-                        __buffa::oneof::operation::Op::PathPaymentStrictReceive(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::operation::Op::PathPaymentStrictReceive(val),
                     );
                 }
             }
@@ -4127,14 +4095,12 @@ impl ::buffa::Message for Asset {
                     __buffa::oneof::asset::Asset::CreditAlphaNum4(ref mut existing),
                 ) = self.asset
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.asset = ::core::option::Option::Some(
-                        __buffa::oneof::asset::Asset::CreditAlphaNum4(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::asset::Asset::CreditAlphaNum4(val),
                     );
                 }
             }
@@ -4147,14 +4113,12 @@ impl ::buffa::Message for Asset {
                     __buffa::oneof::asset::Asset::CreditAlphaNum12(ref mut existing),
                 ) = self.asset
                 {
-                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                    ::buffa::Message::merge_length_delimited(existing, buf, ctx)?;
                 } else {
                     let mut val = ::core::default::Default::default();
                     ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
                     self.asset = ::core::option::Option::Some(
-                        __buffa::oneof::asset::Asset::CreditAlphaNum12(
-                            ::buffa::alloc::boxed::Box::new(val),
-                        ),
+                        __buffa::oneof::asset::Asset::CreditAlphaNum12(val),
                     );
                 }
             }

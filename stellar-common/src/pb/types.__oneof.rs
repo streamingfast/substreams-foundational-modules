@@ -5,48 +5,29 @@ pub mod operation {
     #[allow(unused_imports)]
     use super::*;
     #[derive(Clone, PartialEq, Debug)]
+    #[allow(clippy::large_enum_variant)]
     pub enum Op {
-        CreateAccount(::buffa::alloc::boxed::Box<super::super::super::CreateAccount>),
-        AccountMerge(::buffa::alloc::boxed::Box<super::super::super::AccountMerge>),
-        Payment(::buffa::alloc::boxed::Box<super::super::super::Payment>),
-        CreateClaimableBalance(
-            ::buffa::alloc::boxed::Box<super::super::super::CreateClaimableBalance>,
-        ),
-        ClaimClaimableBalance(
-            ::buffa::alloc::boxed::Box<super::super::super::ClaimClaimableBalance>,
-        ),
-        Clawback(::buffa::alloc::boxed::Box<super::super::super::Clawback>),
-        ClawbackClaimableBalance(
-            ::buffa::alloc::boxed::Box<super::super::super::ClawbackClaimableBalance>,
-        ),
-        AllowTrust(::buffa::alloc::boxed::Box<super::super::super::AllowTrust>),
-        SetTrustLineFlags(
-            ::buffa::alloc::boxed::Box<super::super::super::SetTrustLineFlags>,
-        ),
-        LiquidityPoolDeposit(
-            ::buffa::alloc::boxed::Box<super::super::super::LiquidityPoolDeposit>,
-        ),
-        LiquidityPoolWithdraw(
-            ::buffa::alloc::boxed::Box<super::super::super::LiquidityPoolWithdraw>,
-        ),
-        ManageBuyOffer(::buffa::alloc::boxed::Box<super::super::super::ManageBuyOffer>),
-        ManageSellOffer(
-            ::buffa::alloc::boxed::Box<super::super::super::ManageSellOffer>,
-        ),
-        CreatePassiveSellOffer(
-            ::buffa::alloc::boxed::Box<super::super::super::CreatePassiveSellOffer>,
-        ),
-        PathPaymentStrictSend(
-            ::buffa::alloc::boxed::Box<super::super::super::PathPaymentStrictSend>,
-        ),
-        PathPaymentStrictReceive(
-            ::buffa::alloc::boxed::Box<super::super::super::PathPaymentStrictReceive>,
-        ),
+        CreateAccount(super::super::super::CreateAccount),
+        AccountMerge(super::super::super::AccountMerge),
+        Payment(super::super::super::Payment),
+        CreateClaimableBalance(super::super::super::CreateClaimableBalance),
+        ClaimClaimableBalance(super::super::super::ClaimClaimableBalance),
+        Clawback(super::super::super::Clawback),
+        ClawbackClaimableBalance(super::super::super::ClawbackClaimableBalance),
+        AllowTrust(super::super::super::AllowTrust),
+        SetTrustLineFlags(super::super::super::SetTrustLineFlags),
+        LiquidityPoolDeposit(super::super::super::LiquidityPoolDeposit),
+        LiquidityPoolWithdraw(super::super::super::LiquidityPoolWithdraw),
+        ManageBuyOffer(super::super::super::ManageBuyOffer),
+        ManageSellOffer(super::super::super::ManageSellOffer),
+        CreatePassiveSellOffer(super::super::super::CreatePassiveSellOffer),
+        PathPaymentStrictSend(super::super::super::PathPaymentStrictSend),
+        PathPaymentStrictReceive(super::super::super::PathPaymentStrictReceive),
     }
     impl ::buffa::Oneof for Op {}
     impl From<super::super::super::CreateAccount> for Op {
         fn from(v: super::super::super::CreateAccount) -> Self {
-            Self::CreateAccount(::buffa::alloc::boxed::Box::new(v))
+            Self::CreateAccount(v)
         }
     }
     impl From<super::super::super::CreateAccount> for ::core::option::Option<Op> {
@@ -56,7 +37,7 @@ pub mod operation {
     }
     impl From<super::super::super::AccountMerge> for Op {
         fn from(v: super::super::super::AccountMerge) -> Self {
-            Self::AccountMerge(::buffa::alloc::boxed::Box::new(v))
+            Self::AccountMerge(v)
         }
     }
     impl From<super::super::super::AccountMerge> for ::core::option::Option<Op> {
@@ -66,7 +47,7 @@ pub mod operation {
     }
     impl From<super::super::super::Payment> for Op {
         fn from(v: super::super::super::Payment) -> Self {
-            Self::Payment(::buffa::alloc::boxed::Box::new(v))
+            Self::Payment(v)
         }
     }
     impl From<super::super::super::Payment> for ::core::option::Option<Op> {
@@ -76,7 +57,7 @@ pub mod operation {
     }
     impl From<super::super::super::CreateClaimableBalance> for Op {
         fn from(v: super::super::super::CreateClaimableBalance) -> Self {
-            Self::CreateClaimableBalance(::buffa::alloc::boxed::Box::new(v))
+            Self::CreateClaimableBalance(v)
         }
     }
     impl From<super::super::super::CreateClaimableBalance>
@@ -87,7 +68,7 @@ pub mod operation {
     }
     impl From<super::super::super::ClaimClaimableBalance> for Op {
         fn from(v: super::super::super::ClaimClaimableBalance) -> Self {
-            Self::ClaimClaimableBalance(::buffa::alloc::boxed::Box::new(v))
+            Self::ClaimClaimableBalance(v)
         }
     }
     impl From<super::super::super::ClaimClaimableBalance>
@@ -98,7 +79,7 @@ pub mod operation {
     }
     impl From<super::super::super::Clawback> for Op {
         fn from(v: super::super::super::Clawback) -> Self {
-            Self::Clawback(::buffa::alloc::boxed::Box::new(v))
+            Self::Clawback(v)
         }
     }
     impl From<super::super::super::Clawback> for ::core::option::Option<Op> {
@@ -108,7 +89,7 @@ pub mod operation {
     }
     impl From<super::super::super::ClawbackClaimableBalance> for Op {
         fn from(v: super::super::super::ClawbackClaimableBalance) -> Self {
-            Self::ClawbackClaimableBalance(::buffa::alloc::boxed::Box::new(v))
+            Self::ClawbackClaimableBalance(v)
         }
     }
     impl From<super::super::super::ClawbackClaimableBalance>
@@ -119,7 +100,7 @@ pub mod operation {
     }
     impl From<super::super::super::AllowTrust> for Op {
         fn from(v: super::super::super::AllowTrust) -> Self {
-            Self::AllowTrust(::buffa::alloc::boxed::Box::new(v))
+            Self::AllowTrust(v)
         }
     }
     impl From<super::super::super::AllowTrust> for ::core::option::Option<Op> {
@@ -129,7 +110,7 @@ pub mod operation {
     }
     impl From<super::super::super::SetTrustLineFlags> for Op {
         fn from(v: super::super::super::SetTrustLineFlags) -> Self {
-            Self::SetTrustLineFlags(::buffa::alloc::boxed::Box::new(v))
+            Self::SetTrustLineFlags(v)
         }
     }
     impl From<super::super::super::SetTrustLineFlags> for ::core::option::Option<Op> {
@@ -139,7 +120,7 @@ pub mod operation {
     }
     impl From<super::super::super::LiquidityPoolDeposit> for Op {
         fn from(v: super::super::super::LiquidityPoolDeposit) -> Self {
-            Self::LiquidityPoolDeposit(::buffa::alloc::boxed::Box::new(v))
+            Self::LiquidityPoolDeposit(v)
         }
     }
     impl From<super::super::super::LiquidityPoolDeposit> for ::core::option::Option<Op> {
@@ -149,7 +130,7 @@ pub mod operation {
     }
     impl From<super::super::super::LiquidityPoolWithdraw> for Op {
         fn from(v: super::super::super::LiquidityPoolWithdraw) -> Self {
-            Self::LiquidityPoolWithdraw(::buffa::alloc::boxed::Box::new(v))
+            Self::LiquidityPoolWithdraw(v)
         }
     }
     impl From<super::super::super::LiquidityPoolWithdraw>
@@ -160,7 +141,7 @@ pub mod operation {
     }
     impl From<super::super::super::ManageBuyOffer> for Op {
         fn from(v: super::super::super::ManageBuyOffer) -> Self {
-            Self::ManageBuyOffer(::buffa::alloc::boxed::Box::new(v))
+            Self::ManageBuyOffer(v)
         }
     }
     impl From<super::super::super::ManageBuyOffer> for ::core::option::Option<Op> {
@@ -170,7 +151,7 @@ pub mod operation {
     }
     impl From<super::super::super::ManageSellOffer> for Op {
         fn from(v: super::super::super::ManageSellOffer) -> Self {
-            Self::ManageSellOffer(::buffa::alloc::boxed::Box::new(v))
+            Self::ManageSellOffer(v)
         }
     }
     impl From<super::super::super::ManageSellOffer> for ::core::option::Option<Op> {
@@ -180,7 +161,7 @@ pub mod operation {
     }
     impl From<super::super::super::CreatePassiveSellOffer> for Op {
         fn from(v: super::super::super::CreatePassiveSellOffer) -> Self {
-            Self::CreatePassiveSellOffer(::buffa::alloc::boxed::Box::new(v))
+            Self::CreatePassiveSellOffer(v)
         }
     }
     impl From<super::super::super::CreatePassiveSellOffer>
@@ -191,7 +172,7 @@ pub mod operation {
     }
     impl From<super::super::super::PathPaymentStrictSend> for Op {
         fn from(v: super::super::super::PathPaymentStrictSend) -> Self {
-            Self::PathPaymentStrictSend(::buffa::alloc::boxed::Box::new(v))
+            Self::PathPaymentStrictSend(v)
         }
     }
     impl From<super::super::super::PathPaymentStrictSend>
@@ -202,7 +183,7 @@ pub mod operation {
     }
     impl From<super::super::super::PathPaymentStrictReceive> for Op {
         fn from(v: super::super::super::PathPaymentStrictReceive) -> Self {
-            Self::PathPaymentStrictReceive(::buffa::alloc::boxed::Box::new(v))
+            Self::PathPaymentStrictReceive(v)
         }
     }
     impl From<super::super::super::PathPaymentStrictReceive>
@@ -216,19 +197,16 @@ pub mod asset {
     #[allow(unused_imports)]
     use super::*;
     #[derive(Clone, PartialEq, Debug)]
+    #[allow(clippy::large_enum_variant)]
     pub enum Asset {
         Native(::buffa::alloc::string::String),
-        CreditAlphaNum4(
-            ::buffa::alloc::boxed::Box<super::super::super::CreditAlphaNum4>,
-        ),
-        CreditAlphaNum12(
-            ::buffa::alloc::boxed::Box<super::super::super::CreditAlphaNum12>,
-        ),
+        CreditAlphaNum4(super::super::super::CreditAlphaNum4),
+        CreditAlphaNum12(super::super::super::CreditAlphaNum12),
     }
     impl ::buffa::Oneof for Asset {}
     impl From<super::super::super::CreditAlphaNum4> for Asset {
         fn from(v: super::super::super::CreditAlphaNum4) -> Self {
-            Self::CreditAlphaNum4(::buffa::alloc::boxed::Box::new(v))
+            Self::CreditAlphaNum4(v)
         }
     }
     impl From<super::super::super::CreditAlphaNum4> for ::core::option::Option<Asset> {
@@ -238,7 +216,7 @@ pub mod asset {
     }
     impl From<super::super::super::CreditAlphaNum12> for Asset {
         fn from(v: super::super::super::CreditAlphaNum12) -> Self {
-            Self::CreditAlphaNum12(::buffa::alloc::boxed::Box::new(v))
+            Self::CreditAlphaNum12(v)
         }
     }
     impl From<super::super::super::CreditAlphaNum12> for ::core::option::Option<Asset> {

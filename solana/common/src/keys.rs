@@ -3,6 +3,9 @@ use substreams_solana::{base58, pb::sf::solana::r#type::v1::ConfirmedTransaction
 /// transaction_program_and_account_keys returns an iterator of keys extracted from a transaction. It will
 /// emit the account keys from the transaction message, the loaded writable addresses, the loaded readonly
 /// addresses, and the program ids from the instructions.
+///
+/// A transaction with no meta, transaction or message yields no keys rather than panicking, so
+/// it matches no index query.
 pub fn transaction_program_and_account_keys(
     trx: &ConfirmedTransaction,
 ) -> impl Iterator<Item = String> + '_ {
@@ -31,7 +34,9 @@ pub fn transaction_program_and_account_keys(
 }
 
 /// Optimized version that collects keys into a pre-allocated vector
-/// to reduce allocations in hot paths
+/// to reduce allocations in hot paths.
+///
+/// Yields no keys for a transaction with no meta, transaction or message, as above.
 pub(crate) fn transaction_program_and_account_keys_vec(trx: &ConfirmedTransaction) -> Vec<String> {
     let meta = &trx.meta;
     let message = &trx.transaction.message;

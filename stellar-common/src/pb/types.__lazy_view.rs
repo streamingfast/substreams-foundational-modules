@@ -1714,144 +1714,112 @@ impl<'a> ::buffa::LazyMessageView<'a> for OperationLazyView<'a> {
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::CreateAccount(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::AccountMerge(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::AccountMerge(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::Payment(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::Payment(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::CreateClaimableBalance(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::CreateClaimableBalance(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::ClaimClaimableBalance(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::ClaimClaimableBalance(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::Clawback(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::Clawback(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::ClawbackClaimableBalance(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::ClawbackClaimableBalance(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::AllowTrust(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::AllowTrust(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::SetTrustLineFlags(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::SetTrustLineFlags(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::LiquidityPoolDeposit(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::LiquidityPoolDeposit(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::LiquidityPoolWithdraw(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::LiquidityPoolWithdraw(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::ManageBuyOffer(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::ManageBuyOffer(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::ManageSellOffer(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::ManageSellOffer(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::CreatePassiveSellOffer(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::CreatePassiveSellOffer(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::PathPaymentStrictSend(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::PathPaymentStrictSend(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::operation::Op::PathPaymentStrictReceive(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::operation::Op::PathPaymentStrictReceive(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                         },
@@ -9138,18 +9106,14 @@ impl<'a> ::buffa::LazyMessageView<'a> for AssetLazyView<'a> {
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::asset::Asset::CreditAlphaNum4(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                             super::super::__buffa::view::oneof::asset::Asset::CreditAlphaNum12(
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::asset::Asset::CreditAlphaNum12(
-                                    ::buffa::alloc::boxed::Box::new(
-                                        v.to_owned_from_source(__buffa_src)?,
-                                    ),
+                                    v.to_owned_from_source(__buffa_src)?,
                                 )
                             }
                         },

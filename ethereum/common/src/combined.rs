@@ -44,14 +44,20 @@ fn filtered_events_and_calls(
     let matcher = substreams::sqe::expr_matcher(&query);
 
     calls.calls.retain(|call| {
-        let keys = call_keys(&call.call);
+        let Some(inner) = call.call.as_option() else {
+            return false;
+        };
+        let keys = call_keys(inner);
         let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
 
         matcher.matches_keys(&keys)
     });
 
     events.events.retain(|event| {
-        let keys = evt_keys(&event.log);
+        let Some(log) = event.log.as_option() else {
+            return false;
+        };
+        let keys = evt_keys(log);
         let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
 
         matcher.matches_keys(&keys)

@@ -52,7 +52,10 @@ fn filtered_calls(query: String, mut calls: Calls) -> Result<Calls, Error> {
     let matcher = substreams::sqe::expr_matcher(&query);
 
     calls.calls.retain(|call| {
-        let keys = call_keys(&call.call);
+        let Some(inner) = call.call.as_option() else {
+            return false;
+        };
+        let keys = call_keys(inner);
         let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
 
         matcher.matches_keys(&keys)

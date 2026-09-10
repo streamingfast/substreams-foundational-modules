@@ -53,7 +53,10 @@ fn filtered_events(query: String, mut events: Events) -> Result<Events, Error> {
     let matcher = substreams::sqe::expr_matcher(&query);
 
     events.events.retain(|event| {
-        let keys = evt_keys(&event.log);
+        let Some(log) = event.log.as_option() else {
+            return false;
+        };
+        let keys = evt_keys(log);
         let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
 
         matcher.matches_keys(&keys)

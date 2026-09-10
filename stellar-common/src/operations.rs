@@ -31,12 +31,12 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                 // Create account: https://stellar.expert/explorer/testnet/tx/8191ad23e96b7426fd6692cd0cf402e85067ea2ce40c97c6a6562bfffe71a0b2
                 stellar_xdr::OperationBody::CreateAccount(create_account_op) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::CreateAccount(Box::new(CreateAccount {
+                        op: Some(Op::CreateAccount(CreateAccount {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             destination: create_account_op.destination.to_string(),
                             starting_balance: create_account_op.starting_balance,
-                        }))),
+                        })),
                     });
                 }
                 // Merge Account: https://stellar.expert/explorer/testnet/tx/2bab87af23a13fbe40c363dd326767bb85b00692a3428906f080f2a2a80423c6
@@ -49,12 +49,12 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                     match utils::decode_account_merge_result(&result_xdr) {
                         Some(amount) => {
                             operations.operations.push(Operation {
-                                op: Some(Op::AccountMerge(Box::new(AccountMerge {
+                                op: Some(Op::AccountMerge(AccountMerge {
                                     trx_hash: hash.clone(),
                                     ledger_sequence: transaction.block_number,
                                     account: muxed_account.to_string(),
                                     amount,
-                                }))),
+                                })),
                             });
                         }
                         None => return,
@@ -62,18 +62,18 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                 }
                 stellar_xdr::OperationBody::Payment(payment) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::Payment(Box::new(Payment {
+                        op: Some(Op::Payment(Payment {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             destination: payment.destination.to_string(),
                             asset: utils::create_asset(&payment.asset).into(),
                             amount: payment.amount,
-                        }))),
+                        })),
                     });
                 }
                 stellar_xdr::OperationBody::CreateClaimableBalance(create_claim_balance) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::CreateClaimableBalance(Box::new(CreateClaimableBalance {
+                        op: Some(Op::CreateClaimableBalance(CreateClaimableBalance {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             asset: utils::create_asset(&create_claim_balance.asset).into(),
@@ -87,66 +87,66 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                                     }
                                 })
                                 .collect(),
-                        }))),
+                        })),
                     });
                 }
                 stellar_xdr::OperationBody::ClaimClaimableBalance(claim_claim_balance) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::ClaimClaimableBalance(Box::new(ClaimClaimableBalance {
+                        op: Some(Op::ClaimClaimableBalance(ClaimClaimableBalance {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             balance_id: claim_claim_balance.balance_id.to_string(),
-                        }))),
+                        })),
                     });
                 }
                 stellar_xdr::OperationBody::Clawback(clawback) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::Clawback(Box::new(Clawback {
+                        op: Some(Op::Clawback(Clawback {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             asset: utils::create_asset(&clawback.asset).into(),
                             from: clawback.from.to_string(),
                             amount: clawback.amount,
-                        }))),
+                        })),
                     });
                 }
                 stellar_xdr::OperationBody::ClawbackClaimableBalance(
                     clawback_claimable_balance,
                 ) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::ClawbackClaimableBalance(Box::new(ClawbackClaimableBalance {
+                        op: Some(Op::ClawbackClaimableBalance(ClawbackClaimableBalance {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             balance_id: clawback_claimable_balance.balance_id.to_string(),
-                        }))),
+                        })),
                     });
                 }
                 stellar_xdr::OperationBody::AllowTrust(allow_trust) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::AllowTrust(Box::new(AllowTrust {
+                        op: Some(Op::AllowTrust(AllowTrust {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             trustor: allow_trust.trustor.to_string(),
                             asset: allow_trust.asset.to_string(),
                             authorize: allow_trust.authorize,
-                        }))),
+                        })),
                     });
                 }
                 stellar_xdr::OperationBody::SetTrustLineFlags(set_trust_line_flags) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::SetTrustLineFlags(Box::new(SetTrustLineFlags {
+                        op: Some(Op::SetTrustLineFlags(SetTrustLineFlags {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             trustor: set_trust_line_flags.trustor.to_string(),
                             asset: utils::create_asset(&set_trust_line_flags.asset).into(),
                             clear_flags: set_trust_line_flags.clear_flags,
                             set_flags: set_trust_line_flags.set_flags,
-                        }))),
+                        })),
                     });
                 }
                 stellar_xdr::OperationBody::LiquidityPoolDeposit(liquidity_pool_deposit) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::LiquidityPoolDeposit(Box::new(LiquidityPoolDeposit {
+                        op: Some(Op::LiquidityPoolDeposit(LiquidityPoolDeposit {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             liquidity_pool_id: liquidity_pool_deposit
@@ -157,14 +157,14 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                             max_amount_b: liquidity_pool_deposit.max_amount_b,
                             min_price: utils::create_price(&liquidity_pool_deposit.min_price).into(),
                             max_price: utils::create_price(&liquidity_pool_deposit.max_price).into(),
-                        }))),
+                        })),
                     });
                 }
                 stellar_xdr::OperationBody::LiquidityPoolWithdraw(
                     liquidity_pool_withdraw,
                 ) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::LiquidityPoolWithdraw(Box::new(LiquidityPoolWithdraw {
+                        op: Some(Op::LiquidityPoolWithdraw(LiquidityPoolWithdraw {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             liquidity_pool_id: liquidity_pool_withdraw
@@ -174,12 +174,12 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                             amount: liquidity_pool_withdraw.amount,
                             min_amount_a: liquidity_pool_withdraw.min_amount_a,
                             min_amount_b: liquidity_pool_withdraw.min_amount_b,
-                        }))),
+                        })),
                     });
                 }
                 stellar_xdr::OperationBody::ManageBuyOffer(manage_buy_offer) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::ManageBuyOffer(Box::new(ManageBuyOffer {
+                        op: Some(Op::ManageBuyOffer(ManageBuyOffer {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             selling: utils::create_asset(&manage_buy_offer.selling).into(),
@@ -187,12 +187,12 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                             buy_amount: manage_buy_offer.buy_amount,
                             price: utils::create_price(&manage_buy_offer.price).into(),
                             offer_id: manage_buy_offer.offer_id,
-                        }))),
+                        })),
                     });
                 }
                 stellar_xdr::OperationBody::ManageSellOffer(manage_sell_offer) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::ManageSellOffer(Box::new(ManageSellOffer {
+                        op: Some(Op::ManageSellOffer(ManageSellOffer {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             selling: utils::create_asset(&manage_sell_offer.selling).into(),
@@ -200,26 +200,26 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                             amount: manage_sell_offer.amount,
                             price: utils::create_price(&manage_sell_offer.price).into(),
                             offer_id: manage_sell_offer.offer_id,
-                        }))),
+                        })),
                     });
                 }
                 stellar_xdr::OperationBody::CreatePassiveSellOffer(create_passive_sell) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::CreatePassiveSellOffer(Box::new(CreatePassiveSellOffer {
+                        op: Some(Op::CreatePassiveSellOffer(CreatePassiveSellOffer {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             selling: utils::create_asset(&create_passive_sell.selling).into(),
                             buying: utils::create_asset(&create_passive_sell.buying).into(),
                             amount: create_passive_sell.amount,
                             price: utils::create_price(&create_passive_sell.price).into(),
-                        }))),
+                        })),
                     });
                 }
                 stellar_xdr::OperationBody::PathPaymentStrictSend(
                     path_payment_strict_send,
                 ) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::PathPaymentStrictSend(Box::new(PathPaymentStrictSend {
+                        op: Some(Op::PathPaymentStrictSend(PathPaymentStrictSend {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             send_asset: utils::create_asset(&path_payment_strict_send.send_asset).into(),
@@ -232,14 +232,14 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                                 .iter()
                                 .flat_map(|asset| Some(utils::create_asset(&asset)))
                                 .collect(),
-                        }))),
+                        })),
                     });
                 }
                 stellar_xdr::OperationBody::PathPaymentStrictReceive(
                     path_payment_strict_receive,
                 ) => {
                     operations.operations.push(Operation {
-                        op: Some(Op::PathPaymentStrictReceive(Box::new(PathPaymentStrictReceive {
+                        op: Some(Op::PathPaymentStrictReceive(PathPaymentStrictReceive {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             send_asset: utils::create_asset(&path_payment_strict_receive.send_asset).into(),
@@ -252,7 +252,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                                 .iter()
                                 .flat_map(|asset| Some(utils::create_asset(&asset)))
                                 .collect(),
-                        }))),
+                        })),
                     });
                 }
                 _ => {}
