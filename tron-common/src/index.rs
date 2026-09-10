@@ -1,7 +1,7 @@
-use crate::pb::protocol::transaction::contract::ContractType;
 use crate::pb::sf::substreams::tron::v1::Transactions;
 use crate::pb::sf::tron::r#type::v1::Transaction;
 use crate::utils::{extract_from_address, extract_to_address, tron_address_to_base58};
+use buffa::Enumeration;
 use std::collections::HashSet;
 use substreams::pb::sf::substreams::index::v1::Keys;
 
@@ -26,26 +26,28 @@ pub fn transaction_keys(transaction: &Transaction) -> Vec<String> {
     for contract in &transaction.contracts {
         keys.push(format!(
             "contract_type:{}",
-            ContractType::try_from(contract.r#type)
-                .map(|t| t.as_str_name())
+            contract
+                .r#type
+                .as_known()
+                .map(|t| t.proto_name())
                 .unwrap_or("Unknown")
         ));
 
-        if let Some(ref parameter) = contract.parameter {
-            if let Some(owner_bytes) = extract_from_address(contract.r#type, parameter) {
+        if let Some(parameter) = contract.parameter.as_option() {
+            if let Some(owner_bytes) = extract_from_address(contract.r#type.to_i32(), parameter) {
                 let tron_address = tron_address_to_base58(&owner_bytes);
                 keys.push(format!("from:{}", tron_address));
             }
         }
-        if let Some(ref parameter) = contract.parameter {
-            if let Some(owner_bytes) = extract_to_address(contract.r#type, parameter) {
+        if let Some(parameter) = contract.parameter.as_option() {
+            if let Some(owner_bytes) = extract_to_address(contract.r#type.to_i32(), parameter) {
                 let tron_address = tron_address_to_base58(&owner_bytes);
                 keys.push(format!("to:{}", tron_address));
             }
         }
     }
 
-    if let Some(ref info) = transaction.info {
+    if let Some(info) = transaction.info.as_option() {
         if !info.contract_address.is_empty() {
             let tron_address = tron_address_to_base58(&info.contract_address);
             keys.push(format!("contract_address:{}", tron_address));

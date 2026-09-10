@@ -1,13 +1,17 @@
+use substreams_solana::block_view::lazy::LazyTransaction;
 use substreams_solana::{base58, pb::sf::solana::r#type::v1::ConfirmedTransaction};
 
 /// transaction_program_and_account_keys returns an iterator of keys extracted from a transaction. It will
 /// emit the account keys from the transaction message, the loaded writable addresses, the loaded readonly
 /// addresses, and the program ids from the instructions.
+///
+/// A transaction with no meta, transaction or message yields no keys rather than panicking, so
+/// it matches no index query.
 pub fn transaction_program_and_account_keys(
     trx: &ConfirmedTransaction,
 ) -> impl Iterator<Item = String> + '_ {
-    let meta = trx.meta.as_ref().unwrap();
-    let message = trx.transaction.as_ref().unwrap().message.as_ref().unwrap();
+    let meta = &trx.meta;
+    let message = &trx.transaction.message;
 
     message
         .account_keys
@@ -30,30 +34,15 @@ pub fn transaction_program_and_account_keys(
         }))
 }
 
-/// Optimized version that collects keys into a pre-allocated vector
-/// to reduce allocations in hot paths
-pub(crate) fn transaction_program_and_account_keys_vec(trx: &ConfirmedTransaction) -> Vec<String> {
-    let meta = trx.meta.as_ref().unwrap();
-    let message = trx.transaction.as_ref().unwrap().message.as_ref().unwrap();
+/// The lazy counterpart of [`transaction_program_and_account_keys`], collecting
+/// the same keys in the same order.
+pub(crate) fn lazy_transaction_program_and_account_keys_vec(trx: &LazyTransaction<'_>) -> Vec<String> {
+    let resolved = trx.resolved_accounts();
 
-    // Pre-calculate capacity to avoid reallocations
-    let account_count = message.account_keys.len()
-        + meta.loaded_writable_addresses.len()
-        + meta.loaded_readonly_addresses.len();
-
-    // Estimate instruction count (most transactions have 1-10 instructions)
     let estimated_instruction_count = 10;
-    let estimated_capacity = account_count + estimated_instruction_count;
+    let mut keys = Vec::with_capacity(resolved.len() + estimated_instruction_count);
 
-    let mut keys = Vec::with_capacity(estimated_capacity);
-
-    // Process all account keys
-    for acct in message
-        .account_keys
-        .iter()
-        .chain(meta.loaded_writable_addresses.iter())
-        .chain(meta.loaded_readonly_addresses.iter())
-    {
+    for acct in resolved {
         let encoded = base58::encode(acct);
         let mut key = String::with_capacity(8 + encoded.len());
         key.push_str("account:");
@@ -61,8 +50,10 @@ pub(crate) fn transaction_program_and_account_keys_vec(trx: &ConfirmedTransactio
         keys.push(key);
     }
 
-    // Process all program IDs
-    for inst in trx.walk_instructions() {
+    let Ok(instructions) = trx.walk_instructions() else {
+        return keys;
+    };
+    for inst in instructions {
         let program_id = inst.program_id().to_string();
         let mut key = String::with_capacity(8 + program_id.len());
         key.push_str("program:");
@@ -89,8 +80,8 @@ mod tests {
         let mut result = transaction_program_and_account_keys(confirmed_transaction);
 
         // Expected
-        if let Some(tx) = confirmed_transaction.transaction.as_ref() {
-            if let Some(msg) = tx.message.as_ref() {
+        if let Some(tx) = confirmed_transaction.transaction.as_option() {
+            if let Some(msg) = tx.message.as_option() {
                 msg.account_keys.iter().for_each(|acct| {
                     assert_eq!(
                         result.any(|index| index == format!("account:{}", base58::encode(acct))),

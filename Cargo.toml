@@ -1,7 +1,6 @@
 [workspace]
 members = [
     "common",
-    "antelope-common",
     "cosmos-common",
     "ethereum/common",
     "ethereum/erc20-token-metadata",
@@ -13,6 +12,9 @@ members = [
     "tron-common",
 ]
 resolver = "2"
+
+# Blocked on a buffa release of substreams-antelope, which provides its block model.
+exclude = ["antelope-common"]
 
 [workspace.package]
 edition = "2021"
@@ -28,9 +30,12 @@ base64 = "0.22.1"
 bs58 = "0.4"
 hex = "0.4.3"
 num-bigint = "0.4"
-prost = "0.13"
-prost-types = "0.13"
+buffa = { version = "0.9", default-features = false, features = ["std", "fast-utf8"] }
+buffa-types = { version = "0.9", default-features = false }
+buffa-descriptor = { version = "0.9", default-features = false, features = ["std", "views"] }
 substreams = "0.7"
+substreams-ethereum = "0.11"
+substreams-solana = "0.15"
 testing = { path = "./testing" }
 pretty_assertions = "1.2.1"
 
@@ -38,3 +43,15 @@ pretty_assertions = "1.2.1"
 lto = true
 opt-level = 's'
 strip = "debuginfo"
+
+# Temporary until the buffa migration of the SDKs is released.
+[patch.crates-io]
+substreams = { git = "https://github.com/streamingfast/substreams-rs", branch = "feature/buffa" }
+substreams-macro = { git = "https://github.com/streamingfast/substreams-rs", branch = "feature/buffa" }
+substreams-ethereum = { git = "https://github.com/streamingfast/substreams-ethereum", branch = "feature/buffa" }
+substreams-ethereum-core = { git = "https://github.com/streamingfast/substreams-ethereum", branch = "feature/buffa" }
+substreams-ethereum-abigen = { git = "https://github.com/streamingfast/substreams-ethereum", branch = "feature/buffa" }
+substreams-ethereum-derive = { git = "https://github.com/streamingfast/substreams-ethereum", branch = "feature/buffa" }
+substreams-solana = { git = "https://github.com/streamingfast/substreams-solana", branch = "feature/buffa" }
+substreams-solana-core = { git = "https://github.com/streamingfast/substreams-solana", branch = "feature/buffa" }
+substreams-solana-macro = { git = "https://github.com/streamingfast/substreams-solana", branch = "feature/buffa" }

@@ -10,19 +10,14 @@ fn blocks_without_votes_impl(mut block: Block) -> Block {
     static VOTE_INSTRUCTION: [u8; 32] = b58!("Vote111111111111111111111111111111111111111");
 
     block.transactions.retain(|trx| {
-        let meta = match trx.meta.as_ref() {
-            Some(meta) => meta,
-            None => return false,
-        };
-        if meta.err.is_some() {
+        if trx.meta.is_unset() || trx.transaction.is_unset() || trx.transaction.message.is_unset() {
+            return false;
+        }
+        if trx.meta.err.is_set() {
             return false;
         }
 
-        let transaction = match trx.transaction.as_ref() {
-            Some(transaction) => transaction,
-            None => return false,
-        };
-        let message = transaction.message.as_ref().expect("Message is missing");
+        let message = &trx.transaction.message;
 
         !message.account_keys.iter().any(|v| v == &VOTE_INSTRUCTION)
     });
@@ -34,8 +29,8 @@ fn blocks_without_votes_impl(mut block: Block) -> Block {
 fn transaction_program_and_account_keys(
     trx: &ConfirmedTransaction,
 ) -> impl Iterator<Item = String> + '_ {
-    let meta = trx.meta.as_ref().unwrap();
-    let message = trx.transaction.as_ref().unwrap().message.as_ref().unwrap();
+    let meta = &trx.meta;
+    let message = &trx.transaction.message;
 
     message
         .account_keys

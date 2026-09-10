@@ -14,8 +14,6 @@ bench = false
 crate-type = ["cdylib"]
 
 [dependencies]
-prost = { workspace = true }
-prost-types = { workspace = true }
 substreams = { workspace = true }
 
 [dev-dependencies]
