@@ -1,19 +1,30 @@
+use buffa::view::LazyMessageView;
+
 use crate::{
     index,
     pb::sf::{
         substreams::{tron::v1::Transactions, v1::Clock},
-        tron::r#type::v1::{Block, Transaction},
+        tron::r#type::v1::{BlockLazyView, Transaction},
     },
     utils,
 };
 
 #[substreams::handlers::map]
-fn map_transactions(clock: Clock, block: Block) -> Result<Transactions, substreams::errors::Error> {
-    let transactions: Vec<Transaction> = block
-        .transactions
-        .into_iter()
-        .filter(|tx| !utils::transaction_failed(tx.code.to_i32()))
-        .collect();
+fn map_transactions(
+    clock: Clock,
+    block: &BlockLazyView<'_>,
+) -> Result<Transactions, substreams::errors::Error> {
+    let mut transactions: Vec<Transaction> = Vec::new();
+
+    for transaction in block.transactions.iter() {
+        let transaction = transaction?;
+
+        if utils::transaction_failed(transaction.code.to_i32()) {
+            continue;
+        }
+
+        transactions.push(transaction.to_owned_message()?);
+    }
 
     Ok(Transactions {
         transactions,

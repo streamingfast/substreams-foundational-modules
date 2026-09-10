@@ -65,15 +65,52 @@ fn filtered_events(query: String, mut events: Events) -> Result<Events, Error> {
     Ok(events)
 }
 
-pub fn evt_keys(log: &substreams_ethereum::pb::eth::v2::Log) -> Vec<String> {
+/// The log fields the index keys are built from, implemented for both the owned
+/// `Log` and buffa's `LogLazyView`.
+pub trait EvtKeyed {
+    fn first_topic(&self) -> Option<&[u8]>;
+    fn key_address(&self) -> &[u8];
+}
+
+impl EvtKeyed for substreams_ethereum::pb::eth::v2::Log {
+    fn first_topic(&self) -> Option<&[u8]> {
+        self.topics.get(0).map(|t| t.as_ref())
+    }
+
+    fn key_address(&self) -> &[u8] {
+        &self.address
+    }
+}
+
+impl EvtKeyed for substreams_ethereum::pb::eth::v2::LogLazyView<'_> {
+    fn first_topic(&self) -> Option<&[u8]> {
+        self.topics.get(0).map(|t| &**t)
+    }
+
+    fn key_address(&self) -> &[u8] {
+        self.address
+    }
+}
+
+impl<T: EvtKeyed + ?Sized> EvtKeyed for &T {
+    fn first_topic(&self) -> Option<&[u8]> {
+        (**self).first_topic()
+    }
+
+    fn key_address(&self) -> &[u8] {
+        (**self).key_address()
+    }
+}
+
+pub fn evt_keys<L: EvtKeyed + ?Sized>(log: &L) -> Vec<String> {
     let mut keys = Vec::new();
 
-    if log.topics.len() > 0 {
-        let k_log_sign = format!("evt_sig:0x{}", Hex::encode(log.topics.get(0).unwrap()));
+    if let Some(topic) = log.first_topic() {
+        let k_log_sign = format!("evt_sig:0x{}", Hex::encode(topic));
         keys.push(k_log_sign);
     }
 
-    let k_log_address = format!("evt_addr:0x{}", Hex::encode(&log.address));
+    let k_log_address = format!("evt_addr:0x{}", Hex::encode(log.key_address()));
     keys.push(k_log_address);
 
     keys

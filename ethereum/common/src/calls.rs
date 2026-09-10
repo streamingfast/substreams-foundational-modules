@@ -64,18 +64,52 @@ fn filtered_calls(query: String, mut calls: Calls) -> Result<Calls, Error> {
     Ok(calls)
 }
 
-pub fn call_keys(call: &substreams_ethereum::pb::eth::v2::Call) -> Vec<String> {
+/// The call fields the index keys are built from, implemented for both the owned
+/// `Call` and buffa's `CallLazyView`.
+pub trait CallKeyed {
+    fn key_caller(&self) -> &[u8];
+    fn key_address(&self) -> &[u8];
+    fn key_input(&self) -> &[u8];
+}
+
+impl CallKeyed for substreams_ethereum::pb::eth::v2::Call {
+    fn key_caller(&self) -> &[u8] {
+        &self.caller
+    }
+
+    fn key_address(&self) -> &[u8] {
+        &self.address
+    }
+
+    fn key_input(&self) -> &[u8] {
+        &self.input
+    }
+}
+
+impl CallKeyed for substreams_ethereum::pb::eth::v2::CallLazyView<'_> {
+    fn key_caller(&self) -> &[u8] {
+        self.caller
+    }
+
+    fn key_address(&self) -> &[u8] {
+        self.address
+    }
+
+    fn key_input(&self) -> &[u8] {
+        self.input
+    }
+}
+
+pub fn call_keys<C: CallKeyed + ?Sized>(call: &C) -> Vec<String> {
     let mut keys = Vec::new();
 
-    let from_bytes = &call.caller;
-    let k_call_from = format!("call_from:0x{}", Hex::encode(from_bytes));
+    let k_call_from = format!("call_from:0x{}", Hex::encode(call.key_caller()));
     keys.push(k_call_from);
 
-    let to_bytes = &call.address;
-    let k_call_to = format!("call_to:0x{}", Hex::encode(to_bytes));
+    let k_call_to = format!("call_to:0x{}", Hex::encode(call.key_address()));
     keys.push(k_call_to);
 
-    let input_bytes = &call.input;
+    let input_bytes = call.key_input();
 
     if input_bytes.len() >= 4 {
         let k_call_method = format!("call_method:0x{}", Hex::encode(&input_bytes[..4]));

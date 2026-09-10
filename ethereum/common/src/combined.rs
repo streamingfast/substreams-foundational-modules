@@ -5,12 +5,12 @@ use crate::pb::sf::substreams::ethereum::v1::{
 };
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
-use std::collections::HashMap;
+use buffa::view::{LazyMessageView, MessageView};
 use substreams::errors::Error;
 use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::TransactionTraceStatus;
-use substreams_ethereum::pb::eth::v2::{Block, Call as ethCall, Log};
+use substreams_ethereum::pb::eth::v2::BlockLazyView;
 
 #[substreams::handlers::map]
 fn index_events_and_calls(events: Events, calls: Calls) -> Result<Keys, Error> {
@@ -71,64 +71,59 @@ fn filtered_events_and_calls(
 }
 
 #[substreams::handlers::map]
-fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Error> {
-    let mut events: HashMap<String, Vec<&Log>> = HashMap::new();
-    block.logs().for_each(|log| {
-        let k = Hex::encode(&log.receipt.transaction.hash);
-        events.entry(k).or_default().push(log.log);
-    });
-
-    let mut calls: HashMap<String, Vec<&ethCall>> = HashMap::new();
-    block.calls().for_each(|call| {
-        let k = Hex::encode(&call.transaction.hash);
-        calls.entry(k).or_default().push(call.call);
-    });
-
+fn filtered_transactions(
+    query: String,
+    block: &BlockLazyView<'_>,
+) -> Result<Transactions, Error> {
     let matcher = substreams::sqe::expr_matcher(&query);
 
-    let filtered: Vec<Transaction> = block
-        .transaction_traces
-        .iter()
-        .filter(|tx| tx.status == TransactionTraceStatus::Succeeded)
-        .filter(|tt| {
-            let mut matched = false;
-            let hash = Hex::encode(&tt.hash);
-            if let Some(ev) = events.get(&hash) {
-                ev.iter().for_each(|log| {
-                    let keys = evt_keys(log);
-                    let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
+    let mut filtered: Vec<Transaction> = Vec::new();
+    for trace in block.try_transactions() {
+        let trace = trace?;
+        if trace.status.as_known() != Some(TransactionTraceStatus::Succeeded) {
+            continue;
+        }
 
-                    if matcher.matches_keys(&keys) {
-                        matched = true;
-                        return;
-                    }
-                });
-            };
-            if let Some(ca) = calls.get(&hash) {
-                ca.iter().for_each(|call| {
-                    let keys = call_keys(call);
-                    let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
+        let mut matched = false;
 
-                    if matcher.matches_keys(&keys) {
-                        matched = true;
-                        return;
-                    };
-                });
-            };
-
-            matched
-        })
-        .map(|tt| {
-            let hash = Hex::encode(&tt.hash);
-            Transaction {
-                trace: tt.to_owned().into(),
-                tx_hash: hash,
+        if let Some(receipt) = trace.receipt()? {
+            for log in receipt.logs.iter() {
+                let log = log?;
+                let keys = evt_keys(&log);
+                let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
+                if matcher.matches_keys(&keys) {
+                    matched = true;
+                    break;
+                }
             }
-        })
-        .collect();
+        }
 
+        if !matched {
+            for call in trace.calls.iter() {
+                let call = call?;
+                let keys = call_keys(&call);
+                let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
+                if matcher.matches_keys(&keys) {
+                    matched = true;
+                    break;
+                }
+            }
+        }
+
+        if matched {
+            filtered.push(Transaction {
+                tx_hash: Hex::encode(&trace.hash),
+                trace: trace.to_owned_message()?.into(),
+            });
+        }
+    }
+
+    let timestamp = match block.header.get()? {
+        Some(header) => header.timestamp.as_option().map(|t| t.to_owned_message()),
+        None => None,
+    };
     let clock = Clock {
-        timestamp: block.header.timestamp.clone(),
+        timestamp: timestamp.transpose()?.into(),
         id: Hex::encode(&block.hash),
         number: block.number,
     };
@@ -147,7 +142,7 @@ pub mod tests {
     #[test]
     fn test_filtered_events_and_calls() {
         // Given
-        let block: Block =
+        let block: substreams_ethereum::pb::eth::v2::Block =
             testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
 
         // When
@@ -180,14 +175,15 @@ pub mod tests {
     #[test]
     fn test_filtered_transactions() {
         // Given
-        let block: Block =
-            testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
+        let bytes =
+            testing::read_block_bytes("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
+        let block = BlockLazyView::decode_lazy(&bytes).expect("Not able to decode Block");
 
         // When
         let result = substreams::testing::map!(filtered_transactions(
             "evt_addr:0x6b175474e89094c44da98b954eedeac495271d0f || call_method:0x029b2f34"
                 .to_owned(),
-            block,
+            &block,
         ))
         .expect("Failed to execute function");
 

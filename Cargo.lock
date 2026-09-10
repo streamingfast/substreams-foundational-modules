@@ -3352,7 +3352,7 @@ checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
 [[package]]
 name = "substreams"
 version = "0.7.6"
-source = "git+https://github.com/streamingfast/substreams-rs?branch=feature%2Fbuffa#8ae7d3952f4783db09fd5f0b689939c7cd35e7c5"
+source = "git+https://github.com/streamingfast/substreams-rs?branch=feature%2Fbuffa#1b5d55ca261c50a7aef8ed59bc06b385917e6cd2"
 dependencies = [
  "anyhow",
  "bigdecimal 0.4.10",
@@ -3389,7 +3389,7 @@ dependencies = [
 [[package]]
 name = "substreams-ethereum"
 version = "0.11.1"
-source = "git+https://github.com/streamingfast/substreams-ethereum?branch=feature%2Fbuffa#1c1806712819e1748d31f8a33a5d7ff2261c1368"
+source = "git+https://github.com/streamingfast/substreams-ethereum?branch=feature%2Fbuffa#1fcfb533f42ba161580fa090a31c9ed50161d98d"
 dependencies = [
  "getrandom 0.2.17",
  "num-bigint",
@@ -3402,7 +3402,7 @@ dependencies = [
 [[package]]
 name = "substreams-ethereum-abigen"
 version = "0.11.1"
-source = "git+https://github.com/streamingfast/substreams-ethereum?branch=feature%2Fbuffa#1c1806712819e1748d31f8a33a5d7ff2261c1368"
+source = "git+https://github.com/streamingfast/substreams-ethereum?branch=feature%2Fbuffa#1fcfb533f42ba161580fa090a31c9ed50161d98d"
 dependencies = [
  "anyhow",
  "ethabi 17.2.0",
@@ -3418,7 +3418,7 @@ dependencies = [
 [[package]]
 name = "substreams-ethereum-core"
 version = "0.11.1"
-source = "git+https://github.com/streamingfast/substreams-ethereum?branch=feature%2Fbuffa#1c1806712819e1748d31f8a33a5d7ff2261c1368"
+source = "git+https://github.com/streamingfast/substreams-ethereum?branch=feature%2Fbuffa#1fcfb533f42ba161580fa090a31c9ed50161d98d"
 dependencies = [
  "bigdecimal 0.3.1",
  "buffa",
@@ -3432,7 +3432,7 @@ dependencies = [
 [[package]]
 name = "substreams-ethereum-derive"
 version = "0.11.1"
-source = "git+https://github.com/streamingfast/substreams-ethereum?branch=feature%2Fbuffa#1c1806712819e1748d31f8a33a5d7ff2261c1368"
+source = "git+https://github.com/streamingfast/substreams-ethereum?branch=feature%2Fbuffa#1fcfb533f42ba161580fa090a31c9ed50161d98d"
 dependencies = [
  "ethabi 17.2.0",
  "heck 0.4.1",
@@ -3447,7 +3447,7 @@ dependencies = [
 [[package]]
 name = "substreams-macro"
 version = "0.7.6"
-source = "git+https://github.com/streamingfast/substreams-rs?branch=feature%2Fbuffa#8ae7d3952f4783db09fd5f0b689939c7cd35e7c5"
+source = "git+https://github.com/streamingfast/substreams-rs?branch=feature%2Fbuffa#1b5d55ca261c50a7aef8ed59bc06b385917e6cd2"
 dependencies = [
  "proc-macro2",
  "quote",

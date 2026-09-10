@@ -1,33 +1,42 @@
+use buffa::view::MessageView;
+
 use crate::{
     index,
     pb::sf::{
-        stellar::r#type::v1::Block,
+        stellar::r#type::v1::BlockLazyView,
         substreams::stellar::r#type::v1::{Transaction, Transactions},
     },
     utils,
 };
 
 #[substreams::handlers::map]
-fn map_transactions(block: Block) -> Result<Transactions, substreams::errors::Error> {
-    let transactions: Vec<Transaction> = block
-        .transactions
-        .into_iter()
-        .filter_map(|transaction| {
-            if utils::transaction_failed(transaction.status.to_i32()) {
-                return None;
-            }
+fn map_transactions(
+    block: &BlockLazyView<'_>,
+) -> Result<Transactions, substreams::errors::Error> {
+    let mut transactions: Vec<Transaction> = Vec::new();
 
-            Some(Transaction {
-                hash: transaction.hash,
-                status: transaction.status.to_i32(),
-                created_at: transaction.created_at,
-                application_order: transaction.application_order,
-                envelope_xdr: transaction.envelope_xdr,
-                result_xdr: transaction.result_xdr,
-                block_number: block.number,
-            })
-        })
-        .collect();
+    for transaction in block.transactions.iter() {
+        let transaction = transaction?;
+
+        if utils::transaction_failed(transaction.status.to_i32()) {
+            continue;
+        }
+
+        transactions.push(Transaction {
+            hash: transaction.hash.to_vec(),
+            status: transaction.status.to_i32(),
+            created_at: transaction
+                .created_at
+                .as_option()
+                .map(|t| t.to_owned_message())
+                .transpose()?
+                .into(),
+            application_order: transaction.application_order,
+            envelope_xdr: transaction.envelope_xdr.to_vec(),
+            result_xdr: transaction.result_xdr.to_vec(),
+            block_number: block.number,
+        });
+    }
 
     Ok(Transactions { transactions })
 }

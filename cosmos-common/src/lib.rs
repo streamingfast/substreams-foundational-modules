@@ -3,8 +3,9 @@ mod pb;
 
 use std::collections::HashMap;
 
-use crate::pb::sf::cosmos::r#type::v2::Block;
+use crate::pb::sf::cosmos::r#type::v2::BlockLazyView;
 use anyhow::anyhow;
+use buffa::view::{LazyMessageView, MessageView};
 use pb::sf::substreams::cosmos::v1::*;
 use pb::sf::substreams::v1::Clock;
 use sha2::{Digest, Sha256};
@@ -12,7 +13,7 @@ use substreams::errors::Error;
 use substreams::pb::sf::substreams::index::v1::Keys;
 
 #[substreams::handlers::map]
-pub fn all_events(block: Block) -> Result<EventList, Error> {
+pub fn all_events(block: &BlockLazyView<'_>) -> Result<EventList, Error> {
     // Mutable list to add the output of the Substreams
     let mut events: Vec<Event> = Vec::new();
 
@@ -21,28 +22,23 @@ pub fn all_events(block: Block) -> Result<EventList, Error> {
     }
 
     // block events are the combination of BeginBlockEvents and EndBlockEvents
-    events.extend(block.events.into_iter().map(|event| {
-        return Event {
-            event: event.into(),
+    for event in block.events.iter() {
+        events.push(Event {
+            event: event?.to_owned_message()?.into(),
             transaction_hash: "".to_string(),
-        };
-    }));
+        });
+    }
 
-    for (i, tx_result) in block.tx_results.into_iter().enumerate() {
+    for (i, tx_result) in block.tx_results.iter().enumerate() {
+        let tx_result = tx_result?;
         let tx_hash = compute_tx_hash(block.txs.get(i).unwrap());
 
-        let block_events: Vec<Event> = tx_result
-            .events
-            .into_iter()
-            .map(|event| {
-                return Event {
-                    event: event.into(),
-                    transaction_hash: tx_hash.clone(),
-                };
-            })
-            .collect();
-
-        events.extend(block_events);
+        for event in tx_result.events.iter() {
+            events.push(Event {
+                event: event?.to_owned_message()?.into(),
+                transaction_hash: tx_hash.clone(),
+            });
+        }
     }
 
     Ok(EventList {
@@ -50,7 +46,12 @@ pub fn all_events(block: Block) -> Result<EventList, Error> {
         clock: Clock {
             id: hex::encode(block.hash),
             number: block.height as u64,
-            timestamp: block.time,
+            timestamp: block
+                .time
+                .as_option()
+                .map(|t| t.to_owned_message())
+                .transpose()?
+                .into(),
         }
         .into(),
     })
@@ -232,10 +233,12 @@ mod tests {
     #[test]
     fn test_filtered_events() {
         // Given
-        let block = testing::read_block("./src/testdata/injective_mainnet_103863031.binpb.base64");
+        let bytes =
+            testing::read_block_bytes("./src/testdata/injective_mainnet_103863031.binpb.base64");
+        let block = BlockLazyView::decode_lazy(&bytes).expect("valid block");
 
         // When
-        let all_events = substreams::testing::map!(all_events(block)).unwrap();
+        let all_events = substreams::testing::map!(all_events(&block)).unwrap();
         let result =
             substreams::testing::map!(filtered_events("type:transfer".to_owned(), all_events));
 
@@ -251,10 +254,12 @@ mod tests {
     #[test]
     fn test_filtered_event_groups() {
         // Given
-        let block = testing::read_block("./src/testdata/injective_mainnet_103863031.binpb.base64");
+        let bytes =
+            testing::read_block_bytes("./src/testdata/injective_mainnet_103863031.binpb.base64");
+        let block = BlockLazyView::decode_lazy(&bytes).expect("valid block");
 
         // When
-        let all_events = substreams::testing::map!(all_events(block)).unwrap();
+        let all_events = substreams::testing::map!(all_events(&block)).unwrap();
         let result = substreams::testing::map!(filtered_event_groups(
             "type:transfer".to_owned(),
             all_events
@@ -282,10 +287,12 @@ mod tests {
     #[test]
     fn test_filtered_event_by_attribute_value() {
         // Given
-        let block = testing::read_block("./src/testdata/injective_mainnet_103863031.binpb.base64");
+        let bytes =
+            testing::read_block_bytes("./src/testdata/injective_mainnet_103863031.binpb.base64");
+        let block = BlockLazyView::decode_lazy(&bytes).expect("valid block");
 
         // When
-        let all_events = substreams::testing::map!(all_events(block)).unwrap();
+        let all_events = substreams::testing::map!(all_events(&block)).unwrap();
         let result = substreams::testing::map!(filtered_events_by_attribute_value(
             "type:transfer && attr:sender:inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk".to_owned(),
             all_events,
@@ -313,10 +320,12 @@ mod tests {
     #[test]
     fn test_filtered_event_groups_by_attribute_value() {
         // Given
-        let block = testing::read_block("./src/testdata/injective_mainnet_103863031.binpb.base64");
+        let bytes =
+            testing::read_block_bytes("./src/testdata/injective_mainnet_103863031.binpb.base64");
+        let block = BlockLazyView::decode_lazy(&bytes).expect("valid block");
 
         // When
-        let all_events = substreams::testing::map!(all_events(block)).unwrap();
+        let all_events = substreams::testing::map!(all_events(&block)).unwrap();
         let result = substreams::testing::map!(filtered_event_groups_by_attribute_value(
             "type:transfer && attr:sender".to_owned(),
             all_events,
