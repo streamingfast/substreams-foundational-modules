@@ -1,30 +1,28 @@
+use buffa::view::LazyMessageView;
 use substreams_solana::b58;
-use substreams_solana::pb::sf::solana::r#type::v1::Block;
+use substreams_solana::pb::sf::solana::r#type::v1::{Block, BlockLazyView};
 
 static VOTE_INSTRUCTION: [u8; 32] = b58!("Vote111111111111111111111111111111111111111");
 
 #[substreams::handlers::map]
-fn blocks_without_votes(mut block: Block) -> Result<Block, substreams::errors::Error> {
-    block.transactions.retain(|trx| {
-        let meta = match trx.meta.as_ref() {
-            Some(meta) => meta,
-            None => return false,
-        };
-        if meta.err.is_some() {
+fn blocks_without_votes(block: &BlockLazyView<'_>) -> Result<Block, substreams::errors::Error> {
+    let mut out = block.to_owned_message()?;
+
+    out.transactions.retain(|trx| {
+        if trx.meta.is_unset() || trx.transaction.is_unset() || trx.transaction.message.is_unset() {
+            return false;
+        }
+        if trx.meta.err.is_set() {
             return false;
         }
 
-        let transaction = match trx.transaction.as_ref() {
-            Some(transaction) => transaction,
-            None => return false,
-        };
-        let message = transaction.message.as_ref().expect("Message is missing");
+        let message = &trx.transaction.message;
 
         // Retain only transactions that do **not** contain a vote instruction
         !message.account_keys.iter().any(|v| v == &VOTE_INSTRUCTION)
     });
 
-    Ok(block)
+    Ok(out)
 }
 #[cfg(test)]
 mod tests {
@@ -33,10 +31,13 @@ mod tests {
     #[test]
     fn test_block_without_votes() {
         // Given
-        let block = testing::read_block("./src/testdata/solana_mainnet_313000000.binpb.base64");
+        let bytes =
+            testing::read_block_bytes("./src/testdata/solana_mainnet_313000000.binpb.base64");
+        let block = BlockLazyView::decode_lazy(&bytes).expect("valid block");
 
         // When
-        let result = substreams::testing::map!(blocks_without_votes(block)).expect("Failed to execute function");
+        let result = substreams::testing::map!(blocks_without_votes(&block))
+            .expect("Failed to execute function");
 
         // Expect
         result.transactions().for_each(|t| {

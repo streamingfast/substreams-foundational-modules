@@ -1,11 +1,11 @@
 use crate::pb::protocol;
 use crate::pb::sf::tron::r#type::v1::ResponseCode;
 use bs58;
-use prost::Message;
-use prost_types::Any;
+use buffa::Enumeration;
+use buffa::Message;
+use buffa_types::google::protobuf::Any;
 use protocol::transaction::contract::ContractType;
 use sha2::{Digest, Sha256};
-use std::convert::TryFrom;
 
 pub fn transaction_failed(status: i32) -> bool {
     status != ResponseCode::Success as i32
@@ -14,7 +14,7 @@ pub fn transaction_failed(status: i32) -> bool {
 /// Macro to extract parameter from a contract. Used to extract the from and to addresses from a contract.
 macro_rules! extract_param {
     ($struct_type:ty, $parameter:expr, $field:ident) => {
-        <$struct_type>::decode(&$parameter.value[..])
+        <$struct_type>::decode_from_slice(&$parameter.value[..])
             .ok()
             .map(|c| c.$field)
     };
@@ -23,7 +23,7 @@ macro_rules! extract_param {
 /// Extracts the 'from' (owner) address from a contract parameter, if available.
 /// Returns None if the contract type does not have an owner address.
 pub fn extract_from_address(contract_type: i32, parameter: &Any) -> Option<Vec<u8>> {
-    match ContractType::try_from(contract_type).ok() {
+    match ContractType::from_i32(contract_type) {
         Some(ContractType::TransferContract) => {
             extract_param!(protocol::TransferContract, parameter, owner_address)
         }
@@ -114,7 +114,7 @@ pub fn extract_from_address(contract_type: i32, parameter: &Any) -> Option<Vec<u
             owner_address
         ),
         Some(ContractType::ClearAbiContract) => {
-            extract_param!(protocol::ClearAbiContract, parameter, owner_address)
+            extract_param!(protocol::ClearABIContract, parameter, owner_address)
         }
         Some(ContractType::UpdateBrokerageContract) => {
             extract_param!(protocol::UpdateBrokerageContract, parameter, owner_address)
@@ -172,7 +172,7 @@ pub fn extract_from_address(contract_type: i32, parameter: &Any) -> Option<Vec<u
 /// Extracts the 'to' (recipient) address from a contract parameter, if available.
 /// Returns None if the contract type does not have a to address.
 pub fn extract_to_address(contract_type: i32, parameter: &Any) -> Option<Vec<u8>> {
-    match ContractType::try_from(contract_type).ok()? {
+    match ContractType::from_i32(contract_type)? {
         ContractType::TransferContract => {
             extract_param!(protocol::TransferContract, parameter, to_address)
         }
@@ -249,7 +249,7 @@ mod tests {
     use crate::pb::protocol;
     use crate::pb::protocol::transaction::contract::ContractType;
     use base64::Engine;
-    use prost_types::Any;
+    use buffa_types::google::protobuf::Any;
 
     // Helper macro to automate test generation for contract types with owner_address
     macro_rules! test_owner_extract {
@@ -259,10 +259,10 @@ mod tests {
                 let owner = vec![1, 2, 3, 4];
                 let mut contract = <$struct_type>::default();
                 contract.$field = owner.clone();
-                let any = Any {
-                    type_url: format!("type.googleapis.com/{}", stringify!($struct_type)),
-                    value: contract.encode_to_vec(),
-                };
+                let any = Any::pack(
+                    &contract,
+                    format!("type.googleapis.com/{}", stringify!($struct_type)),
+                );
                 let result = extract_from_address($contract_type as i32, &any);
                 assert_eq!(result, Some(owner));
             }
@@ -277,10 +277,10 @@ mod tests {
                 let to = vec![9, 8, 7, 6];
                 let mut contract = <$struct_type>::default();
                 contract.$field = to.clone();
-                let any = Any {
-                    type_url: format!("type.googleapis.com/{}", stringify!($struct_type)),
-                    value: contract.encode_to_vec(),
-                };
+                let any = Any::pack(
+                    &contract,
+                    format!("type.googleapis.com/{}", stringify!($struct_type)),
+                );
                 let result = extract_to_address($contract_type as i32, &any);
                 assert_eq!(result, Some(to));
             }
@@ -452,7 +452,7 @@ mod tests {
     test_owner_extract!(
         extract_clear_abi_contract,
         ContractType::ClearAbiContract,
-        protocol::ClearAbiContract,
+        protocol::ClearABIContract,
         owner_address
     );
     test_owner_extract!(
@@ -521,10 +521,10 @@ mod tests {
         let owner = vec![7, 7, 7, 7];
         let mut contract = protocol::ShieldedTransferContract::default();
         contract.transparent_from_address = owner.clone();
-        let any = Any {
-            type_url: "type.googleapis.com/protocol.ShieldedTransferContract".to_string(),
-            value: contract.encode_to_vec(),
-        };
+        let any = Any::pack(
+            &contract,
+            "type.googleapis.com/protocol.ShieldedTransferContract",
+        );
         let result = extract_from_address(ContractType::ShieldedTransferContract as i32, &any);
         assert_eq!(result, Some(owner));
     }
@@ -533,7 +533,7 @@ mod tests {
     fn extract_custom_contract_none() {
         let any = Any {
             type_url: "type.googleapis.com/protocol.CustomContract".to_string(),
-            value: vec![],
+            ..Default::default()
         };
         let result = extract_from_address(ContractType::CustomContract as i32, &any);
         assert_eq!(result, None);
@@ -543,7 +543,7 @@ mod tests {
     fn extract_get_contract_none() {
         let any = Any {
             type_url: "type.googleapis.com/protocol.GetContract".to_string(),
-            value: vec![],
+            ..Default::default()
         };
         let result = extract_from_address(ContractType::GetContract as i32, &any);
         assert_eq!(result, None);

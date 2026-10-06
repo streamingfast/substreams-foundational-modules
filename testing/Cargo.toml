@@ -14,4 +14,4 @@ name = "testing"
 [dependencies]
 anyhow = { workspace = true }
 base64 = { workspace = true }
-prost = { workspace = true }
+buffa = { workspace = true }

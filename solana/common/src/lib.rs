@@ -1,7 +1,7 @@
 mod block;
 mod index;
 mod keys;
-#[allow(dead_code)]
+#[allow(dead_code, unused_imports)]
 pub mod pb;
 mod transaction;
 

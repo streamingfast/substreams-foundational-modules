@@ -1,46 +1,52 @@
 use crate::{
-    keys::transaction_program_and_account_keys_vec, pb::sf::substreams::solana::v1::Transactions,
+    keys::lazy_transaction_program_and_account_keys_vec,
+    pb::sf::substreams::solana::v1::Transactions,
 };
-use substreams_solana::pb::sf::solana::r#type::v1::Block;
+use buffa::view::LazyMessageView;
+use substreams_solana::block_view::lazy::LazyTransaction;
+use substreams_solana::pb::sf::solana::r#type::v1::BlockLazyView;
 
 #[substreams::handlers::map]
 fn transactions_by_programid_without_votes(
     query: String,
-    block: Block,
+    block: &BlockLazyView<'_>,
 ) -> Result<Transactions, substreams::errors::Error> {
     let query = substreams::sqe::expr_matcher(&query);
 
-    let mut transactions = Transactions {
-        transactions: block.transactions,
-    };
-
-    transactions.transactions.retain(|trx| {
-        trx.walk_instructions().any(|view| {
+    let mut transactions = Vec::new();
+    for trx in block.transactions() {
+        let resolved = LazyTransaction::new(&trx)?;
+        let matched = resolved.walk_instructions()?.any(|view| {
             let key = format!("program:{}", view.program_id());
             query.matches_keys(&[key])
-        })
-    });
+        });
 
-    Ok(transactions)
+        if matched {
+            transactions.push(trx.to_owned_message()?);
+        }
+    }
+
+    Ok(Transactions { transactions })
 }
 
 #[substreams::handlers::map]
 fn transactions_by_programid_and_account_without_votes(
     query: String,
-    block: Block,
+    block: &BlockLazyView<'_>,
 ) -> Result<Transactions, substreams::errors::Error> {
     let query = substreams::sqe::expr_matcher(&query);
 
-    let mut transactions = Transactions {
-        transactions: block.transactions,
-    };
+    let mut transactions = Vec::new();
+    for trx in block.transactions() {
+        let resolved = LazyTransaction::new(&trx)?;
+        let keys = lazy_transaction_program_and_account_keys_vec(&resolved);
 
-    transactions.transactions.retain(|trx| {
-        let keys = transaction_program_and_account_keys_vec(trx);
-        query.matches_keys(&keys)
-    });
+        if query.matches_keys(&keys) {
+            transactions.push(trx.to_owned_message()?);
+        }
+    }
 
-    Ok(transactions)
+    Ok(Transactions { transactions })
 }
 
 #[cfg(test)]
@@ -52,12 +58,14 @@ mod tests {
     #[test]
     fn test_transactions_by_programid_without_votes() {
         // Given
-        let block = testing::read_block("./src/testdata/solana_mainnet_313000000.binpb.base64");
+        let bytes =
+            testing::read_block_bytes("./src/testdata/solana_mainnet_313000000.binpb.base64");
+        let block = BlockLazyView::decode_lazy(&bytes).expect("valid block");
 
         // When
         let result = substreams::testing::map!(transactions_by_programid_without_votes(
             "program:whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc".to_owned(),
-            block,
+            &block,
         ))
         .expect("Failed to execute function");
 
@@ -76,12 +84,14 @@ mod tests {
     #[test]
     fn test_transactions_by_programid_and_account_without_votes() {
         // Given
-        let block = testing::read_block("./src/testdata/solana_mainnet_313000000.binpb.base64");
+        let bytes =
+            testing::read_block_bytes("./src/testdata/solana_mainnet_313000000.binpb.base64");
+        let block = BlockLazyView::decode_lazy(&bytes).expect("valid block");
 
         // When
         let result = substreams::testing::map!(transactions_by_programid_and_account_without_votes(
             "program:whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc && account:5qrvgpvr55Eo7c5bBcwopdiQ6TpvceiRm42yjHTbtDvc".to_owned(),
-            block,
+            &block,
         ))
         .expect("Failed to execute function");
 
@@ -89,8 +99,8 @@ mod tests {
         result.transactions.into_iter().for_each(|transaction| {
             let mut matched = true;
 
-            if let Some(tx) = transaction.transaction.as_ref() {
-                if let Some(msg) = tx.message.as_ref() {
+            if let Some(tx) = transaction.transaction.as_option() {
+                if let Some(msg) = tx.message.as_option() {
                     if !msg.account_keys.iter().any(|acct| {
                         base58::encode(acct) == "5qrvgpvr55Eo7c5bBcwopdiQ6TpvceiRm42yjHTbtDvc"
                     }) {
@@ -128,13 +138,16 @@ mod tests {
     #[test]
     fn test_transactions_by_programid_and_account_without_votes_account_keys() {
         // Given
-        let block: Block =
+        let bytes =
+            testing::read_block_bytes("./src/testdata/solana_mainnet_318251413.binpb.base64");
+        let view = BlockLazyView::decode_lazy(&bytes).expect("valid block");
+        let block: substreams_solana::pb::sf::solana::r#type::v1::Block =
             testing::read_block("./src/testdata/solana_mainnet_318251413.binpb.base64");
 
         // When
         let result = substreams::testing::map!(transactions_by_programid_and_account_without_votes(
             "program:JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4 && account:3EsvvyqporKr5DVpzWsdYCphpXqXnQBMQLGNwSH5MmRE".to_owned(),
-            block.clone(),
+            &view,
         ))
         .expect("Failed to execute function");
 
@@ -154,8 +167,8 @@ mod tests {
                     matched = false;
                 }
 
-                if let Some(tx) = transaction.transaction.as_ref() {
-                    if let Some(msg) = tx.message.as_ref() {
+                if let Some(tx) = transaction.transaction.as_option() {
+                    if let Some(msg) = tx.message.as_option() {
                         if !msg
                             .account_keys
                             .iter()

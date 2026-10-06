@@ -66,7 +66,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             destination: payment.destination.to_string(),
-                            asset: Some(utils::create_asset(&payment.asset)),
+                            asset: utils::create_asset(&payment.asset).into(),
                             amount: payment.amount,
                         })),
                     });
@@ -76,7 +76,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         op: Some(Op::CreateClaimableBalance(CreateClaimableBalance {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
-                            asset: Some(utils::create_asset(&create_claim_balance.asset)),
+                            asset: utils::create_asset(&create_claim_balance.asset).into(),
                             amount: create_claim_balance.amount,
                             claimants: create_claim_balance
                                 .claimants
@@ -104,7 +104,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         op: Some(Op::Clawback(Clawback {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
-                            asset: Some(utils::create_asset(&clawback.asset)),
+                            asset: utils::create_asset(&clawback.asset).into(),
                             from: clawback.from.to_string(),
                             amount: clawback.amount,
                         })),
@@ -138,7 +138,7 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
                             trustor: set_trust_line_flags.trustor.to_string(),
-                            asset: Some(utils::create_asset(&set_trust_line_flags.asset)),
+                            asset: utils::create_asset(&set_trust_line_flags.asset).into(),
                             clear_flags: set_trust_line_flags.clear_flags,
                             set_flags: set_trust_line_flags.set_flags,
                         })),
@@ -155,8 +155,8 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                                 .to_string(),
                             max_amount_a: liquidity_pool_deposit.max_amount_a,
                             max_amount_b: liquidity_pool_deposit.max_amount_b,
-                            min_price: Some(utils::create_price(&liquidity_pool_deposit.min_price)),
-                            max_price: Some(utils::create_price(&liquidity_pool_deposit.max_price)),
+                            min_price: utils::create_price(&liquidity_pool_deposit.min_price).into(),
+                            max_price: utils::create_price(&liquidity_pool_deposit.max_price).into(),
                         })),
                     });
                 }
@@ -182,10 +182,10 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         op: Some(Op::ManageBuyOffer(ManageBuyOffer {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
-                            selling: Some(utils::create_asset(&manage_buy_offer.selling)),
-                            buying: Some(utils::create_asset(&manage_buy_offer.buying)),
+                            selling: utils::create_asset(&manage_buy_offer.selling).into(),
+                            buying: utils::create_asset(&manage_buy_offer.buying).into(),
                             buy_amount: manage_buy_offer.buy_amount,
-                            price: Some(utils::create_price(&manage_buy_offer.price)),
+                            price: utils::create_price(&manage_buy_offer.price).into(),
                             offer_id: manage_buy_offer.offer_id,
                         })),
                     });
@@ -195,10 +195,10 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         op: Some(Op::ManageSellOffer(ManageSellOffer {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
-                            selling: Some(utils::create_asset(&manage_sell_offer.selling)),
-                            buying: Some(utils::create_asset(&manage_sell_offer.buying)),
+                            selling: utils::create_asset(&manage_sell_offer.selling).into(),
+                            buying: utils::create_asset(&manage_sell_offer.buying).into(),
                             amount: manage_sell_offer.amount,
-                            price: Some(utils::create_price(&manage_sell_offer.price)),
+                            price: utils::create_price(&manage_sell_offer.price).into(),
                             offer_id: manage_sell_offer.offer_id,
                         })),
                     });
@@ -208,10 +208,10 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         op: Some(Op::CreatePassiveSellOffer(CreatePassiveSellOffer {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
-                            selling: Some(utils::create_asset(&create_passive_sell.selling)),
-                            buying: Some(utils::create_asset(&create_passive_sell.buying)),
+                            selling: utils::create_asset(&create_passive_sell.selling).into(),
+                            buying: utils::create_asset(&create_passive_sell.buying).into(),
                             amount: create_passive_sell.amount,
-                            price: Some(utils::create_price(&create_passive_sell.price)),
+                            price: utils::create_price(&create_passive_sell.price).into(),
                         })),
                     });
                 }
@@ -222,14 +222,10 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         op: Some(Op::PathPaymentStrictSend(PathPaymentStrictSend {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
-                            send_asset: Some(utils::create_asset(
-                                &path_payment_strict_send.send_asset,
-                            )),
+                            send_asset: utils::create_asset(&path_payment_strict_send.send_asset).into(),
                             send_amount: path_payment_strict_send.send_amount,
                             destination: path_payment_strict_send.destination.to_string(),
-                            dest_asset: Some(utils::create_asset(
-                                &path_payment_strict_send.dest_asset,
-                            )),
+                            dest_asset: utils::create_asset(&path_payment_strict_send.dest_asset).into(),
                             dest_min: path_payment_strict_send.dest_min,
                             path: path_payment_strict_send
                                 .path
@@ -246,14 +242,10 @@ fn map_operations(transactions: Transactions) -> Result<Operations, substreams::
                         op: Some(Op::PathPaymentStrictReceive(PathPaymentStrictReceive {
                             trx_hash: hash.clone(),
                             ledger_sequence: transaction.block_number,
-                            send_asset: Some(utils::create_asset(
-                                &path_payment_strict_receive.send_asset,
-                            )),
+                            send_asset: utils::create_asset(&path_payment_strict_receive.send_asset).into(),
                             send_max: path_payment_strict_receive.send_max,
                             destination: path_payment_strict_receive.destination.to_string(),
-                            dest_asset: Some(utils::create_asset(
-                                &path_payment_strict_receive.dest_asset,
-                            )),
+                            dest_asset: utils::create_asset(&path_payment_strict_receive.dest_asset).into(),
                             dest_amount: path_payment_strict_receive.dest_amount,
                             path: path_payment_strict_receive
                                 .path

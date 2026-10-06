@@ -13,8 +13,8 @@ crate-type = ["cdylib"]
 
 [dependencies]
 five8 = "0.2"
-prost = { workspace = true }
-prost-types = { workspace = true }
+buffa = { workspace = true }
+buffa-types = { workspace = true }
 substreams = { workspace = true }
 
 [dev-dependencies]

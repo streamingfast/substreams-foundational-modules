@@ -1,10 +1,10 @@
-#[allow(dead_code)]
+#[allow(dead_code, unused_imports)]
 mod pb;
 
 use crate::pb::sf::substreams::foundational_store::model::v2::{Entry, Key, SinkEntries};
 use crate::pb::sf::substreams::solana::spl::v1::AccountOwner;
 use crate::pb::sf::substreams::solana::v1::Transactions as SolanaTransactions;
-use prost_types::Any;
+use buffa_types::google::protobuf::Any;
 use spl_token_2022::instruction::TokenInstruction;
 use spl_token_metadata_interface::instruction::TokenMetadataInstruction;
 use substreams::errors::Error;
@@ -37,18 +37,16 @@ fn map_spl_initialized_account(
             owner: initialized_account.owner,
         };
 
-        let mut buf = Vec::new();
-        prost::Message::encode(&account_owner, &mut buf).unwrap();
-
         let entry = Entry {
-            key: Some(Key {
+            key: Key {
                 bytes: account.to_vec(),
-            }),
-            value: Some(Any {
-                type_url: "type.googleapis.com/sf.substreams.solana.spl.v1.AccountOwner"
-                    .to_string(),
-                value: buf,
-            }),
+            }
+            .into(),
+            value: Any::pack(
+                &account_owner,
+                "type.googleapis.com/sf.substreams.solana.spl.v1.AccountOwner",
+            )
+            .into(),
         };
         // substreams::log::info!("adding key: {}", account);
         entries.push(entry);
@@ -172,8 +170,8 @@ mod tests {
             .transactions_owned()
             .into_iter()
             .filter(|trx| {
-                if let Some(transaction) = &trx.transaction {
-                    if let Some(message) = &transaction.message {
+                if let Some(transaction) = trx.transaction.as_option() {
+                    if let Some(message) = transaction.message.as_option() {
                         return message.account_keys.iter().any(|key| {
                             let key_str = bs58::encode(key).into_string();
                             key_str == SOLANA_TOKEN_PROGRAM_KEG
@@ -193,9 +191,9 @@ mod tests {
         assert_eq!(result.entries.len(), 188, "Unexpected number of entries");
 
         for entry in result.entries {
-            assert!(entry.value.is_some(), "Entry value should not be None");
+            assert!(entry.value.is_set(), "Entry value should not be None");
 
-            if let Some(value) = &entry.value {
+            if let Some(value) = entry.value.as_option() {
                 assert_eq!(
                     value.type_url, "type.googleapis.com/sf.substreams.solana.spl.v1.AccountOwner",
                     "Type URL should match AccountOwner"

@@ -8,41 +8,40 @@ use substreams::Hex;
 use crate::{
     index::event_keys,
     pb::sf::{
-        stellar::r#type::v1::Block,
+        stellar::r#type::v1::BlockLazyView,
         substreams::stellar::r#type::v1::{Event, Events},
     },
     utils::transaction_failed,
 };
 
 #[substreams::handlers::map]
-fn map_events(block: Block) -> Result<Events, substreams::errors::Error> {
-    let contract_events = block
-        .transactions
-        .into_iter()
-        .filter(|transaction| !transaction_failed(transaction.status))
-        .filter_map(|transaction| transaction.events)
-        .flat_map(|events| {
-            events
-                .contract_events_xdr
-                .into_iter()
-                .flat_map(|contract_event_group| {
-                    contract_event_group
-                        .events
-                        .into_iter()
-                        .filter_map(|event_bytes| {
-                            match decode_contract_event(&event_bytes) {
-                                Ok(event) => Some(event),
-                                Err(e) => {
-                                    substreams::log::info!("Skipping event: decode error: {}", e);
-                                    None
-                                }
-                            }
-                        })
-                        .collect::<Vec<Event>>()
-                })
-                .collect::<Vec<Event>>()
-        })
-        .collect();
+fn map_events(block: &BlockLazyView<'_>) -> Result<Events, substreams::errors::Error> {
+    let mut contract_events: Vec<Event> = Vec::new();
+
+    for transaction in block.transactions.iter() {
+        let transaction = transaction?;
+
+        if transaction_failed(transaction.status.to_i32()) {
+            continue;
+        }
+
+        let Some(events) = transaction.events.get()? else {
+            continue;
+        };
+
+        for contract_event_group in events.contract_events_xdr.iter() {
+            let contract_event_group = contract_event_group?;
+
+            for event_bytes in contract_event_group.events.iter() {
+                match decode_contract_event(event_bytes) {
+                    Ok(event) => contract_events.push(event),
+                    Err(e) => {
+                        substreams::log::info!("Skipping event: decode error: {}", e);
+                    }
+                }
+            }
+        }
+    }
 
     Ok(Events {
         events: contract_events,
