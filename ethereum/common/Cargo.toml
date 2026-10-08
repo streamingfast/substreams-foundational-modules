@@ -1,6 +1,6 @@
 [package]
 name = "ethereum-common"
-version = "0.3.3"
+version = "0.4.0"
 description = "Foundational Substreams Modules for Ethereum"
 repository = "https://github.com/streamingfast/substreams-foundational-modules/ethereum-common"
 edition.workspace = true
@@ -13,13 +13,8 @@ categories.workspace = true
 bench = false
 crate-type = ["cdylib"]
 
-[[bench]]
-name = "filter_calls"
-harness = false
-
 [dependencies]
 anyhow = { workspace = true }
-ethabi = "17"
 hex-literal = "0.3"
 num-bigint = { workspace = true }
 buffa = { workspace = true }
@@ -27,10 +22,5 @@ buffa-types = { workspace = true }
 substreams = { workspace = true }
 substreams-ethereum = { workspace = true }
 
-# Required so that ethabi > ethereum-types build correctly under wasm32-unknown-unknown
-[target.wasm32-unknown-unknown.dependencies]
-getrandom = { version = "0.2", features = ["custom"] }
-
 [dev-dependencies]
-criterion = { version = "0.5", features = ["html_reports"] }
 testing = { workspace = true }

@@ -1,68 +1,4 @@
-use crate::pb::sf::substreams::ethereum::v1::{Call, Calls};
-use crate::pb::sf::substreams::v1::Clock;
-use anyhow::Ok;
-use substreams::errors::Error;
-use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
-use substreams_ethereum::pb::eth::v2::{Block, TransactionTraceStatus};
-
-#[substreams::handlers::map]
-fn all_calls(blk: Block) -> Result<Calls, Error> {
-    let clock = Clock {
-        timestamp: blk.header.timestamp.clone(),
-        id: Hex::encode(&blk.hash),
-        number: blk.number,
-    };
-
-    let calls: Vec<Call> = blk
-        .transaction_traces
-        .into_iter()
-        .filter(|tx| tx.status == TransactionTraceStatus::Succeeded)
-        .map(|tx| (tx.calls, tx.hash))
-        .flat_map(|(call, hash)| {
-            call.into_iter().map(move |c| Call {
-                tx_hash: Hex::encode(&hash),
-                call: c.into(),
-            })
-        })
-        .collect();
-
-    Ok(Calls {
-        calls: calls,
-        clock: clock.into(),
-    })
-}
-
-#[substreams::handlers::map]
-fn index_calls(calls: Calls) -> Result<Keys, Error> {
-    let mut keys = Keys::default();
-
-    calls.calls.into_iter().for_each(|call| {
-        if let Some(call) = call.call.as_option() {
-            call_keys(call).into_iter().for_each(|k| {
-                keys.keys.push(k);
-            });
-        }
-    });
-    Ok(keys)
-}
-
-#[substreams::handlers::map]
-fn filtered_calls(query: String, mut calls: Calls) -> Result<Calls, Error> {
-    let matcher = substreams::sqe::expr_matcher(&query);
-
-    calls.calls.retain(|call| {
-        let Some(inner) = call.call.as_option() else {
-            return false;
-        };
-        let keys = call_keys(inner);
-        let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
-
-        matcher.matches_keys(&keys)
-    });
-
-    Ok(calls)
-}
 
 /// The call fields the index keys are built from, implemented for both the owned
 /// `Call` and buffa's `CallLazyView`.
@@ -122,37 +58,21 @@ pub fn call_keys<C: CallKeyed + ?Sized>(call: &C) -> Vec<String> {
 #[cfg(test)]
 pub mod tests {
     use super::*;
+    use buffa::view::LazyMessageView;
+    use substreams_ethereum::pb::eth::v2::BlockLazyView;
 
+    /// The fixture block holds 670 calls across its successful transactions, so
+    /// `call_keys` yields one `call_from` and one `call_to` for each.
     #[test]
-    fn test_all_calls() {
-        let block = testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
+    fn test_call_keys_over_a_real_block() {
+        let bytes =
+            testing::read_block_bytes("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
+        let block = BlockLazyView::decode_lazy(&bytes).expect("Not able to decode Block");
 
-        let result =
-            substreams::testing::map!(all_calls(block)).expect("Failed to execute function");
-        assert_eq!(result.calls.len(), 670);
-    }
+        let keys: Vec<String> = block.calls().flat_map(|call| call_keys(&call)).collect();
 
-    #[test]
-    fn test_filtered_calls() {
-        // Given
-        let block: Block =
-            testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
-
-        // When
-        let result = substreams::testing::map!(filtered_calls(
-            "call_from:0x5acc84a3e955bdd76467d3348077d003f00ffb97".to_owned(),
-            substreams::testing::map!(all_calls(block)).unwrap(),
-        ))
-        .expect("Failed to execute function");
-
-        // Expect
-        result.calls.iter().for_each(|c| {
-            let caller = &c.call.caller;
-
-            assert_eq!(
-                Hex::encode(&caller),
-                "5acc84a3e955bdd76467d3348077d003f00ffb97"
-            );
-        });
+        assert_eq!(keys.iter().filter(|k| k.starts_with("call_from:")).count(), 670);
+        assert_eq!(keys.iter().filter(|k| k.starts_with("call_to:")).count(), 670);
+        assert!(keys.iter().any(|k| k == "call_from:0x5acc84a3e955bdd76467d3348077d003f00ffb97"));
     }
 }

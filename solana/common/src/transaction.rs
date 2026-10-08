@@ -15,6 +15,7 @@ fn transactions_by_programid_without_votes(
 
     let mut transactions = Vec::new();
     for trx in block.transactions() {
+        let trx = trx?;
         let resolved = LazyTransaction::new(&trx)?;
         let matched = resolved.walk_instructions()?.any(|view| {
             let key = format!("program:{}", view.program_id());
@@ -38,6 +39,7 @@ fn transactions_by_programid_and_account_without_votes(
 
     let mut transactions = Vec::new();
     for trx in block.transactions() {
+        let trx = trx?;
         let resolved = LazyTransaction::new(&trx)?;
         let keys = lazy_transaction_program_and_account_keys_vec(&resolved);
 

@@ -1,68 +1,18 @@
-use crate::pb::sf::substreams::ethereum::v1::{Event, Events};
-use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use substreams::errors::Error;
 use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
-use substreams_ethereum::pb::eth::v2::{Block, TransactionTraceStatus};
+use substreams_ethereum::pb::eth::v2::BlockLazyView;
 
 #[substreams::handlers::map]
-fn all_events(blk: Block) -> Result<Events, Error> {
-    let clock = Clock {
-        timestamp: blk.header.timestamp.clone(),
-        id: Hex::encode(&blk.hash),
-        number: blk.number,
-    };
-
-    let events: Vec<Event> = blk
-        .transaction_traces
-        .into_iter()
-        .filter(|tx| tx.status == TransactionTraceStatus::Succeeded)
-        .map(|tx| (tx.receipt.into_option().unwrap_or_default().logs, tx.hash))
-        .flat_map(|(log, hash)| {
-            log.into_iter().map(move |l| Event {
-                tx_hash: Hex::encode(&hash),
-                log: l.into(),
-            })
-        })
-        .collect();
-
-    Ok(Events {
-        events: events,
-        clock: clock.into(),
-    })
-}
-
-#[substreams::handlers::map]
-fn index_events(events: Events) -> Result<Keys, Error> {
+fn index_events(block: &BlockLazyView<'_>) -> Result<Keys, Error> {
     let mut keys = Keys::default();
 
-    events.events.into_iter().for_each(|e| {
-        if let Some(log) = e.log.as_option() {
-            evt_keys(&log).into_iter().for_each(|k| {
-                keys.keys.push(k);
-            });
-        }
-    });
+    for log in block.logs() {
+        keys.keys.extend(evt_keys(&log));
+    }
 
     Ok(keys)
-}
-
-#[substreams::handlers::map]
-fn filtered_events(query: String, mut events: Events) -> Result<Events, Error> {
-    let matcher = substreams::sqe::expr_matcher(&query);
-
-    events.events.retain(|event| {
-        let Some(log) = event.log.as_option() else {
-            return false;
-        };
-        let keys = evt_keys(log);
-        let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
-
-        matcher.matches_keys(&keys)
-    });
-
-    Ok(events)
 }
 
 /// The log fields the index keys are built from, implemented for both the owned
@@ -119,29 +69,27 @@ pub fn evt_keys<L: EvtKeyed + ?Sized>(log: &L) -> Vec<String> {
 #[cfg(test)]
 pub mod tests {
     use super::*;
+    use buffa::view::LazyMessageView;
 
     #[test]
-    fn test_filtered_events() {
+    fn test_index_events() {
         // Given
-        let block: Block =
-            testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
+        let bytes = testing::read_block_bytes("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
+        let block = BlockLazyView::decode_lazy(&bytes).expect("Not able to decode Block");
 
         // When
-        let result = substreams::testing::map!(filtered_events(
-            "evt_addr:0x5acc84a3e955bdd76467d3348077d003f00ffb97".to_owned(),
-            substreams::testing::map!(all_events(block)).unwrap(),
-        ))
-        .expect("Failed to execute function");
+        let keys = substreams::testing::map!(index_events(&block))
+            .expect("Failed to execute function");
 
         // Expect
-        assert!(result.events.len() > 0);
-        result.events.iter().for_each(|e| {
-            let address: &Vec<u8> = &e.log.address;
-
-            assert_eq!(
-                Hex::encode(address),
-                "5acc84a3e955bdd76467d3348077d003f00ffb97"
-            );
-        });
+        assert!(keys.keys.len() > 0);
+        assert!(keys
+            .keys
+            .iter()
+            .all(|k| k.starts_with("evt_sig:0x") || k.starts_with("evt_addr:0x")));
+        assert!(keys
+            .keys
+            .iter()
+            .any(|k| k == "evt_addr:0x5acc84a3e955bdd76467d3348077d003f00ffb97"));
     }
 }

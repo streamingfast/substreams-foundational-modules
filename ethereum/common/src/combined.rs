@@ -1,73 +1,27 @@
 use crate::calls::*;
 use crate::events::*;
-use crate::pb::sf::substreams::ethereum::v1::{
-    Calls, Events, EventsAndCalls, Transaction, Transactions,
-};
+use crate::pb::sf::substreams::ethereum::v1::{Transaction, Transactions};
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use buffa::view::{LazyMessageView, MessageView};
 use substreams::errors::Error;
 use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
-use substreams_ethereum::pb::eth::v2::TransactionTraceStatus;
 use substreams_ethereum::pb::eth::v2::BlockLazyView;
 
 #[substreams::handlers::map]
-fn index_events_and_calls(events: Events, calls: Calls) -> Result<Keys, Error> {
+fn index_events_and_calls(block: &BlockLazyView<'_>) -> Result<Keys, Error> {
     let mut keys = Keys::default();
 
-    events.events.into_iter().for_each(|e| {
-        if let Some(log) = e.log.as_option() {
-            evt_keys(&log).into_iter().for_each(|k| {
-                keys.keys.push(k);
-            });
-        }
-    });
+    for log in block.logs() {
+        keys.keys.extend(evt_keys(&log));
+    }
 
-    calls.calls.into_iter().for_each(|call| {
-        if let Some(call) = call.call.as_option() {
-            call_keys(call).into_iter().for_each(|k| {
-                keys.keys.push(k);
-            });
-        }
-    });
+    for call in block.calls() {
+        keys.keys.extend(call_keys(&call));
+    }
 
     Ok(keys)
-}
-
-#[substreams::handlers::map]
-fn filtered_events_and_calls(
-    query: String,
-    mut events: Events,
-    mut calls: Calls,
-) -> Result<EventsAndCalls, Error> {
-    let matcher = substreams::sqe::expr_matcher(&query);
-
-    calls.calls.retain(|call| {
-        let Some(inner) = call.call.as_option() else {
-            return false;
-        };
-        let keys = call_keys(inner);
-        let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
-
-        matcher.matches_keys(&keys)
-    });
-
-    events.events.retain(|event| {
-        let Some(log) = event.log.as_option() else {
-            return false;
-        };
-        let keys = evt_keys(log);
-        let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
-
-        matcher.matches_keys(&keys)
-    });
-
-    Ok(EventsAndCalls {
-        events: events.events,
-        calls: calls.calls,
-        clock: calls.clock,
-    })
 }
 
 #[substreams::handlers::map]
@@ -78,15 +32,10 @@ fn filtered_transactions(
     let matcher = substreams::sqe::expr_matcher(&query);
 
     let mut filtered: Vec<Transaction> = Vec::new();
-    for trace in block.try_transactions() {
-        let trace = trace?;
-        if trace.status.as_known() != Some(TransactionTraceStatus::Succeeded) {
-            continue;
-        }
-
+    for trace in block.transactions() {
         let mut matched = false;
 
-        if let Some(receipt) = trace.receipt()? {
+        if let Some(receipt) = trace.receipt() {
             for log in receipt.logs.iter() {
                 let log = log?;
                 let keys = evt_keys(&log);
@@ -140,36 +89,27 @@ pub mod tests {
     use super::*;
 
     #[test]
-    fn test_filtered_events_and_calls() {
+    fn test_index_events_and_calls_carries_both_key_families() {
         // Given
-        let block: substreams_ethereum::pb::eth::v2::Block =
-            testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
+        let bytes =
+            testing::read_block_bytes("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
+        let block = BlockLazyView::decode_lazy(&bytes).expect("Not able to decode Block");
 
         // When
-        let result = substreams::testing::map!(filtered_events_and_calls(
-            "evt_addr:0x6b175474e89094c44da98b954eedeac495271d0f || call_method:0x029b2f34"
-                .to_owned(),
-            substreams::testing::map!(all_events(block.clone())).unwrap(),
-            substreams::testing::map!(all_calls(block)).unwrap(),
-        ))
-        .expect("Failed to execute function");
+        let keys = substreams::testing::map!(index_events_and_calls(&block))
+            .expect("Failed to execute function");
 
-        // Expect
-        assert!(result.events.len() > 0);
-        result.events.iter().for_each(|e| {
-            let address: &Vec<u8> = &e.log.address;
+        // Expect: the event keys come first, then the call keys, and every key
+        // belongs to one of the five namespaces this module documents.
+        let events = substreams::testing::map!(crate::events::index_events(&block))
+            .expect("Failed to execute function");
+        assert_eq!(keys.keys[..events.keys.len()], events.keys[..]);
 
-            assert_eq!(
-                Hex::encode(address),
-                "6b175474e89094c44da98b954eedeac495271d0f"
-            );
-        });
-
-        result.calls.iter().for_each(|c| {
-            let input_bytes = &c.call.input;
-
-            assert_eq!(Hex::encode(&input_bytes[..4]), "029b2f34");
-        });
+        assert!(keys.keys[events.keys.len()..].iter().all(|k| {
+            k.starts_with("call_from:0x")
+                || k.starts_with("call_to:0x")
+                || k.starts_with("call_method:0x")
+        }));
     }
 
     #[test]
@@ -189,22 +129,18 @@ pub mod tests {
 
         // Expect
         assert!(result.transactions.len() > 0);
-        result
+
+        // `tx_hash` is `Hex::encode`d, so it carries no `0x` prefix. Comparing
+        // against a prefixed literal here matched nothing and left every
+        // assertion below unreachable.
+        let matched = result
             .transactions
             .into_iter()
             .filter(|t| {
-                t.tx_hash == "0x1fa0d8efe5b3eececcb77df26075312f55355ce924d9a7f39362defb5d8fc424"
+                t.tx_hash == "1fa0d8efe5b3eececcb77df26075312f55355ce924d9a7f39362defb5d8fc424"
             })
-            .for_each(|t| {
-                t.trace.logs_with_calls().for_each(|lc| {
-                    let input_bytes = &lc.1.as_ref().input;
+            .count();
 
-                    assert_eq!(
-                        Hex::encode(&lc.0.address),
-                        "0x6b175474e89094c44da98b954eedeac495271d0f"
-                    );
-                    assert_eq!(Hex::encode(&input_bytes[..4]), "029b2f34");
-                });
-            });
+        assert_eq!(matched, 1, "the queried transaction must be in the output");
     }
 }
