@@ -139,22 +139,8 @@ network: mainnet
 
 networks:
   mainnet: {}
-  base: {}
-  bsc: {}
-  optimism: {}
-  arbitrum-one: {}
-  matic: {}
-  avalanche: {}
-  celo: {}
-  linea: {}
-  unichain: {}
-  ink: {}
-  soneium: {}
-  worldchain: {}
-  zora: {}
-  monad: {}
-  blast-mainnet: {}
-  xlayer-mainnet: {}
+  sepolia: {}
+  hoodi: {}
 
 params:
   filtered_events: "evt_sig:0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31"
