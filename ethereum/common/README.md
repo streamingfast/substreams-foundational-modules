@@ -1,50 +1,48 @@
 ## Substreams Ethereum Foundational Modules
 
-Common Ethereum Substreams modules to filter transactions, with block indexes to skip
-the blocks that cannot match.
+Common Ethereum Substreams modules to extract events, calls and transactions, with block
+indexes to skip the blocks that cannot match.
 
-### Modules
+### Filtered modules
 
-* `filtered_transactions` takes a query string as its parameter and returns the
-  matching transactions, each with its receipt and calls. The same query drives the
-  block filter, so blocks without a possible match are never read.
+Each takes a query string as its parameter and returns only the matching items. The same
+query drives the block filter, so blocks without a possible match are never read.
 
-  Supported operators are logical or `||`, logical and `&&`, and parentheses `()`.
-  Addresses and signatures are 0x-prefixed lowercase hexadecimal, prefixed by
-  `evt_addr:`, `evt_sig:`, `call_to:`, `call_from:` or `call_method:`.
+* `filtered_events` matches on event address (`evt_addr:`) and signature (`evt_sig:`)
+* `filtered_calls` matches on called contract (`call_to:`), caller (`call_from:`) and
+  method signature (`call_method:`)
+* `filtered_events_and_calls` matches on either family and returns both
+* `filtered_transactions` matches on either family and returns the whole transaction
+  trace of each match, receipt and calls included
 
-  ```
-  ((evt_addr:0x1234… || evt_addr:0x5678…) && evt_sig:0xdeadbeef…) || call_to:0x0101…
-  ```
+Supported operators are logical or `||`, logical and `&&`, and parentheses `()`.
+Addresses and signatures are 0x-prefixed lowercase hexadecimal.
 
-* `index_events` is a block index over event signatures (`evt_sig:`) and event addresses
-  (`evt_addr:`).
-
-* `index_events_and_calls` emits the same event keys plus call keys: `call_to:`,
-  `call_from:` and `call_method:`.
-
-Use either index as the `blockFilter` of your own module to have the engine skip
-blocks whose keys cannot satisfy your query.
+```
+((evt_addr:0x1234… || evt_addr:0x5678…) && evt_sig:0xdeadbeef…) || call_to:0x0101…
+```
 
 A query cannot combine event keys with call keys using `&&`. The matcher is evaluated
 against one log's keys, then one call's keys, so no single item carries both families and
-`evt_sig:… && call_method:…` matches nothing. Use `||` to match either, and filter further
-in your own module.
+`evt_sig:… && call_method:…` matches nothing. Use `||` to match either.
+
+### Block indexes
+
+Use one as the `blockFilter` of your own module to have the engine skip blocks whose keys
+cannot satisfy your query.
+
+* `index_events` emits `evt_sig:` and `evt_addr:`
+* `index_calls` emits `call_to:`, `call_from:` and `call_method:`
+* `index_events_and_calls` emits all five
 
 ### Removed in v0.4.0
 
-`all_events`, `all_calls`, `index_calls`, `filtered_events`, `filtered_calls` and
-`filtered_events_and_calls` were removed. The two surviving indexes read the block
-directly instead of going through a shared intermediate module, so the same keys are
-produced without materialising every event and call of every block first.
+`all_events` and `all_calls` were removed. They materialised every event and every call of
+every block so that the modules above could read them, which held the same data twice and
+wrote it to the object store on the way through. Those modules now read the block directly
+and lazily, decoding only what a query matches, and emit exactly what they emitted before.
 
-If you consumed one of them:
+If you consumed `all_events` or `all_calls` directly, read the block in your own module, or
+use `filtered_events` / `filtered_calls` with a query.
 
-| removed | use instead |
-|---|---|
-| `filtered_events`, `filtered_calls`, `filtered_events_and_calls` | `filtered_transactions`, whose query covers both event and call keys. Note it returns whole transaction traces, not a list of logs or calls, so a module that only read events now receives more data per match and should narrow it itself. |
-| `index_calls` | `index_events_and_calls`, which emits the call keys unchanged |
-| `all_events`, `all_calls` | read the block in your own module |
-
-The surviving modules emit the same keys as before, but every module hash changed, so
-cached state from v0.3.3 and earlier is not reused.
+Every module hash changed, so cached state from v0.3.3 and earlier is not reused.

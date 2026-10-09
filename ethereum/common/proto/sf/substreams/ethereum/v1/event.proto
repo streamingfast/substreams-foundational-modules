@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package sf.substreams.ethereum.v1;
+
+import 'sf/ethereum/type/v2/type.proto';
+import 'sf/substreams/v1/clock.proto';
+
+message Events {
+  sf.substreams.v1.Clock clock = 1;
+  repeated Event events = 2;
+  reserved 3; // for cross-compatibility with Call message
+}
+
+message Event {
+  sf.ethereum.type.v2.Log log = 1;
+  string tx_hash = 2;
+}
