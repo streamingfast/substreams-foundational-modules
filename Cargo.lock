@@ -889,8 +889,6 @@ dependencies = [
  "anyhow",
  "buffa",
  "buffa-types",
- "hex-literal",
- "num-bigint",
  "substreams",
  "substreams-ethereum",
  "testing",

@@ -15,8 +15,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = { workspace = true }
-hex-literal = "0.3"
-num-bigint = { workspace = true }
 buffa = { workspace = true }
 buffa-types = { workspace = true }
 substreams = { workspace = true }

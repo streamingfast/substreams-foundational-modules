@@ -69,5 +69,7 @@ modules:
       Addresses and signatures to match must be written as 0x-prefixed hexadecimal, lowercase, prefixed by `evt_addr:`, `evt_sig:`, `call_to:`, `call_from:` or `call_method:`.
       Example: `((evt_addr:0x1234... || evt_addr:0x5678...) && evt_sig:0xdeadbeef...) || call_to:0x01010101...`
 
+network: ethereum-mainnet
+
 params:
   filtered_transactions: "evt_sig:0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31 || (call_method:0xa9059cbb && call_to:0xdac17f958d2ee523a2206206994597c13d831ec7)"

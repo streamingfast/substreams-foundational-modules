@@ -26,6 +26,11 @@ the blocks that cannot match.
 Use either index as the `blockFilter` of your own module to have the engine skip
 blocks whose keys cannot satisfy your query.
 
+A query cannot combine event keys with call keys using `&&`. The matcher is evaluated
+against one log's keys, then one call's keys, so no single item carries both families and
+`evt_sig:… && call_method:…` matches nothing. Use `||` to match either, and filter further
+in your own module.
+
 ### Removed in v0.4.0
 
 `all_events`, `all_calls`, `index_calls`, `filtered_events`, `filtered_calls` and
@@ -37,7 +42,7 @@ If you consumed one of them:
 
 | removed | use instead |
 |---|---|
-| `filtered_events`, `filtered_calls`, `filtered_events_and_calls` | `filtered_transactions`, whose query covers both event and call keys |
+| `filtered_events`, `filtered_calls`, `filtered_events_and_calls` | `filtered_transactions`, whose query covers both event and call keys. Note it returns whole transaction traces, not a list of logs or calls, so a module that only read events now receives more data per match and should narrow it itself. |
 | `index_calls` | `index_events_and_calls`, which emits the call keys unchanged |
 | `all_events`, `all_calls` | read the block in your own module |
 
