@@ -27,7 +27,6 @@ fn filtered_calls(query: String, block: &BlockLazyView<'_>) -> Result<Calls, Err
         for call in trace.calls.iter() {
             let call = call?;
             let keys = call_keys(&call);
-            let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
             if !matcher.matches_keys(&keys) {
                 continue;
             }
@@ -181,5 +180,4 @@ pub mod tests {
         ))
         .expect("Failed to execute");
         assert!(none.calls.is_empty());
-    }
-}
+    }}

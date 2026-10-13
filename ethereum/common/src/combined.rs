@@ -41,7 +41,6 @@ fn filtered_events_and_calls(
             for log in receipt.logs.iter() {
                 let log = log?;
                 let keys = evt_keys(&log);
-                let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
                 if matcher.matches_keys(&keys) {
                     events.push(Event {
                         tx_hash: Hex::encode(&trace.hash),
@@ -54,7 +53,6 @@ fn filtered_events_and_calls(
         for call in trace.calls.iter() {
             let call = call?;
             let keys = call_keys(&call);
-            let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
             if matcher.matches_keys(&keys) {
                 calls.push(Call {
                     tx_hash: Hex::encode(&trace.hash),
@@ -96,7 +94,6 @@ fn filtered_transactions(
             for log in receipt.logs.iter() {
                 let log = log?;
                 let keys = evt_keys(&log);
-                let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
                 if matcher.matches_keys(&keys) {
                     matched = true;
                     break;
@@ -108,7 +105,6 @@ fn filtered_transactions(
             for call in trace.calls.iter() {
                 let call = call?;
                 let keys = call_keys(&call);
-                let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
                 if matcher.matches_keys(&keys) {
                     matched = true;
                     break;

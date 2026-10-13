@@ -31,7 +31,6 @@ fn filtered_events(query: String, block: &BlockLazyView<'_>) -> Result<Events, E
         for log in receipt.logs.iter() {
             let log = log?;
             let keys = evt_keys(&log);
-            let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
             if !matcher.matches_keys(&keys) {
                 continue;
             }
