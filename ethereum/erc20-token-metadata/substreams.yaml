@@ -42,3 +42,17 @@ networks:
   mainnet: {}
   sepolia: {}
   hoodi: {}
+  base: {}
+  bsc: {}
+  optimism: {}
+  arbitrum-one: {}
+  matic: {}
+  avalanche: {}
+  unichain: {}
+  worldchain: {}
+  monad: {}
+  arc: {}
+  robinhood: {}
+  tron-evm: {}
+  injective-evm: {}
+  injective-evm-testnet: {}
