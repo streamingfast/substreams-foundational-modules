@@ -22,12 +22,10 @@ In your substreams.yaml,
 
 ```
 imports:
-  sol: https://spkg.io/streamingfast/solana-common-v0.4.0.spkg
+  sol: https://spkg.io/streamingfast/solana-common-v0.2.0.spkg
 ```
 
-2. Replace any `source: sf.solana.type.v1.Block` input with `map: sol:blocks_without_votes` (you will be getting the same protobuf object, but with some vote-related transactions already pruned)
-
-3. Add block filtering to your "entry modules" (any module reading blocks or transactions before emitting your custom types):
+2. Add block filtering to your "entry modules" (any module reading blocks or transactions before emitting your custom types):
 
 If you know the instruction `program ID` of all transactions that you want, use the `program_ids_without_votes` index like this:
 
@@ -55,7 +53,7 @@ In your substreams.yaml,
 
 ```
 imports:
-  sol: https://spkg.io/streamingfast/solana-common-v0.4.0.spkg
+  sol: https://spkg.io/streamingfast/solana-common-v0.2.0.spkg
 ```
 
 2. Set one of `transactions_by_programid_without_votes` or `transactions_by_programid_and_account_without_votes` (along with `source: sf.substreams.v1.Clock` if you need slot number/ID/timestamp) as your module input, ex:
@@ -79,10 +77,6 @@ params:
 4. Run `substreams protogen` against your substreams.yaml to create the rust bindings of the protobuf definition inside the substreams. (If you are using the `substreams-solana` rust crate, follow the instructions to write a `buf.gen.yaml` that will bind things correctly: https://github.com/streamingfast/substreams-solana, ) 
 
 ## Modules
-
-### `blocks_without_votes` (map)
-
-* This module is a mapper that provides drop-in replacement of the raw solana blocks, but uses 25% of its storage by pruning all the "Vote Transactions" (i.e. transactions containg `Vote111111111111111111111111111111111111111` instructions) from the 'transactions' array.
 
 ### `program_ids_without_votes` (index)
 

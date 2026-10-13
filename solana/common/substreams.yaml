@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: "solana_common"
-  version: v0.4.0
+  version: v0.2.0
   url: https://github.com/streamingfast/substreams-foundational-modules/solana/common
   description: Foundational modules for Solana to extract transactions with indexing and filtering
   image: ./solana.png
@@ -30,20 +30,10 @@ binaries:
     file: ../../target/wasm32-unknown-unknown/release/solana_common.wasm
 
 modules:
-  - name: blocks_without_votes
-    kind: map
-    inputs:
-      - source: sf.solana.type.v1.Block
-    output:
-      type: proto:sf.solana.type.v1.Block
-    doc: |
-      `blocks_without_votes` allows you to consume a full Solana Block without Vote instructions (`Vote111111111111111111111111111111111111111`).
-      If you consume it on HISTORICAL data (+1000 blocks from HEAD), you will be reading from the StreamingFast cache, thus saving costs on the amount of TB read.
-
   - name: program_ids_without_votes
     kind: blockIndex
     inputs:
-      - map: blocks_without_votes
+      - source: sf.solana.type.v1.Block
     output:
       type: proto:sf.substreams.index.v1.Keys
     doc: |
@@ -54,7 +44,7 @@ modules:
   - name: program_ids_and_accounts_without_votes
     kind: blockIndex
     inputs:
-      - map: blocks_without_votes
+      - source: sf.solana.type.v1.Block
     output:
       type: proto:sf.substreams.index.v1.Keys
 
@@ -62,7 +52,7 @@ modules:
     kind: map
     inputs:
       - params: string
-      - map: blocks_without_votes
+      - source: sf.solana.type.v1.Block
     blockFilter:
       module: program_ids_without_votes
       query:
@@ -74,7 +64,7 @@ modules:
     kind: map
     inputs:
       - params: string
-      - map: blocks_without_votes
+      - source: sf.solana.type.v1.Block
     blockFilter:
       module: program_ids_and_accounts_without_votes
       query:

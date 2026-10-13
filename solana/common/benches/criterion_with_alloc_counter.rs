@@ -4,7 +4,6 @@
 use criterion::{criterion_group, criterion_main, Criterion};
 use std::alloc::{GlobalAlloc, Layout, System};
 use std::sync::atomic::{AtomicU64, Ordering};
-use substreams_solana::b58;
 use substreams_solana::pb::sf::solana::r#type::v1::{Block, ConfirmedTransaction};
 
 // Custom allocator that counts allocations
@@ -49,25 +48,6 @@ fn get_allocation_stats() -> (u64, u64, u64, u64) {
 }
 
 // Helper functions
-fn blocks_without_votes_impl(mut block: Block) -> Block {
-    static VOTE_INSTRUCTION: [u8; 32] = b58!("Vote111111111111111111111111111111111111111");
-
-    block.transactions.retain(|trx| {
-        if trx.meta.is_unset() || trx.transaction.is_unset() || trx.transaction.message.is_unset() {
-            return false;
-        }
-        if trx.meta.err.is_set() {
-            return false;
-        }
-
-        let message = &trx.transaction.message;
-
-        !message.account_keys.iter().any(|v| v == &VOTE_INSTRUCTION)
-    });
-
-    block
-}
-
 fn transaction_program_and_account_keys(
     trx: &ConfirmedTransaction,
 ) -> impl Iterator<Item = String> + '_ {
@@ -118,31 +98,6 @@ fn bench_with_allocations(c: &mut Criterion) {
     });
 
     // Benchmark blocks without votes
-    group.bench_function("blocks_without_votes", |b| {
-        b.iter_custom(|iters| {
-            reset_counters();
-            let start = std::time::Instant::now();
-
-            for _i in 0..iters {
-                let _result = blocks_without_votes_impl(block.clone());
-            }
-
-            let elapsed = start.elapsed();
-            let (allocated, deallocated, alloc_count, dealloc_count) = get_allocation_stats();
-
-            eprintln!(
-                "\nblocks_without_votes stats (avg per iteration for {} iters):",
-                iters
-            );
-            eprintln!("  Bytes allocated: {}", allocated / iters);
-            eprintln!("  Bytes deallocated: {}", deallocated / iters);
-            eprintln!("  Allocations: {}", alloc_count / iters);
-            eprintln!("  Deallocations: {}", dealloc_count / iters);
-
-            elapsed
-        });
-    });
-
     // Benchmark key extraction
     group.bench_function("key_extraction", |b| {
         b.iter_custom(|iters| {

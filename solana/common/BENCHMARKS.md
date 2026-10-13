@@ -19,16 +19,15 @@ cargo bench --bench solana_common_benchmarks -- <benchmark_name>
 For example:
 
 ```bash
-cargo bench --bench solana_common_benchmarks -- blocks_without_votes
+cargo bench --bench solana_common_benchmarks -- transactions_by_programid
 ```
 
 ## Available Benchmarks
 
 ### Block Processing
 
-1. **blocks_without_votes** - Measures performance of filtering out vote transactions from blocks
-2. **block_clone** - Measures the cost of cloning a full block
-3. **transaction_count** - Baseline measurement for accessing transaction count
+1. **block_clone** - Measures the cost of cloning a full block
+2. **transaction_count** - Baseline measurement for accessing transaction count
 
 ### Transaction Filtering
 

@@ -80,16 +80,17 @@ mod tests {
         let mut result = transaction_program_and_account_keys(confirmed_transaction);
 
         // Expected
-        if let Some(tx) = confirmed_transaction.transaction.as_option() {
-            if let Some(msg) = tx.message.as_option() {
-                msg.account_keys.iter().for_each(|acct| {
-                    assert_eq!(
-                        result.any(|index| index == format!("account:{}", base58::encode(acct))),
-                        true
-                    )
-                });
-            }
-        }
+        confirmed_transaction
+            .transaction
+            .message
+            .account_keys
+            .iter()
+            .for_each(|acct| {
+                assert_eq!(
+                    result.any(|index| index == format!("account:{}", base58::encode(acct))),
+                    true
+                )
+            });
 
         confirmed_transaction.walk_instructions().for_each(|inst| {
             let expected_key = format!("program:{}", inst.program_id());

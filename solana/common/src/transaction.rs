@@ -101,14 +101,16 @@ mod tests {
         result.transactions.into_iter().for_each(|transaction| {
             let mut matched = true;
 
-            if let Some(tx) = transaction.transaction.as_option() {
-                if let Some(msg) = tx.message.as_option() {
-                    if !msg.account_keys.iter().any(|acct| {
-                        base58::encode(acct) == "5qrvgpvr55Eo7c5bBcwopdiQ6TpvceiRm42yjHTbtDvc"
-                    }) {
-                        matched = false
-                    }
-                }
+            if !transaction
+                .transaction
+                .message
+                .account_keys
+                .iter()
+                .any(|acct| {
+                    base58::encode(acct) == "5qrvgpvr55Eo7c5bBcwopdiQ6TpvceiRm42yjHTbtDvc"
+                })
+            {
+                matched = false
             }
 
             // Check if the given program id is contained within the instructions.
@@ -169,16 +171,14 @@ mod tests {
                     matched = false;
                 }
 
-                if let Some(tx) = transaction.transaction.as_option() {
-                    if let Some(msg) = tx.message.as_option() {
-                        if !msg
-                            .account_keys
-                            .iter()
-                            .any(|acct| base58::encode(acct) == EXPECTED_ACCOUNT_JUP)
-                        {
-                            matched = false;
-                        }
-                    }
+                if !transaction
+                    .transaction
+                    .message
+                    .account_keys
+                    .iter()
+                    .any(|acct| base58::encode(acct) == EXPECTED_ACCOUNT_JUP)
+                {
+                    matched = false;
                 }
 
                 return matched;
