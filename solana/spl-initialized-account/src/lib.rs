@@ -170,16 +170,10 @@ mod tests {
             .transactions_owned()
             .into_iter()
             .filter(|trx| {
-                if let Some(transaction) = trx.transaction.as_option() {
-                    if let Some(message) = transaction.message.as_option() {
-                        return message.account_keys.iter().any(|key| {
-                            let key_str = bs58::encode(key).into_string();
-                            key_str == SOLANA_TOKEN_PROGRAM_KEG
-                                || key_str == SOLANA_TOKEN_PROGRAM_ZQB
-                        });
-                    }
-                }
-                false
+                trx.transaction.message.account_keys.iter().any(|key| {
+                    let key_str = bs58::encode(key).into_string();
+                    key_str == SOLANA_TOKEN_PROGRAM_KEG || key_str == SOLANA_TOKEN_PROGRAM_ZQB
+                })
             })
             .collect();
 
@@ -193,7 +187,8 @@ mod tests {
         for entry in result.entries {
             assert!(entry.value.is_set(), "Entry value should not be None");
 
-            if let Some(value) = entry.value.as_option() {
+            {
+                let value = &entry.value;
                 assert_eq!(
                     value.type_url, "type.googleapis.com/sf.substreams.solana.spl.v1.AccountOwner",
                     "Type URL should match AccountOwner"

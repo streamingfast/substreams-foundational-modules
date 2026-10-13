@@ -62,6 +62,9 @@ fn index_events(events: EventList) -> Result<Keys, Error> {
     let mut keys = Keys::default();
 
     events.events.into_iter().for_each(|e| {
+        // `into_option` here, not a deref: this consumes the event to avoid cloning its
+        // attributes, and the consuming alternative, `MessageField::unwrap`, panics on an
+        // unset field rather than skipping it.
         if let Some(ev) = e.event.into_option() {
             keys.keys.push(format!("type:{}", ev.r#type));
             ev.attributes.into_iter().for_each(|attr| {
@@ -81,17 +84,16 @@ fn filtered_events(query: String, events: EventList) -> Result<EventList, Error>
         .events
         .into_iter()
         .filter(|e| {
-            if let Some(ev) = e.event.as_option() {
-                let mut keys = Vec::new();
-                keys.push(format!("type:{}", ev.r#type.clone()));
-                ev.attributes.iter().for_each(|attr| {
-                    keys.push(format!("attr:{}", attr.key));
-                });
-
-                matcher.matches_keys(&keys)
-            } else {
-                false
+            if e.event.is_unset() {
+                return false;
             }
+            let ev = &e.event;
+            let mut keys = Vec::new();
+            keys.push(format!("type:{}", ev.r#type.clone()));
+            ev.attributes.iter().for_each(|attr| {
+                keys.push(format!("attr:{}", attr.key));
+            });
+            matcher.matches_keys(&keys)
         })
         .collect();
 
@@ -112,17 +114,16 @@ fn filtered_event_groups(query: String, events: EventList) -> Result<EventList, 
         .events
         .iter()
         .filter(|e| {
-            if let Some(ev) = e.event.as_option() {
-                let mut keys = Vec::new();
-                keys.push(format!("type:{}", ev.r#type.clone()));
-                ev.attributes.iter().for_each(|attr| {
-                    keys.push(format!("attr:{}", attr.key));
-                });
-
-                matcher.matches_keys(&keys)
-            } else {
-                false
+            if e.event.is_unset() {
+                return false;
             }
+            let ev = &e.event;
+            let mut keys = Vec::new();
+            keys.push(format!("type:{}", ev.r#type.clone()));
+            ev.attributes.iter().for_each(|attr| {
+                keys.push(format!("attr:{}", attr.key));
+            });
+            matcher.matches_keys(&keys)
         })
         .map(|e| (e.transaction_hash.to_string(), true))
         .collect::<HashMap<String, bool>>();
@@ -153,18 +154,17 @@ fn filtered_events_by_attribute_value(
         .events
         .into_iter()
         .filter(|e| {
-            if let Some(ev) = e.event.as_option() {
-                let mut keys = Vec::new();
-                keys.push(format!("type:{}", ev.r#type.clone()));
-                ev.attributes.iter().for_each(|attr| {
-                    keys.push(format!("attr:{}", attr.key));
-                    keys.push(format!("attr:{}:{}", attr.key, attr.value));
-                });
-
-                matcher.matches_keys(&keys)
-            } else {
-                false
+            if e.event.is_unset() {
+                return false;
             }
+            let ev = &e.event;
+            let mut keys = Vec::new();
+            keys.push(format!("type:{}", ev.r#type.clone()));
+            ev.attributes.iter().for_each(|attr| {
+                keys.push(format!("attr:{}", attr.key));
+                keys.push(format!("attr:{}:{}", attr.key, attr.value));
+            });
+            matcher.matches_keys(&keys)
         })
         .collect();
 
@@ -188,18 +188,17 @@ fn filtered_event_groups_by_attribute_value(
         .events
         .iter()
         .filter(|e| {
-            if let Some(ev) = e.event.as_option() {
-                let mut keys = Vec::new();
-                keys.push(format!("type:{}", ev.r#type.clone()));
-                ev.attributes.iter().for_each(|attr| {
-                    keys.push(format!("attr:{}", attr.key));
-                    keys.push(format!("attr:{}:{}", attr.key, attr.value));
-                });
-
-                matcher.matches_keys(&keys)
-            } else {
-                false
+            if e.event.is_unset() {
+                return false;
             }
+            let ev = &e.event;
+            let mut keys = Vec::new();
+            keys.push(format!("type:{}", ev.r#type.clone()));
+            ev.attributes.iter().for_each(|attr| {
+                keys.push(format!("attr:{}", attr.key));
+                keys.push(format!("attr:{}:{}", attr.key, attr.value));
+            });
+            matcher.matches_keys(&keys)
         })
         .map(|e| (e.transaction_hash.to_string(), true))
         .collect::<HashMap<String, bool>>();
