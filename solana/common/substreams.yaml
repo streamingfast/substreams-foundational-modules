@@ -6,10 +6,10 @@ package:
   description: Foundational modules for Solana to extract transactions with indexing and filtering
   image: ./solana.png
 
-network: solana-mainnet-beta
+network: solana-mainnet
 
 networks:
-  solana-mainnet-beta: {}
+  solana-mainnet: {}
   solana-devnet: {}
 
 imports:
