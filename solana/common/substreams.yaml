@@ -6,7 +6,11 @@ package:
   description: Foundational modules for Solana to extract transactions with indexing and filtering
   image: ./solana.png
 
-network: solana
+network: solana-mainnet-beta
+
+networks:
+  solana-mainnet-beta: {}
+  solana-devnet: {}
 
 imports:
   solana: https://github.com/streamingfast/firehose-solana/releases/download/v1.3.0/solana-v0.1.5.spkg
