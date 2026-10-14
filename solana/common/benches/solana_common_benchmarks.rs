@@ -29,7 +29,7 @@ fn bench_transactions_by_programid(c: &mut Criterion) {
     let block: Block = testing::read_block("./src/testdata/solana_mainnet_313000000.binpb.base64");
     let query_str = "program:whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc";
 
-    c.bench_function("transactions_by_programid_without_votes", |b| {
+    c.bench_function("transactions_by_programid", |b| {
         b.iter(|| {
             let query = substreams::sqe::expr_matcher(black_box(query_str));
             let mut transactions = block.transactions.clone();
@@ -82,7 +82,7 @@ fn bench_transaction_program_and_account_keys(c: &mut Criterion) {
 fn bench_program_ids_extraction(c: &mut Criterion) {
     let block: Block = testing::read_block("./src/testdata/solana_mainnet_313000000.binpb.base64");
 
-    c.bench_function("program_ids_without_votes", |b| {
+    c.bench_function("program_ids", |b| {
         b.iter(|| {
             let block_clone = block.clone();
             let keys: Vec<String> = black_box(block_clone)
@@ -98,7 +98,7 @@ fn bench_program_ids_extraction(c: &mut Criterion) {
 fn bench_program_ids_and_accounts_extraction(c: &mut Criterion) {
     let block: Block = testing::read_block("./src/testdata/solana_mainnet_313000000.binpb.base64");
 
-    c.bench_function("program_ids_and_accounts_without_votes", |b| {
+    c.bench_function("program_ids_and_accounts", |b| {
         b.iter(|| {
             let block_clone = block.clone();
             let keys: Vec<String> = black_box(block_clone)

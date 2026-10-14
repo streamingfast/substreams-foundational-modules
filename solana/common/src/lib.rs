@@ -7,6 +7,6 @@ mod transaction;
 // Re-export functions for benchmarking
 pub use keys::transaction_program_and_account_keys;
 pub use transaction::{
-    __impl_transactions_by_programid_and_account_without_votes,
-    __impl_transactions_by_programid_without_votes,
+    __impl_transactions_by_programid_and_account,
+    __impl_transactions_by_programid,
 };

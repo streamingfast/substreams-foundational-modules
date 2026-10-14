@@ -2017,7 +2017,7 @@ dependencies = [
 
 [[package]]
 name = "solana-common"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "anyhow",
  "bs58 0.4.0",

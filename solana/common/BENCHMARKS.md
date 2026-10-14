@@ -31,15 +31,15 @@ cargo bench --bench solana_common_benchmarks -- transactions_by_programid
 
 ### Transaction Filtering
 
-4. **transactions_by_programid_without_votes** - Filters transactions by program ID using expression matching
+4. **transactions_by_programid** - Filters transactions by program ID using expression matching
 5. **transactions_by_programid_and_account** - Filters transactions by both program ID and account address
 6. **transaction_retain_with_filter** - Measures the retain operation with program ID filtering
 
 ### Key Extraction
 
 7. **transaction_program_and_account_keys** - Extracts all program and account keys from a single transaction
-8. **program_ids_without_votes** - Extracts all program IDs from a block
-9. **program_ids_and_accounts_without_votes** - Extracts both program IDs and account keys from all transactions in a block
+8. **program_ids** - Extracts all program IDs from a block
+9. **program_ids_and_accounts** - Extracts both program IDs and account keys from all transactions in a block
 
 ### Instruction Walking
 

@@ -140,7 +140,7 @@ program_ids_extraction
 
 ## Real-World Example
 
-Let's say you want to optimize the `blocks_without_votes` function:
+Let's say you want to optimize a module that filters a block's transactions in place:
 
 ### Step 1: Baseline with DHAT
 ```bash
@@ -149,7 +149,7 @@ cargo bench --bench memory_benchmarks
 
 Output:
 ```
-blocks_without_votes
+filter_transactions
   Total allocations: 2,500
   Total bytes: 1,048,576 (1024 KB)
 ```
@@ -179,7 +179,7 @@ cargo bench --bench memory_benchmarks
 
 New output:
 ```
-blocks_without_votes
+filter_transactions
   Total allocations: 800  (-68%)
   Total bytes: 524,288 (-50%)
 ```

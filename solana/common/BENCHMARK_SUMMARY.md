@@ -14,12 +14,11 @@ cargo bench --bench solana_common_benchmarks
 \`\`\`
 
 #### Benchmarks Included:
-- `blocks_without_votes` - Filter vote transactions from blocks
-- `transactions_by_programid_without_votes` - Filter by program ID
+- `transactions_by_programid` - Filter by program ID
 - `transactions_by_programid_and_account` - Filter by program ID and account
 - `transaction_program_and_account_keys` - Extract keys from single transaction
-- `program_ids_without_votes` - Extract program IDs from block
-- `program_ids_and_accounts_without_votes` - Extract all keys from block
+- `program_ids` - Extract program IDs from block
+- `program_ids_and_accounts` - Extract all keys from block
 - `walk_instructions_single_transaction` - Count instructions in one transaction
 - `walk_all_instructions_in_block` - Count all instructions in block
 - `transaction_retain_with_filter` - Retain operation with filtering
@@ -76,7 +75,6 @@ cargo bench --bench criterion_with_alloc_counter
 
 #### Benchmarks Included:
 - `block_clone` - With allocation stats
-- `blocks_without_votes` - With allocation stats
 - `key_extraction` - With allocation stats
 - `walk_instructions` - With allocation stats
 
@@ -112,7 +110,7 @@ time:   [1.2345 ms 1.2567 ms 1.2789 ms]
 ### During Development
 \`\`\`bash
 # Quick performance check
-cargo bench --bench solana_common_benchmarks -- blocks_without_votes
+cargo bench --bench solana_common_benchmarks -- transactions_by_programid
 
 # Check memory impact of change
 cargo bench --bench memory_benchmarks
