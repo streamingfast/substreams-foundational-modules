@@ -1,6 +1,6 @@
 [package]
 name = "solana-common"
-version = "0.2.0"
+version = "0.5.0"
 description = "Substreams showcasing the building blocks of Solana"
 repository = "https://github.com/streamingfast/substreams-foundational-modules/solana-common"
 edition.workspace = true

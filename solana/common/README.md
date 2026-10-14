@@ -22,7 +22,7 @@ In your substreams.yaml,
 
 ```
 imports:
-  sol: https://spkg.io/streamingfast/solana-common-v0.2.0.spkg
+  sol: https://spkg.io/streamingfast/solana-common-v0.5.0.spkg
 ```
 
 2. Add block filtering to your "entry modules" (any module reading blocks or transactions before emitting your custom types):
@@ -53,7 +53,7 @@ In your substreams.yaml,
 
 ```
 imports:
-  sol: https://spkg.io/streamingfast/solana-common-v0.2.0.spkg
+  sol: https://spkg.io/streamingfast/solana-common-v0.5.0.spkg
 ```
 
 2. Set one of `transactions_by_programid_without_votes` or `transactions_by_programid_and_account_without_votes` (along with `source: sf.substreams.v1.Clock` if you need slot number/ID/timestamp) as your module input, ex:
