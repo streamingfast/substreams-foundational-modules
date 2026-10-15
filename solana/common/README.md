@@ -119,5 +119,6 @@ Use it to only get blocks that contain instructions matching the programID/accou
 ## v0.5.1
 
 - Removed `blocks_without_votes`: read `sf.solana.type.v1.Block` directly with `source:` instead of `map: sol:blocks_without_votes`
+- Module names dropped the `_without_votes` suffix, for example `transactions_by_programid_without_votes` is now `transactions_by_programid`
 - Built on `substreams` 0.8 and `substreams-solana` 0.16
 - Requires reprocessing all blocks, every module hash changed
