@@ -14,7 +14,7 @@ package:
   version: v0.1.0
 
 imports:
-  mantra: https://spkg.io/streamingfast/mantra-common-v0.1.0.spkg # Import the package from substreams.dev
+  mantra: https://spkg.io/streamingfast/mantra-common-v0.2.0.spkg # Import the package from substreams.dev
 
 modules:
   - name: my_events # Define your Substreams module

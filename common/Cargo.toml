@@ -1,6 +1,6 @@
 [package]
 name = "common"
-version = "0.1.0"
+version = "0.2.0"
 description = "Common modules for all chains"
 repository = "https://github.com/streamingfast/substreams-foundational-modules/ethereum-common"
 edition.workspace = true

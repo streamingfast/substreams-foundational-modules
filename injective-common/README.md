@@ -14,7 +14,7 @@ package:
   version: v0.1.0
 
 imports:
-  injective: https://spkg.io/streamingfast/injective-common-v0.2.4.spkg # Import the package from substreams.dev
+  injective: https://spkg.io/streamingfast/injective-common-v0.3.0.spkg # Import the package from substreams.dev
 
 modules:
   - name: my_events # Define your Substreams module

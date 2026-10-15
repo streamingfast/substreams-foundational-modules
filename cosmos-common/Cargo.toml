@@ -1,6 +1,6 @@
 [package]
 name = "cosmos-common"
-version = "0.0.1"
+version = "0.2.0"
 description = "Foundational Substreams Modules for Cosmos Chains"
 repository = "https://github.com/streamingfast/substreams-foundational-modules/cosmos-common"
 edition.workspace = true

@@ -1,14 +1,14 @@
 specVersion: v0.1.0
 package:
   name: mantra_common
-  version: v0.1.1
+  version: v0.2.0
   url: https://github.com/streamingfast/substreams-foundational-modules/mantra-common
   description: Foundational modules for Mantra to extract events with indexing and filtering
 
 network: mantra-mainnet
 
 imports:
-  cosmos: https://spkg.io/streamingfast/cosmos-common-v0.1.1.spkg
+  cosmos: https://spkg.io/streamingfast/cosmos-common-v0.2.0.spkg
 
 modules:
   - name: all_events

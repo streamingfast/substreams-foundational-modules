@@ -539,7 +539,7 @@ checksum = "c3e64b0cc0439b12df2fa678eae89a1c56a529fd067a9115f7827f1fffd22b32"
 
 [[package]]
 name = "common"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "criterion",
  "substreams",
@@ -554,7 +554,7 @@ checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
 
 [[package]]
 name = "cosmos-common"
-version = "0.0.1"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "buffa",
@@ -1974,7 +1974,7 @@ dependencies = [
 
 [[package]]
 name = "solana-accounts-common"
-version = "0.0.0"
+version = "0.2.0"
 dependencies = [
  "base64",
  "buffa",
@@ -2614,7 +2614,7 @@ dependencies = [
 
 [[package]]
 name = "spl-initialized-account"
-version = "0.1.2"
+version = "0.2.1"
 dependencies = [
  "anyhow",
  "borsh 0.9.3",
@@ -2918,7 +2918,7 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
 name = "stellar-common"
-version = "0.6.1"
+version = "0.7.0"
 dependencies = [
  "anyhow",
  "base64",
@@ -3295,7 +3295,7 @@ dependencies = [
 
 [[package]]
 name = "tron-common"
-version = "0.1.2"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "base64",

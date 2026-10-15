@@ -1,13 +1,13 @@
 specVersion: v0.1.0
 package:
   name: solana_accounts_foundational
-  version: v0.1.1
+  version: v0.2.0
   url: https://github.com/streamingfast/substreams-foundational-modules
   image: solana.png
   description: Foundational (common) module for fetching solana account changes
 
 imports:
-  solana_common: solana-common@v0.3.0
+  solana_common: solana-common@v0.5.1
 
 binaries:
   default:

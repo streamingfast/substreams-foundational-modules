@@ -7,7 +7,7 @@ The Cosmos Foundational modules are Substreams modules extracting common data fr
 This module is a general Cosmos foundational module, so it can be run within any Cosmos blockchain. For example, to run it against the Injective endpoint:
 
 ```bash
-substreams gui cosmos-common-v0.0.1.spkg all_events -e mainnet.injective.streamingfast.io:443
+substreams gui cosmos-common-v0.2.0.spkg all_events -e mainnet.injective.streamingfast.io:443
 ```
 
 However, StreamingFast recommends using the blockchain-specific foundational modules specified (for example, `injective-common` for Injective or `mantra-common` for Mantra), instead of this generic Cosmos package.
@@ -21,7 +21,7 @@ package:
   version: v0.1.0
 
 imports:
-  cosmos: https://spkg.io/streamingfast/cosmos-common-v0.0.1.spkg # Import the package from substreams.dev
+  cosmos: https://spkg.io/streamingfast/cosmos-common-v0.2.0.spkg # Import the package from substreams.dev
 
 modules:
   - name: my_events # Define your Substreams module

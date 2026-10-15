@@ -2,7 +2,7 @@
 specVersion: v0.1.0
 package:
   name: cosmos_common
-  version: v0.1.1
+  version: v0.2.0
   url: https://github.com/streamingfast/substreams-foundational-modules/cosmos-common
   description: Foundational modules for Cosmos to extract events and transactions with indexing and filtering
 

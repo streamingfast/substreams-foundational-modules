@@ -1,5 +1,6 @@
 [package]
 name = "solana-accounts-common"
+version = "0.2.0"
 description = "Substreams showcasing the building blocks of Solana Accounts"
 repository = "https://github.com/streamingfast/substreams-foundational-modules/solana-accounts-common"
 edition.workspace = true
