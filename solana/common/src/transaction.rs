@@ -7,7 +7,7 @@ use substreams_solana::block_view::lazy::LazyTransaction;
 use substreams_solana::pb::sf::solana::r#type::v1::BlockLazyView;
 
 #[substreams::handlers::map]
-fn transactions_by_programid_without_votes(
+fn transactions_by_programid(
     query: String,
     block: &BlockLazyView<'_>,
 ) -> Result<Transactions, substreams::errors::Error> {
@@ -15,6 +15,7 @@ fn transactions_by_programid_without_votes(
 
     let mut transactions = Vec::new();
     for trx in block.transactions() {
+        let trx = trx?;
         let resolved = LazyTransaction::new(&trx)?;
         let matched = resolved.walk_instructions()?.any(|view| {
             let key = format!("program:{}", view.program_id());
@@ -30,7 +31,7 @@ fn transactions_by_programid_without_votes(
 }
 
 #[substreams::handlers::map]
-fn transactions_by_programid_and_account_without_votes(
+fn transactions_by_programid_and_account(
     query: String,
     block: &BlockLazyView<'_>,
 ) -> Result<Transactions, substreams::errors::Error> {
@@ -38,6 +39,7 @@ fn transactions_by_programid_and_account_without_votes(
 
     let mut transactions = Vec::new();
     for trx in block.transactions() {
+        let trx = trx?;
         let resolved = LazyTransaction::new(&trx)?;
         let keys = lazy_transaction_program_and_account_keys_vec(&resolved);
 
@@ -56,14 +58,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_transactions_by_programid_without_votes() {
+    fn test_transactions_by_programid() {
         // Given
         let bytes =
             testing::read_block_bytes("./src/testdata/solana_mainnet_313000000.binpb.base64");
         let block = BlockLazyView::decode_lazy(&bytes).expect("valid block");
 
         // When
-        let result = substreams::testing::map!(transactions_by_programid_without_votes(
+        let result = substreams::testing::map!(transactions_by_programid(
             "program:whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc".to_owned(),
             &block,
         ))
@@ -82,14 +84,14 @@ mod tests {
     }
 
     #[test]
-    fn test_transactions_by_programid_and_account_without_votes() {
+    fn test_transactions_by_programid_and_account() {
         // Given
         let bytes =
             testing::read_block_bytes("./src/testdata/solana_mainnet_313000000.binpb.base64");
         let block = BlockLazyView::decode_lazy(&bytes).expect("valid block");
 
         // When
-        let result = substreams::testing::map!(transactions_by_programid_and_account_without_votes(
+        let result = substreams::testing::map!(transactions_by_programid_and_account(
             "program:whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc && account:5qrvgpvr55Eo7c5bBcwopdiQ6TpvceiRm42yjHTbtDvc".to_owned(),
             &block,
         ))
@@ -99,14 +101,16 @@ mod tests {
         result.transactions.into_iter().for_each(|transaction| {
             let mut matched = true;
 
-            if let Some(tx) = transaction.transaction.as_option() {
-                if let Some(msg) = tx.message.as_option() {
-                    if !msg.account_keys.iter().any(|acct| {
-                        base58::encode(acct) == "5qrvgpvr55Eo7c5bBcwopdiQ6TpvceiRm42yjHTbtDvc"
-                    }) {
-                        matched = false
-                    }
-                }
+            if !transaction
+                .transaction
+                .message
+                .account_keys
+                .iter()
+                .any(|acct| {
+                    base58::encode(acct) == "5qrvgpvr55Eo7c5bBcwopdiQ6TpvceiRm42yjHTbtDvc"
+                })
+            {
+                matched = false
             }
 
             // Check if the given program id is contained within the instructions.
@@ -136,7 +140,7 @@ mod tests {
     }
 
     #[test]
-    fn test_transactions_by_programid_and_account_without_votes_account_keys() {
+    fn test_transactions_by_programid_and_account_account_keys() {
         // Given
         let bytes =
             testing::read_block_bytes("./src/testdata/solana_mainnet_318251413.binpb.base64");
@@ -145,7 +149,7 @@ mod tests {
             testing::read_block("./src/testdata/solana_mainnet_318251413.binpb.base64");
 
         // When
-        let result = substreams::testing::map!(transactions_by_programid_and_account_without_votes(
+        let result = substreams::testing::map!(transactions_by_programid_and_account(
             "program:JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4 && account:3EsvvyqporKr5DVpzWsdYCphpXqXnQBMQLGNwSH5MmRE".to_owned(),
             &view,
         ))
@@ -167,16 +171,14 @@ mod tests {
                     matched = false;
                 }
 
-                if let Some(tx) = transaction.transaction.as_option() {
-                    if let Some(msg) = tx.message.as_option() {
-                        if !msg
-                            .account_keys
-                            .iter()
-                            .any(|acct| base58::encode(acct) == EXPECTED_ACCOUNT_JUP)
-                        {
-                            matched = false;
-                        }
-                    }
+                if !transaction
+                    .transaction
+                    .message
+                    .account_keys
+                    .iter()
+                    .any(|acct| base58::encode(acct) == EXPECTED_ACCOUNT_JUP)
+                {
+                    matched = false;
                 }
 
                 return matched;

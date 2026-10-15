@@ -4,14 +4,6 @@ The **Solana Common Modules** Substreams contains a set of modules that allow yo
 
 The `substreams.yaml` file defines all the different modules available, and also provides you with documentation about the usage of every module.
 
-# What's new ? 
-
-## v0.4.0
-
-- Added the new field 'costUnits' under transactionsStatusMeta, added a bit after block `363312000`
-- Requires reprocessing all blocks to get this new field (no 'use:' field in this release)
-- Minor performance improvements (~5%)
-
 # Using this module to speed up a substreams
 
 ## Using the full "solana block" object (simplest if changing an existing substreams)
@@ -22,18 +14,16 @@ In your substreams.yaml,
 
 ```
 imports:
-  sol: https://spkg.io/streamingfast/solana-common-v0.4.0.spkg
+  sol: https://spkg.io/streamingfast/solana-common-v0.5.1.spkg
 ```
 
-2. Replace any `source: sf.solana.type.v1.Block` input with `map: sol:blocks_without_votes` (you will be getting the same protobuf object, but with some vote-related transactions already pruned)
+2. Add block filtering to your "entry modules" (any module reading blocks or transactions before emitting your custom types):
 
-3. Add block filtering to your "entry modules" (any module reading blocks or transactions before emitting your custom types):
-
-If you know the instruction `program ID` of all transactions that you want, use the `program_ids_without_votes` index like this:
+If you know the instruction `program ID` of all transactions that you want, use the `program_ids` index like this:
 
 ```
     blockFilter:
-      module: sol:program_ids_without_votes
+      module: sol:program_ids
       query:
         string: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy || program:Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD"
 ```
@@ -42,7 +32,7 @@ If you also need to get transactions based on the instruction's `accounts`, use 
 
 ```
     blockFilter:
-      module: sol:program_ids_and_accounts_without_votes
+      module: sol:program_ids_and_accounts
       query:
         string: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy || account:Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD"
 ```
@@ -55,36 +45,32 @@ In your substreams.yaml,
 
 ```
 imports:
-  sol: https://spkg.io/streamingfast/solana-common-v0.4.0.spkg
+  sol: https://spkg.io/streamingfast/solana-common-v0.5.1.spkg
 ```
 
-2. Set one of `transactions_by_programid_without_votes` or `transactions_by_programid_and_account_without_votes` (along with `source: sf.substreams.v1.Clock` if you need slot number/ID/timestamp) as your module input, ex:
+2. Set one of `transactions_by_programid` or `transactions_by_programid_and_account` (along with `source: sf.substreams.v1.Clock` if you need slot number/ID/timestamp) as your module input, ex:
 
 ```
   - name: my_cool_module
     kind: map
     inputs:
       - source: sf.substreams.v1.Clock
-      - map: sol:transactions_by_programid_without_votes
+      - map: sol:transactions_by_programid
 ```
 
-3. Set the "block filter string" on the `sol:transactions_by_programid_without_votes` or `transactions_by_programid_and_account_without_votes` module to match the data that you want to be fed to your module:
+3. Set the "block filter string" on the `sol:transactions_by_programid` or `transactions_by_programid_and_account` module to match the data that you want to be fed to your module:
 
 ```
 params:
-  sol:transactions_by_programid_without_votes: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy"
-  sol:transactions_by_programid_and_account_without_votes: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy || (account:Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD && program:FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH)"
+  sol:transactions_by_programid: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy"
+  sol:transactions_by_programid_and_account: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy || (account:Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD && program:FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH)"
 ```
 
-4. Run `substreams protogen` against your substreams.yaml to create the rust bindings of the protobuf definition inside the substreams. (If you are using the `substreams-solana` rust crate, follow the instructions to write a `buf.gen.yaml` that will bind things correctly: https://github.com/streamingfast/substreams-solana, ) 
+4. Run `substreams build`. With `buffa` in your `Cargo.toml` dependencies, it generates the Rust bindings for these types, so you do not need to write a `buf.gen.yaml` yourself.
 
 ## Modules
 
-### `blocks_without_votes` (map)
-
-* This module is a mapper that provides drop-in replacement of the raw solana blocks, but uses 25% of its storage by pruning all the "Vote Transactions" (i.e. transactions containg `Vote111111111111111111111111111111111111111` instructions) from the 'transactions' array.
-
-### `program_ids_without_votes` (index)
+### `program_ids` (index)
 
 * This module is an index that allows you to efficiently retrieve instructions based on the program ID.
   Example keys: `program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`, `program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy`
@@ -95,12 +81,12 @@ Use it to only get blocks that contain instructions matching the programID/accou
   - name: my_module
     ...
     blockFilter:
-      module: program_ids_without_votes
+      module: program_ids
       query:
         string: (program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy || program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA)
 ```
 
-### `program_ids_and_accounts_without_votes` (index)
+### `program_ids_and_accounts` (index)
 
 * This module is an index that allows you to efficiently retrieve instructions based on the program ID and/or accounts.
    Example keys: `account:Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD`, `program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`  
@@ -111,19 +97,28 @@ Use it to only get blocks that contain instructions matching the programID/accou
   - name: my_module
     ...
     blockFilter:
-      module: program_ids_and_accounts_without_votes
+      module: program_ids_and_accounts
       query:
         string: (account:Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD && program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA)
 ```
 
-### `transactions_by_programid_without_votes` (map)
+### `transactions_by_programid` (map)
 
-* This modules uses the `program_ids_without_votes` index to only process blocks that contain matching instructions. 
+* This modules uses the `program_ids` index to only process blocks that contain matching instructions. 
 * Furthermore, it filters out all the transactions that do not contain a matching instruction, so your module can be run only on data that is meaningful to you.
 * Set the query string by using params (ref: https://substreams.streamingfast.io/documentation/develop/parameterized-modules)
 
-### `transactions_by_programid_and_account_without_votes` (map)
+### `transactions_by_programid_and_account` (map)
 
-* This modules uses the `program_ids_and_accounts_without_votes` index to only process blocks that contain matching instructions. 
+* This modules uses the `program_ids_and_accounts` index to only process blocks that contain matching instructions. 
 * Furthermore, it filters out all the transactions that do not contain a matching instruction, so your module can be run only on data that is meaningful to you.
 * Set the query string by using params (ref: https://substreams.streamingfast.io/documentation/develop/parameterized-modules)
+
+# What's new
+
+## v0.5.1
+
+- Removed `blocks_without_votes`: read `sf.solana.type.v1.Block` directly with `source:` instead of `map: sol:blocks_without_votes`
+- Module names dropped the `_without_votes` suffix, for example `transactions_by_programid_without_votes` is now `transactions_by_programid`
+- Built on `substreams` 0.8 and `substreams-solana` 0.16
+- Requires reprocessing all blocks, every module hash changed

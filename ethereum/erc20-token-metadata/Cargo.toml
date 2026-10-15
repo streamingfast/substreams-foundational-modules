@@ -1,6 +1,6 @@
 [package]
 name = "erc20-token-metadata"
-version = "0.1.0"
+version = "0.2.1"
 description = "Substreams Foundational Store storing ERC20 Token Metadata, contains both the sink and the required proto definitions for queries."
 repository = "https://github.com/streamingfast/substreams-foundational-modules/tree/develop/ethereum/erc20-token-metadata"
 edition.workspace = true
@@ -18,4 +18,4 @@ buffa-types = { workspace = true }
 buffa-descriptor = { workspace = true }
 substreams = { workspace = true }
 substreams-ethereum = { workspace = true }
-substreams-abis = "0.7.2"
+substreams-abis = "2.0"

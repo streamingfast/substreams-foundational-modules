@@ -4,29 +4,9 @@
 #[global_allocator]
 static ALLOC: dhat::Alloc = dhat::Alloc;
 
-use substreams_solana::b58;
 use substreams_solana::pb::sf::solana::r#type::v1::{Block, ConfirmedTransaction};
 
 // Helper function to filter blocks without votes
-fn blocks_without_votes_impl(mut block: Block) -> Block {
-    static VOTE_INSTRUCTION: [u8; 32] = b58!("Vote111111111111111111111111111111111111111");
-
-    block.transactions.retain(|trx| {
-        if trx.meta.is_unset() || trx.transaction.is_unset() || trx.transaction.message.is_unset() {
-            return false;
-        }
-        if trx.meta.err.is_set() {
-            return false;
-        }
-
-        let message = &trx.transaction.message;
-
-        !message.account_keys.iter().any(|v| v == &VOTE_INSTRUCTION)
-    });
-
-    block
-}
-
 // Helper function to extract transaction program and account keys
 fn transaction_program_and_account_keys(
     trx: &ConfirmedTransaction,
@@ -60,15 +40,8 @@ fn main() {
     let stats_after = dhat::HeapStats::get();
     print_stats_diff("Block clone", &stats_before, &stats_after);
 
-    // Benchmark 2: Blocks without votes
-    println!("\n2. Blocks without votes:");
-    let stats_before = dhat::HeapStats::get();
-    let _filtered = blocks_without_votes_impl(block.clone());
-    let stats_after = dhat::HeapStats::get();
-    print_stats_diff("Blocks without votes", &stats_before, &stats_after);
-
-    // Benchmark 3: Transaction filtering by program ID
-    println!("\n3. Transaction filtering by program ID:");
+    // Benchmark 2: Transaction filtering by program ID
+    println!("\n2. Transaction filtering by program ID:");
     let stats_before = dhat::HeapStats::get();
     let query =
         substreams::sqe::expr_matcher("program:whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc");
@@ -80,8 +53,8 @@ fn main() {
     let stats_after = dhat::HeapStats::get();
     print_stats_diff("Filter by program ID", &stats_before, &stats_after);
 
-    // Benchmark 4: Key extraction from all transactions
-    println!("\n4. Key extraction from all transactions:");
+    // Benchmark 3: Key extraction from all transactions
+    println!("\n3. Key extraction from all transactions:");
     let stats_before = dhat::HeapStats::get();
     let keys: Vec<String> = block
         .transactions()
@@ -94,8 +67,8 @@ fn main() {
         &stats_after,
     );
 
-    // Benchmark 5: Walking all instructions
-    println!("\n5. Walking all instructions:");
+    // Benchmark 4: Walking all instructions
+    println!("\n4. Walking all instructions:");
     let stats_before = dhat::HeapStats::get();
     let count = block.walk_instructions().count();
     let stats_after = dhat::HeapStats::get();
@@ -105,8 +78,8 @@ fn main() {
         &stats_after,
     );
 
-    // Benchmark 6: Program ID extraction
-    println!("\n6. Program ID extraction:");
+    // Benchmark 5: Program ID extraction
+    println!("\n5. Program ID extraction:");
     let stats_before = dhat::HeapStats::get();
     let program_ids: Vec<String> = block
         .walk_instructions()

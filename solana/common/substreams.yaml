@@ -1,12 +1,16 @@
 specVersion: v0.1.0
 package:
   name: "solana_common"
-  version: v0.4.0
+  version: v0.5.1
   url: https://github.com/streamingfast/substreams-foundational-modules/solana/common
   description: Foundational modules for Solana to extract transactions with indexing and filtering
   image: ./solana.png
 
-network: solana
+network: solana-mainnet
+
+networks:
+  solana-mainnet: {}
+  solana-devnet: {}
 
 imports:
   solana: https://github.com/streamingfast/firehose-solana/releases/download/v1.3.0/solana-v0.1.5.spkg
@@ -30,58 +34,61 @@ binaries:
     file: ../../target/wasm32-unknown-unknown/release/solana_common.wasm
 
 modules:
-  - name: blocks_without_votes
-    kind: map
+  - name: program_ids
+    kind: blockIndex
     inputs:
       - source: sf.solana.type.v1.Block
     output:
-      type: proto:sf.solana.type.v1.Block
-    doc: |
-      `blocks_without_votes` allows you to consume a full Solana Block without Vote instructions (`Vote111111111111111111111111111111111111111`).
-      If you consume it on HISTORICAL data (+1000 blocks from HEAD), you will be reading from the StreamingFast cache, thus saving costs on the amount of TB read.
-
-  - name: program_ids_without_votes
-    kind: blockIndex
-    inputs:
-      - map: blocks_without_votes
-    output:
       type: proto:sf.substreams.index.v1.Keys
     doc: |
-      `program_ids_without_votes` creates a _cache_ to efficiently retrieve instructions based on the program ID.
+      `program_ids` creates a _cache_ to efficiently retrieve instructions based on the program ID.
       For example, the following sets keys for the Token program:
       * program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
 
-  - name: program_ids_and_accounts_without_votes
+  - name: program_ids_and_accounts
     kind: blockIndex
     inputs:
-      - map: blocks_without_votes
+      - source: sf.solana.type.v1.Block
     output:
       type: proto:sf.substreams.index.v1.Keys
+    doc: |
+      `program_ids_and_accounts` creates a _cache_ to efficiently retrieve instructions based on the program ID and the accounts they use.
+      For example, the following sets keys for the Token program and one account:
+      * program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+      * account:Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD
 
-  - name: transactions_by_programid_without_votes
+  - name: transactions_by_programid
     kind: map
     inputs:
       - params: string
-      - map: blocks_without_votes
+      - source: sf.solana.type.v1.Block
     blockFilter:
-      module: program_ids_without_votes
+      module: program_ids
       query:
         params: true
     output:
       type: proto:sf.substreams.solana.v1.Transactions
+    doc: |
+      `transactions_by_programid` emits the transactions that contain an instruction matching the query, and skips blocks with none through the `program_ids` index.
+      Set the query in params, for example:
+      * program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
 
-  - name: transactions_by_programid_and_account_without_votes
+  - name: transactions_by_programid_and_account
     kind: map
     inputs:
       - params: string
-      - map: blocks_without_votes
+      - source: sf.solana.type.v1.Block
     blockFilter:
-      module: program_ids_and_accounts_without_votes
+      module: program_ids_and_accounts
       query:
         params: true
     output:
       type: proto:sf.substreams.solana.v1.Transactions
+    doc: |
+      `transactions_by_programid_and_account` emits the transactions that contain an instruction matching the query, and skips blocks with none through the `program_ids_and_accounts` index.
+      Set the query in params, for example:
+      * program:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA && account:Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD
 
 params: # Default parameters for the filter modules. You can override these parameters based on your needs.
-  transactions_by_programid_without_votes: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy"
-  transactions_by_programid_and_account_without_votes: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy || (account:Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD && program:FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH)"
+  transactions_by_programid: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy"
+  transactions_by_programid_and_account: "program:4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy || (account:Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD && program:FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH)"

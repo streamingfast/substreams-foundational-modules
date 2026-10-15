@@ -32,7 +32,7 @@ pub fn batch_name<'a>(contracts: &'a [&[u8]], chunk_size: usize) -> HashMap<&'a 
     for chunks in contracts.chunks(chunk_size) {
         let batch = chunks.iter().fold(RpcBatch::new(), |batch, address| {
             batch.add(
-                substreams_abis::evm::token::erc20::functions::Name {},
+                substreams_abis::standard::erc20::functions::Name {},
                 address.to_vec(),
             )
         });
@@ -48,7 +48,7 @@ pub fn batch_name<'a>(contracts: &'a [&[u8]], chunk_size: usize) -> HashMap<&'a 
             // erc20::Name
             if let Some(name) = RpcBatch::decode::<
                 String,
-                substreams_abis::evm::token::erc20::functions::Name,
+                substreams_abis::standard::erc20::functions::Name,
             >(&responses[i])
             {
                 // Handle empty
@@ -68,7 +68,7 @@ pub fn batch_name<'a>(contracts: &'a [&[u8]], chunk_size: usize) -> HashMap<&'a 
             // sai::Name
             if let Some(bytes32) = RpcBatch::decode::<
                 [u8; 32],
-                substreams_abis::evm::tokens::sai::functions::Name,
+                substreams_abis::tokens::erc20::sai::functions::Name,
             >(&responses[i])
             {
                 let name = bytes32_to_string(&bytes32);
@@ -96,7 +96,7 @@ pub fn batch_symbol<'a>(contracts: &'a [&[u8]], chunk_size: usize) -> HashMap<&'
     for chunks in contracts.chunks(chunk_size) {
         let batch = chunks.iter().fold(RpcBatch::new(), |batch, address| {
             batch.add(
-                substreams_abis::evm::token::erc20::functions::Symbol {},
+                substreams_abis::standard::erc20::functions::Symbol {},
                 address.to_vec(),
             )
         });
@@ -108,7 +108,7 @@ pub fn batch_symbol<'a>(contracts: &'a [&[u8]], chunk_size: usize) -> HashMap<&'
             // erc20::Symbol
             if let Some(symbol) = RpcBatch::decode::<
                 String,
-                substreams_abis::evm::token::erc20::functions::Symbol,
+                substreams_abis::standard::erc20::functions::Symbol,
             >(&responses[i])
             {
                 // Handle empty symbol
@@ -128,7 +128,7 @@ pub fn batch_symbol<'a>(contracts: &'a [&[u8]], chunk_size: usize) -> HashMap<&'
             // sai::Symbol
             if let Some(symbol_32) = RpcBatch::decode::<
                 [u8; 32],
-                substreams_abis::evm::tokens::sai::functions::Symbol,
+                substreams_abis::tokens::erc20::sai::functions::Symbol,
             >(&responses[i])
             {
                 let symbol = bytes32_to_string(&symbol_32);
@@ -156,7 +156,7 @@ pub fn batch_decimals<'a>(contracts: &'a [&[u8]], chunk_size: usize) -> HashMap<
     for chunks in contracts.chunks(chunk_size) {
         let batch = chunks.iter().fold(RpcBatch::new(), |batch, address| {
             batch.add(
-                substreams_abis::evm::token::erc20::functions::Decimals {},
+                substreams_abis::standard::erc20::functions::Decimals {},
                 address.to_vec(),
             )
         });
@@ -168,7 +168,7 @@ pub fn batch_decimals<'a>(contracts: &'a [&[u8]], chunk_size: usize) -> HashMap<
             // erc20::Decimals
             if let Some(decimals) = RpcBatch::decode::<
                 BigInt,
-                substreams_abis::evm::token::erc20::functions::Decimals,
+                substreams_abis::standard::erc20::functions::Decimals,
             >(&responses[i])
             {
                 if let Some(decimals_u8) = bigint_to_uint8(&decimals) {
