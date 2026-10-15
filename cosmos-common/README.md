@@ -1,6 +1,6 @@
 # cosmos-common
 
-The Cosmos Foundational modules are Substreams modules extracting common data from different Cosmos blockchains (e.g. Injective or Mantra).
+The Cosmos Foundational modules are Substreams modules extracting common data from different Cosmos blockchains (e.g. Injective).
 
 ## Usage
 
@@ -10,7 +10,7 @@ This module is a general Cosmos foundational module, so it can be run within any
 substreams gui cosmos-common-v0.2.0.spkg all_events -e mainnet.injective.streamingfast.io:443
 ```
 
-However, StreamingFast recommends using the blockchain-specific foundational modules specified (for example, `injective-common` for Injective or `mantra-common` for Mantra), instead of this generic Cosmos package.
+However, StreamingFast recommends using the blockchain-specific foundational modules specified (for example, `injective-common` for Injective), instead of this generic Cosmos package.
 
 Usually, foundational modules are directly imported and used in other Substreams. All the official foundational modules are stored in [substreams.dev](`https://substreams.dev`).
 
