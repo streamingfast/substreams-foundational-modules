@@ -4,7 +4,7 @@ package:
   description: "Foundational module for TRON"
   image: ./tron.png
   name: tron_foundational
-  version: v0.1.2
+  version: v0.2.0
 
 imports:
   tron: https://github.com/streamingfast/substreams-tron/releases/download/v0.1.2/substreams-tron-v0.1.2.spkg

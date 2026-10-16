@@ -1,6 +1,6 @@
 [package]
 name = "spl-initialized-account"
-version = "0.1.2"
+version = "0.2.1"
 description = "Substreams Foundational Store storing SPL Initialized Account data, contains both the sink and the required proto definitions for queries."
 repository = "https://github.com/streamingfast/substreams-foundational-modules/tree/develop/solana/spl-initialized-account#solana-spl-initialized-account-foundational-store"
 edition.workspace = true

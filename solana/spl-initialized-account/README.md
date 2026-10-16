@@ -23,7 +23,7 @@ First, add you `substreams.yaml` manifest the SPL Initialized Account import and
 
 imports:
   ...
-  spl_initialized_account: spl-initialized-account@v0.1.2
+  spl_initialized_account: spl-initialized-account@v0.2.1
 
 modules:
   ...
@@ -32,7 +32,7 @@ modules:
     kind: map
     inputs:
       ...
-      - foundational-store: spl-initialized-account@v0.1.2
+      - foundational-store: spl-initialized-account@v0.2.1
     output:
       ...
 ```
