@@ -1256,6 +1256,9 @@ pub struct MessageLazyView<'a> {
     pub account_keys: ::buffa::RepeatedView<'a, &'a [u8]>,
     /// Field 3: `recent_blockhash`
     pub recent_blockhash: &'a [u8],
+    /// Top-level instructions
+    /// T instructions (?)
+    ///
     /// Field 4: `instructions`
     pub instructions: ::buffa::LazyRepeatedView<
         'a,
@@ -2426,17 +2429,25 @@ pub struct TransactionStatusMetaLazyView<'a> {
     pub pre_balances: ::buffa::RepeatedView<'a, u64>,
     /// Field 4: `post_balances`
     pub post_balances: ::buffa::RepeatedView<'a, u64>,
+    /// InnerInstructions are instructions made to external programs as part of the transaction.
+    ///
+    /// Count == len(I)
+    ///
     /// Field 5: `inner_instructions`
     pub inner_instructions: ::buffa::LazyRepeatedView<
         'a,
         super::super::__buffa::lazy_view::InnerInstructionsLazyView<'a>,
     >,
-    /// Field 10: `inner_instructions_none`
-    pub inner_instructions_none: bool,
+    /// ```text
+    /// bool inner_instructions_none = 10;
+    /// ```
+    ///
     /// Field 6: `log_messages`
     pub log_messages: ::buffa::RepeatedView<'a, &'a str>,
-    /// Field 11: `log_messages_none`
-    pub log_messages_none: bool,
+    /// ```text
+    /// bool log_messages_none = 11;
+    /// ```
+    ///
     /// Field 7: `pre_token_balances`
     pub pre_token_balances: ::buffa::LazyRepeatedView<
         'a,
@@ -2456,19 +2467,23 @@ pub struct TransactionStatusMetaLazyView<'a> {
     pub loaded_writable_addresses: ::buffa::RepeatedView<'a, &'a [u8]>,
     /// Field 13: `loaded_readonly_addresses`
     pub loaded_readonly_addresses: ::buffa::RepeatedView<'a, &'a [u8]>,
+    /// ```text
+    /// bool return_data_none = 15;
+    /// ```
+    ///
     /// Field 14: `return_data`
     pub return_data: ::buffa::LazyMessageFieldView<
         'a,
         super::super::__buffa::lazy_view::ReturnDataLazyView<'a>,
     >,
-    /// Field 15: `return_data_none`
-    pub return_data_none: bool,
     /// Sum of compute units consumed by all instructions.
     /// Available since Solana v1.10.35 / v1.11.6.
     /// Set to `None` for txs executed on earlier versions.
     ///
     /// Field 16: `compute_units_consumed`
     pub compute_units_consumed: ::core::option::Option<u64>,
+    /// Field 17: `cost_units`
+    pub cost_units: ::core::option::Option<u64>,
 }
 impl<'a> TransactionStatusMetaLazyView<'a> {
     /// Decode from `buf` under the limits carried by `ctx`, recording
@@ -2518,22 +2533,6 @@ impl<'a> TransactionStatusMetaLazyView<'a> {
                     )?;
                     view.fee = ::buffa::types::decode_uint64(&mut cur)?;
                 }
-                10u32 => {
-                    ::buffa::encoding::check_wire_type(
-                        tag,
-                        ::buffa::encoding::WireType::Varint,
-                    )?;
-                    view.inner_instructions_none = ::buffa::types::decode_bool(
-                        &mut cur,
-                    )?;
-                }
-                11u32 => {
-                    ::buffa::encoding::check_wire_type(
-                        tag,
-                        ::buffa::encoding::WireType::Varint,
-                    )?;
-                    view.log_messages_none = ::buffa::types::decode_bool(&mut cur)?;
-                }
                 14u32 => {
                     ::buffa::encoding::check_wire_type(
                         tag,
@@ -2544,13 +2543,6 @@ impl<'a> TransactionStatusMetaLazyView<'a> {
                     ctx.register_element_memory(::core::mem::size_of::<&'a [u8]>())?;
                     view.return_data.push_fragment(sub, __sub_ctx);
                 }
-                15u32 => {
-                    ::buffa::encoding::check_wire_type(
-                        tag,
-                        ::buffa::encoding::WireType::Varint,
-                    )?;
-                    view.return_data_none = ::buffa::types::decode_bool(&mut cur)?;
-                }
                 16u32 => {
                     ::buffa::encoding::check_wire_type(
                         tag,
@@ -2559,6 +2551,13 @@ impl<'a> TransactionStatusMetaLazyView<'a> {
                     view.compute_units_consumed = Some(
                         ::buffa::types::decode_uint64(&mut cur)?,
                     );
+                }
+                17u32 => {
+                    ::buffa::encoding::check_wire_type(
+                        tag,
+                        ::buffa::encoding::WireType::Varint,
+                    )?;
+                    view.cost_units = Some(::buffa::types::decode_uint64(&mut cur)?);
                 }
                 3u32 => {
                     if tag.wire_type() == ::buffa::encoding::WireType::LengthDelimited {
@@ -2739,9 +2738,7 @@ impl<'a> ::buffa::LazyMessageView<'a> for TransactionStatusMetaLazyView<'a> {
                 }
                 __out
             },
-            inner_instructions_none: self.inner_instructions_none,
             log_messages: self.log_messages.iter().map(|s| s.to_string()).collect(),
-            log_messages_none: self.log_messages_none,
             pre_token_balances: {
                 let mut __out = ::buffa::alloc::vec::Vec::with_capacity(
                     self.pre_token_balances.len(),
@@ -2788,8 +2785,8 @@ impl<'a> ::buffa::LazyMessageView<'a> for TransactionStatusMetaLazyView<'a> {
                 }
                 ::core::option::Option::None => ::buffa::MessageField::none(),
             },
-            return_data_none: self.return_data_none,
             compute_units_consumed: self.compute_units_consumed,
+            cost_units: self.cost_units,
             ..::core::default::Default::default()
         })
     }
@@ -2860,12 +2857,6 @@ impl<'a> TransactionStatusMetaLazyView<'a> {
                 += 1u64 + ::buffa::encoding::varint_len(__frag.len() as u64) as u64
                     + __frag.len() as u64;
         }
-        if self.inner_instructions_none {
-            size += 1u64 + ::buffa::types::BOOL_ENCODED_LEN as u64;
-        }
-        if self.log_messages_none {
-            size += 1u64 + ::buffa::types::BOOL_ENCODED_LEN as u64;
-        }
         for v in &self.loaded_writable_addresses {
             size += 1u64 + ::buffa::types::bytes_encoded_len(v) as u64;
         }
@@ -2877,10 +2868,10 @@ impl<'a> TransactionStatusMetaLazyView<'a> {
                 += 1u64 + ::buffa::encoding::varint_len(__frag.len() as u64) as u64
                     + __frag.len() as u64;
         }
-        if self.return_data_none {
-            size += 1u64 + ::buffa::types::BOOL_ENCODED_LEN as u64;
-        }
         if let Some(v) = self.compute_units_consumed {
+            size += 2u64 + ::buffa::types::uint64_encoded_len(v) as u64;
+        }
+        if let Some(v) = self.cost_units {
             size += 2u64 + ::buffa::types::uint64_encoded_len(v) as u64;
         }
         ::buffa::saturate_size(size)
@@ -2971,12 +2962,6 @@ impl<'a> TransactionStatusMetaLazyView<'a> {
             ::buffa::encoding::encode_varint(__frag.len() as u64, buf);
             buf.put_slice(__frag);
         }
-        if self.inner_instructions_none {
-            ::buffa::types::put_bool_field(10u32, self.inner_instructions_none, buf);
-        }
-        if self.log_messages_none {
-            ::buffa::types::put_bool_field(11u32, self.log_messages_none, buf);
-        }
         for v in &self.loaded_writable_addresses {
             ::buffa::types::put_shared_bytes_field(12u32, v, buf);
         }
@@ -2992,11 +2977,11 @@ impl<'a> TransactionStatusMetaLazyView<'a> {
             ::buffa::encoding::encode_varint(__frag.len() as u64, buf);
             buf.put_slice(__frag);
         }
-        if self.return_data_none {
-            ::buffa::types::put_bool_field(15u32, self.return_data_none, buf);
-        }
         if let Some(v) = self.compute_units_consumed {
             ::buffa::types::put_uint64_field(16u32, v, buf);
+        }
+        if let Some(v) = self.cost_units {
+            ::buffa::types::put_uint64_field(17u32, v, buf);
         }
     }
     /// Compute size, then write. Primary encode entry point.

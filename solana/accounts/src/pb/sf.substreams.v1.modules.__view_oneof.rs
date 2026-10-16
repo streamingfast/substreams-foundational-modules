@@ -16,6 +16,26 @@ pub mod module {
                 super::super::super::super::__buffa::view::module::KindStoreView<'a>,
             >,
         ),
+        KindBlockIndex(
+            ::buffa::alloc::boxed::Box<
+                super::super::super::super::__buffa::view::module::KindBlockIndexView<'a>,
+            >,
+        ),
+    }
+    pub mod block_filter {
+        #[allow(unused_imports)]
+        use super::*;
+        #[derive(Clone, Debug)]
+        pub enum Query<'a> {
+            QueryString(&'a str),
+            QueryFromParams(
+                ::buffa::alloc::boxed::Box<
+                    super::super::super::super::super::__buffa::view::module::QueryFromParamsView<
+                        'a,
+                    >,
+                >,
+            ),
+        }
     }
     pub mod input {
         #[allow(unused_imports)]

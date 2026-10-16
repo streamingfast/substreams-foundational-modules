@@ -1079,6 +1079,9 @@ pub struct MessageView<'a> {
     pub account_keys: ::buffa::RepeatedView<'a, &'a [u8]>,
     /// Field 3: `recent_blockhash`
     pub recent_blockhash: &'a [u8],
+    /// Top-level instructions
+    /// T instructions (?)
+    ///
     /// Field 4: `instructions`
     pub instructions: ::buffa::RepeatedView<
         'a,
@@ -1443,6 +1446,9 @@ impl MessageOwnedView {
     pub fn recent_blockhash(&self) -> &'_ [u8] {
         self.0.reborrow().recent_blockhash
     }
+    /// Top-level instructions
+    /// T instructions (?)
+    ///
     /// Field 4: `instructions`
     #[must_use]
     pub fn instructions(
@@ -2040,17 +2046,25 @@ pub struct TransactionStatusMetaView<'a> {
     pub pre_balances: ::buffa::RepeatedView<'a, u64>,
     /// Field 4: `post_balances`
     pub post_balances: ::buffa::RepeatedView<'a, u64>,
+    /// InnerInstructions are instructions made to external programs as part of the transaction.
+    ///
+    /// Count == len(I)
+    ///
     /// Field 5: `inner_instructions`
     pub inner_instructions: ::buffa::RepeatedView<
         'a,
         super::super::__buffa::view::InnerInstructionsView<'a>,
     >,
-    /// Field 10: `inner_instructions_none`
-    pub inner_instructions_none: bool,
+    /// ```text
+    /// bool inner_instructions_none = 10;
+    /// ```
+    ///
     /// Field 6: `log_messages`
     pub log_messages: ::buffa::RepeatedView<'a, &'a str>,
-    /// Field 11: `log_messages_none`
-    pub log_messages_none: bool,
+    /// ```text
+    /// bool log_messages_none = 11;
+    /// ```
+    ///
     /// Field 7: `pre_token_balances`
     pub pre_token_balances: ::buffa::RepeatedView<
         'a,
@@ -2067,18 +2081,22 @@ pub struct TransactionStatusMetaView<'a> {
     pub loaded_writable_addresses: ::buffa::RepeatedView<'a, &'a [u8]>,
     /// Field 13: `loaded_readonly_addresses`
     pub loaded_readonly_addresses: ::buffa::RepeatedView<'a, &'a [u8]>,
+    /// ```text
+    /// bool return_data_none = 15;
+    /// ```
+    ///
     /// Field 14: `return_data`
     pub return_data: ::buffa::MessageFieldView<
         super::super::__buffa::view::ReturnDataView<'a>,
     >,
-    /// Field 15: `return_data_none`
-    pub return_data_none: bool,
     /// Sum of compute units consumed by all instructions.
     /// Available since Solana v1.10.35 / v1.11.6.
     /// Set to `None` for txs executed on earlier versions.
     ///
     /// Field 16: `compute_units_consumed`
     pub compute_units_consumed: ::core::option::Option<u64>,
+    /// Field 17: `cost_units`
+    pub cost_units: ::core::option::Option<u64>,
 }
 impl<'a> ::buffa::MessageView<'a> for TransactionStatusMetaView<'a> {
     type Owned = super::super::TransactionStatusMeta;
@@ -2138,20 +2156,6 @@ impl<'a> ::buffa::MessageView<'a> for TransactionStatusMetaView<'a> {
                 )?;
                 view.fee = ::buffa::types::decode_uint64(&mut cur)?;
             }
-            10u32 => {
-                ::buffa::encoding::check_wire_type(
-                    tag,
-                    ::buffa::encoding::WireType::Varint,
-                )?;
-                view.inner_instructions_none = ::buffa::types::decode_bool(&mut cur)?;
-            }
-            11u32 => {
-                ::buffa::encoding::check_wire_type(
-                    tag,
-                    ::buffa::encoding::WireType::Varint,
-                )?;
-                view.log_messages_none = ::buffa::types::decode_bool(&mut cur)?;
-            }
             14u32 => {
                 ::buffa::encoding::check_wire_type(
                     tag,
@@ -2173,13 +2177,6 @@ impl<'a> ::buffa::MessageView<'a> for TransactionStatusMetaView<'a> {
                     }
                 }
             }
-            15u32 => {
-                ::buffa::encoding::check_wire_type(
-                    tag,
-                    ::buffa::encoding::WireType::Varint,
-                )?;
-                view.return_data_none = ::buffa::types::decode_bool(&mut cur)?;
-            }
             16u32 => {
                 ::buffa::encoding::check_wire_type(
                     tag,
@@ -2188,6 +2185,13 @@ impl<'a> ::buffa::MessageView<'a> for TransactionStatusMetaView<'a> {
                 view.compute_units_consumed = Some(
                     ::buffa::types::decode_uint64(&mut cur)?,
                 );
+            }
+            17u32 => {
+                ::buffa::encoding::check_wire_type(
+                    tag,
+                    ::buffa::encoding::WireType::Varint,
+                )?;
+                view.cost_units = Some(::buffa::types::decode_uint64(&mut cur)?);
             }
             3u32 => {
                 if tag.wire_type() == ::buffa::encoding::WireType::LengthDelimited {
@@ -2381,9 +2385,7 @@ impl<'a> ::buffa::MessageView<'a> for TransactionStatusMetaView<'a> {
                 .iter()
                 .map(|v| v.to_owned_from_source(__buffa_src))
                 .collect::<::core::result::Result<_, ::buffa::DecodeError>>()?,
-            inner_instructions_none: self.inner_instructions_none,
             log_messages: self.log_messages.iter().map(|s| s.to_string()).collect(),
-            log_messages_none: self.log_messages_none,
             pre_token_balances: self
                 .pre_token_balances
                 .iter()
@@ -2418,8 +2420,8 @@ impl<'a> ::buffa::MessageView<'a> for TransactionStatusMetaView<'a> {
                 }
                 None => ::buffa::MessageField::none(),
             },
-            return_data_none: self.return_data_none,
             compute_units_consumed: self.compute_units_consumed,
+            cost_units: self.cost_units,
             ..::core::default::Default::default()
         })
     }
@@ -2492,12 +2494,6 @@ impl<'a> ::buffa::ViewEncode<'a> for TransactionStatusMetaView<'a> {
                 += 1u64 + ::buffa::encoding::varint_len(inner_size as u64) as u64
                     + inner_size as u64;
         }
-        if self.inner_instructions_none {
-            size += 1u64 + ::buffa::types::BOOL_ENCODED_LEN as u64;
-        }
-        if self.log_messages_none {
-            size += 1u64 + ::buffa::types::BOOL_ENCODED_LEN as u64;
-        }
         for v in &self.loaded_writable_addresses {
             size += 1u64 + ::buffa::types::bytes_encoded_len(v) as u64;
         }
@@ -2512,10 +2508,10 @@ impl<'a> ::buffa::ViewEncode<'a> for TransactionStatusMetaView<'a> {
                 += 1u64 + ::buffa::encoding::varint_len(inner_size as u64) as u64
                     + inner_size as u64;
         }
-        if self.return_data_none {
-            size += 1u64 + ::buffa::types::BOOL_ENCODED_LEN as u64;
-        }
         if let Some(v) = self.compute_units_consumed {
+            size += 2u64 + ::buffa::types::uint64_encoded_len(v) as u64;
+        }
+        if let Some(v) = self.cost_units {
             size += 2u64 + ::buffa::types::uint64_encoded_len(v) as u64;
         }
         ::buffa::saturate_size(size)
@@ -2596,12 +2592,6 @@ impl<'a> ::buffa::ViewEncode<'a> for TransactionStatusMetaView<'a> {
             );
             v.write_to(__cache, buf);
         }
-        if self.inner_instructions_none {
-            ::buffa::types::put_bool_field(10u32, self.inner_instructions_none, buf);
-        }
-        if self.log_messages_none {
-            ::buffa::types::put_bool_field(11u32, self.log_messages_none, buf);
-        }
         for v in &self.loaded_writable_addresses {
             ::buffa::types::put_shared_bytes_field(12u32, v, buf);
         }
@@ -2616,11 +2606,11 @@ impl<'a> ::buffa::ViewEncode<'a> for TransactionStatusMetaView<'a> {
             );
             self.return_data.write_to(__cache, buf);
         }
-        if self.return_data_none {
-            ::buffa::types::put_bool_field(15u32, self.return_data_none, buf);
-        }
         if let Some(v) = self.compute_units_consumed {
             ::buffa::types::put_uint64_field(16u32, v, buf);
+        }
+        if let Some(v) = self.cost_units {
+            ::buffa::types::put_uint64_field(17u32, v, buf);
         }
     }
 }
@@ -2740,6 +2730,10 @@ impl TransactionStatusMetaOwnedView {
     pub fn post_balances(&self) -> &::buffa::RepeatedView<'_, u64> {
         &self.0.reborrow().post_balances
     }
+    /// InnerInstructions are instructions made to external programs as part of the transaction.
+    ///
+    /// Count == len(I)
+    ///
     /// Field 5: `inner_instructions`
     #[must_use]
     pub fn inner_instructions(
@@ -2750,21 +2744,19 @@ impl TransactionStatusMetaOwnedView {
     > {
         &self.0.reborrow().inner_instructions
     }
-    /// Field 10: `inner_instructions_none`
-    #[must_use]
-    pub fn inner_instructions_none(&self) -> bool {
-        self.0.reborrow().inner_instructions_none
-    }
+    /// ```text
+    /// bool inner_instructions_none = 10;
+    /// ```
+    ///
     /// Field 6: `log_messages`
     #[must_use]
     pub fn log_messages(&self) -> &::buffa::RepeatedView<'_, &'_ str> {
         &self.0.reborrow().log_messages
     }
-    /// Field 11: `log_messages_none`
-    #[must_use]
-    pub fn log_messages_none(&self) -> bool {
-        self.0.reborrow().log_messages_none
-    }
+    /// ```text
+    /// bool log_messages_none = 11;
+    /// ```
+    ///
     /// Field 7: `pre_token_balances`
     #[must_use]
     pub fn pre_token_balances(
@@ -2796,17 +2788,16 @@ impl TransactionStatusMetaOwnedView {
     pub fn loaded_readonly_addresses(&self) -> &::buffa::RepeatedView<'_, &'_ [u8]> {
         &self.0.reborrow().loaded_readonly_addresses
     }
+    /// ```text
+    /// bool return_data_none = 15;
+    /// ```
+    ///
     /// Field 14: `return_data`
     #[must_use]
     pub fn return_data(
         &self,
     ) -> &::buffa::MessageFieldView<super::super::__buffa::view::ReturnDataView<'_>> {
         &self.0.reborrow().return_data
-    }
-    /// Field 15: `return_data_none`
-    #[must_use]
-    pub fn return_data_none(&self) -> bool {
-        self.0.reborrow().return_data_none
     }
     /// Sum of compute units consumed by all instructions.
     /// Available since Solana v1.10.35 / v1.11.6.
@@ -2816,6 +2807,11 @@ impl TransactionStatusMetaOwnedView {
     #[must_use]
     pub fn compute_units_consumed(&self) -> ::core::option::Option<u64> {
         self.0.reborrow().compute_units_consumed
+    }
+    /// Field 17: `cost_units`
+    #[must_use]
+    pub fn cost_units(&self) -> ::core::option::Option<u64> {
+        self.0.reborrow().cost_units
     }
 }
 impl ::core::convert::From<::buffa::OwnedView<TransactionStatusMetaView<'static>>>

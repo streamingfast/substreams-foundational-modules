@@ -523,6 +523,10 @@ pub struct ModuleView<'a> {
     >,
     /// Field 8: `initial_block`
     pub initial_block: u64,
+    /// Field 9: `block_filter`
+    pub block_filter: ::buffa::MessageFieldView<
+        super::super::__buffa::view::module::BlockFilterView<'a>,
+    >,
     pub kind: ::core::option::Option<
         super::super::__buffa::view::oneof::module::Kind<'a>,
     >,
@@ -606,6 +610,27 @@ impl<'a> ::buffa::MessageView<'a> for ModuleView<'a> {
                 )?;
                 view.initial_block = ::buffa::types::decode_uint64(&mut cur)?;
             }
+            9u32 => {
+                ::buffa::encoding::check_wire_type(
+                    tag,
+                    ::buffa::encoding::WireType::LengthDelimited,
+                )?;
+                let __sub_ctx = ctx.descend()?;
+                let sub = ::buffa::types::borrow_bytes(&mut cur)?;
+                match view.block_filter.as_mut() {
+                    Some(existing) => {
+                        ::buffa::MessageView::merge_into_view(existing, sub, __sub_ctx)?
+                    }
+                    None => {
+                        view.block_filter = ::buffa::MessageFieldView::set(
+                            <super::super::__buffa::view::module::BlockFilterView as ::buffa::MessageView>::decode_view_ctx(
+                                sub,
+                                __sub_ctx,
+                            )?,
+                        );
+                    }
+                }
+            }
             6u32 => {
                 ::buffa::encoding::check_wire_type(
                     tag,
@@ -688,6 +713,37 @@ impl<'a> ::buffa::MessageView<'a> for ModuleView<'a> {
                     );
                 }
             }
+            10u32 => {
+                ::buffa::encoding::check_wire_type(
+                    tag,
+                    ::buffa::encoding::WireType::LengthDelimited,
+                )?;
+                let __sub_ctx = ctx.descend()?;
+                let sub = ::buffa::types::borrow_bytes(&mut cur)?;
+                if let Some(
+                    super::super::__buffa::view::oneof::module::Kind::KindBlockIndex(
+                        ref mut existing,
+                    ),
+                ) = view.kind
+                {
+                    ::buffa::MessageView::merge_into_view(
+                        &mut **existing,
+                        sub,
+                        __sub_ctx,
+                    )?;
+                } else {
+                    view.kind = Some(
+                        super::super::__buffa::view::oneof::module::Kind::KindBlockIndex(
+                            ::buffa::alloc::boxed::Box::new(
+                                <super::super::__buffa::view::module::KindBlockIndexView as ::buffa::MessageView>::decode_view_ctx(
+                                    sub,
+                                    __sub_ctx,
+                                )?,
+                            ),
+                        ),
+                    );
+                }
+            }
             _ => {
                 ::buffa::encoding::skip_field_depth(tag, &mut cur, ctx.depth())?;
             }
@@ -726,6 +782,15 @@ impl<'a> ::buffa::MessageView<'a> for ModuleView<'a> {
                 None => ::buffa::MessageField::none(),
             },
             initial_block: self.initial_block,
+            block_filter: match self.block_filter.as_option() {
+                Some(v) => {
+                    ::buffa::MessageField::<
+                        super::super::module::BlockFilter,
+                        ::buffa::Inline<super::super::module::BlockFilter>,
+                    >::some(v.to_owned_from_source(__buffa_src)?)
+                }
+                None => ::buffa::MessageField::none(),
+            },
             kind: match self.kind.as_ref() {
                 ::core::option::Option::Some(v) => {
                     ::core::option::Option::Some(
@@ -743,6 +808,15 @@ impl<'a> ::buffa::MessageView<'a> for ModuleView<'a> {
                                 v,
                             ) => {
                                 super::super::__buffa::oneof::module::Kind::KindStore(
+                                    ::buffa::alloc::boxed::Box::new(
+                                        v.to_owned_from_source(__buffa_src)?,
+                                    ),
+                                )
+                            }
+                            super::super::__buffa::view::oneof::module::Kind::KindBlockIndex(
+                                v,
+                            ) => {
+                                super::super::__buffa::oneof::module::Kind::KindBlockIndex(
                                     ::buffa::alloc::boxed::Box::new(
                                         v.to_owned_from_source(__buffa_src)?,
                                     ),
@@ -784,6 +858,14 @@ impl<'a> ::buffa::ViewEncode<'a> for ModuleView<'a> {
                         += 1u64 + ::buffa::encoding::varint_len(inner as u64) as u64
                             + inner as u64;
                 }
+                super::super::__buffa::view::oneof::module::Kind::KindBlockIndex(x) => {
+                    let __slot = __cache.reserve();
+                    let inner = x.compute_size(__cache);
+                    __cache.set(__slot, inner);
+                    size
+                        += 1u64 + ::buffa::encoding::varint_len(inner as u64) as u64
+                            + inner as u64;
+                }
             }
         }
         if self.binary_index != 0u32 {
@@ -812,6 +894,14 @@ impl<'a> ::buffa::ViewEncode<'a> for ModuleView<'a> {
         }
         if self.initial_block != 0u64 {
             size += 1u64 + ::buffa::types::uint64_encoded_len(self.initial_block) as u64;
+        }
+        if self.block_filter.is_set() {
+            let __slot = __cache.reserve();
+            let inner_size = self.block_filter.compute_size(__cache);
+            __cache.set(__slot, inner_size);
+            size
+                += 1u64 + ::buffa::encoding::varint_len(inner_size as u64) as u64
+                    + inner_size as u64;
         }
         ::buffa::saturate_size(size)
     }
@@ -844,6 +934,14 @@ impl<'a> ::buffa::ViewEncode<'a> for ModuleView<'a> {
                     );
                     x.write_to(__cache, buf);
                 }
+                super::super::__buffa::view::oneof::module::Kind::KindBlockIndex(x) => {
+                    ::buffa::types::put_len_delimited_header(
+                        10u32,
+                        u64::from(__cache.consume_next()),
+                        buf,
+                    );
+                    x.write_to(__cache, buf);
+                }
             }
         }
         if self.binary_index != 0u32 {
@@ -870,6 +968,14 @@ impl<'a> ::buffa::ViewEncode<'a> for ModuleView<'a> {
         }
         if self.initial_block != 0u64 {
             ::buffa::types::put_uint64_field(8u32, self.initial_block, buf);
+        }
+        if self.block_filter.is_set() {
+            ::buffa::types::put_len_delimited_header(
+                9u32,
+                u64::from(__cache.consume_next()),
+                buf,
+            );
+            self.block_filter.write_to(__cache, buf);
         }
     }
 }
@@ -993,6 +1099,15 @@ impl ModuleOwnedView {
     pub fn initial_block(&self) -> u64 {
         self.0.reborrow().initial_block
     }
+    /// Field 9: `block_filter`
+    #[must_use]
+    pub fn block_filter(
+        &self,
+    ) -> &::buffa::MessageFieldView<
+        super::super::__buffa::view::module::BlockFilterView<'_>,
+    > {
+        &self.0.reborrow().block_filter
+    }
     /// Oneof `kind`.
     #[must_use]
     pub fn kind(
@@ -1024,6 +1139,540 @@ impl ::buffa::HasMessageView for super::super::Module {
 pub mod module {
     #[allow(unused_imports)]
     use super::*;
+    #[derive(Clone, Debug, Default)]
+    pub struct BlockFilterView<'a> {
+        /// Field 1: `module`
+        pub module: &'a str,
+        pub query: ::core::option::Option<
+            super::super::super::__buffa::view::oneof::module::block_filter::Query<'a>,
+        >,
+    }
+    impl<'a> ::buffa::MessageView<'a> for BlockFilterView<'a> {
+        type Owned = super::super::super::module::BlockFilter;
+        fn decode_view(
+            buf: &'a [u8],
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            let __limit = ::core::cell::Cell::new(::buffa::DEFAULT_UNKNOWN_FIELD_LIMIT);
+            let __elem = ::core::cell::Cell::new(::buffa::DEFAULT_ELEMENT_MEMORY_LIMIT);
+            <Self as ::buffa::MessageView>::decode_view_ctx(
+                buf,
+                ::buffa::DecodeContext::new(::buffa::RECURSION_LIMIT, &__limit)
+                    .with_element_memory(&__elem),
+            )
+        }
+        fn decode_view_with_ctx(
+            buf: &'a [u8],
+            ctx: ::buffa::DecodeContext<'_>,
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            <Self as ::buffa::MessageView>::decode_view_ctx(buf, ctx)
+        }
+        #[inline]
+        fn merge_view_field(
+            &mut self,
+            tag: ::buffa::encoding::Tag,
+            cur: &'a [u8],
+            _before_tag: &'a [u8],
+            ctx: ::buffa::DecodeContext<'_>,
+        ) -> ::core::result::Result<&'a [u8], ::buffa::DecodeError> {
+            let _ = ctx;
+            #[allow(unused_variables)]
+            let view = self;
+            let mut cur = cur;
+            match tag.field_number() {
+                1u32 => {
+                    ::buffa::encoding::check_wire_type(
+                        tag,
+                        ::buffa::encoding::WireType::LengthDelimited,
+                    )?;
+                    view.module = ::buffa::types::borrow_str(&mut cur)?;
+                }
+                2u32 => {
+                    ::buffa::encoding::check_wire_type(
+                        tag,
+                        ::buffa::encoding::WireType::LengthDelimited,
+                    )?;
+                    view.query = Some(
+                        super::super::super::__buffa::view::oneof::module::block_filter::Query::QueryString(
+                            ::buffa::types::borrow_str(&mut cur)?,
+                        ),
+                    );
+                }
+                3u32 => {
+                    ::buffa::encoding::check_wire_type(
+                        tag,
+                        ::buffa::encoding::WireType::LengthDelimited,
+                    )?;
+                    let __sub_ctx = ctx.descend()?;
+                    let sub = ::buffa::types::borrow_bytes(&mut cur)?;
+                    if let Some(
+                        super::super::super::__buffa::view::oneof::module::block_filter::Query::QueryFromParams(
+                            ref mut existing,
+                        ),
+                    ) = view.query
+                    {
+                        ::buffa::MessageView::merge_into_view(
+                            &mut **existing,
+                            sub,
+                            __sub_ctx,
+                        )?;
+                    } else {
+                        view.query = Some(
+                            super::super::super::__buffa::view::oneof::module::block_filter::Query::QueryFromParams(
+                                ::buffa::alloc::boxed::Box::new(
+                                    <super::super::super::__buffa::view::module::QueryFromParamsView as ::buffa::MessageView>::decode_view_ctx(
+                                        sub,
+                                        __sub_ctx,
+                                    )?,
+                                ),
+                            ),
+                        );
+                    }
+                }
+                _ => {
+                    ::buffa::encoding::skip_field_depth(tag, &mut cur, ctx.depth())?;
+                }
+            }
+            ::core::result::Result::Ok(cur)
+        }
+        fn to_owned_message(
+            &self,
+        ) -> ::core::result::Result<
+            super::super::super::module::BlockFilter,
+            ::buffa::DecodeError,
+        > {
+            self.to_owned_from_source(None)
+        }
+        #[allow(clippy::useless_conversion, clippy::needless_update)]
+        fn to_owned_from_source(
+            &self,
+            __buffa_src: ::core::option::Option<&::buffa::bytes::Bytes>,
+        ) -> ::core::result::Result<
+            super::super::super::module::BlockFilter,
+            ::buffa::DecodeError,
+        > {
+            #[allow(unused_imports)]
+            use ::buffa::alloc::string::ToString as _;
+            let _ = __buffa_src;
+            ::core::result::Result::Ok(super::super::super::module::BlockFilter {
+                module: self.module.to_string(),
+                query: match self.query.as_ref() {
+                    ::core::option::Option::Some(v) => {
+                        ::core::option::Option::Some(
+                            match v {
+                                super::super::super::__buffa::view::oneof::module::block_filter::Query::QueryString(
+                                    v,
+                                ) => {
+                                    super::super::super::__buffa::oneof::module::block_filter::Query::QueryString(
+                                        v.to_string(),
+                                    )
+                                }
+                                super::super::super::__buffa::view::oneof::module::block_filter::Query::QueryFromParams(
+                                    v,
+                                ) => {
+                                    super::super::super::__buffa::oneof::module::block_filter::Query::QueryFromParams(
+                                        ::buffa::alloc::boxed::Box::new(
+                                            v.to_owned_from_source(__buffa_src)?,
+                                        ),
+                                    )
+                                }
+                            },
+                        )
+                    }
+                    ::core::option::Option::None => ::core::option::Option::None,
+                },
+                ..::core::default::Default::default()
+            })
+        }
+    }
+    impl<'a> ::buffa::ViewEncode<'a> for BlockFilterView<'a> {
+        #[allow(clippy::needless_borrow, clippy::let_and_return)]
+        fn compute_size(&self, __cache: &mut ::buffa::SizeCache) -> u32 {
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+            let mut size = 0u64;
+            if !self.module.is_empty() {
+                size += 1u64 + ::buffa::types::string_encoded_len(&self.module) as u64;
+            }
+            if let ::core::option::Option::Some(ref v) = self.query {
+                match v {
+                    super::super::super::__buffa::view::oneof::module::block_filter::Query::QueryString(
+                        x,
+                    ) => {
+                        size += 1u64 + ::buffa::types::string_encoded_len(x) as u64;
+                    }
+                    super::super::super::__buffa::view::oneof::module::block_filter::Query::QueryFromParams(
+                        x,
+                    ) => {
+                        let __slot = __cache.reserve();
+                        let inner = x.compute_size(__cache);
+                        __cache.set(__slot, inner);
+                        size
+                            += 1u64 + ::buffa::encoding::varint_len(inner as u64) as u64
+                                + inner as u64;
+                    }
+                }
+            }
+            ::buffa::saturate_size(size)
+        }
+        #[allow(clippy::needless_borrow)]
+        fn write_to(
+            &self,
+            __cache: &mut ::buffa::SizeCache,
+            buf: &mut impl ::buffa::EncodeSink,
+        ) {
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+            if !self.module.is_empty() {
+                ::buffa::types::put_string_field(1u32, &self.module, buf);
+            }
+            if let ::core::option::Option::Some(ref v) = self.query {
+                match v {
+                    super::super::super::__buffa::view::oneof::module::block_filter::Query::QueryString(
+                        x,
+                    ) => {
+                        ::buffa::types::put_string_field(2u32, x, buf);
+                    }
+                    super::super::super::__buffa::view::oneof::module::block_filter::Query::QueryFromParams(
+                        x,
+                    ) => {
+                        ::buffa::types::put_len_delimited_header(
+                            3u32,
+                            u64::from(__cache.consume_next()),
+                            buf,
+                        );
+                        x.write_to(__cache, buf);
+                    }
+                }
+            }
+        }
+    }
+    impl<'a> ::buffa::MessageName for BlockFilterView<'a> {
+        const PACKAGE: &'static str = "sf.substreams.v1";
+        const NAME: &'static str = "Module.BlockFilter";
+        const FULL_NAME: &'static str = "sf.substreams.v1.Module.BlockFilter";
+        const TYPE_URL: &'static str = "type.googleapis.com/sf.substreams.v1.Module.BlockFilter";
+    }
+    ::buffa::impl_default_view_instance!(BlockFilterView);
+    ::buffa::impl_view_reborrow!(BlockFilterView);
+    /** Self-contained, `'static` owned view of a `BlockFilter` message.
+
+ Wraps [`::buffa::OwnedView`]`<`[`BlockFilterView`]`<'static>>`: the decoded view and the [`::buffa::bytes::Bytes`] buffer it borrows from travel together, so the handle is `'static` and `Send + Sync` — suitable for async handlers, spawned tasks, and anywhere a `'static` bound is required.
+
+ Field accessors return borrows tied to `&self`. Use [`Self::view`] to get the full [`BlockFilterView`] when you need struct patterns, iteration helpers, or to pass the view to lifetime-parameterised code.*/
+    #[derive(Clone, Debug)]
+    pub struct BlockFilterOwnedView(::buffa::OwnedView<BlockFilterView<'static>>);
+    impl BlockFilterOwnedView {
+        /// Decode an owned view from a [`::buffa::bytes::Bytes`] buffer.
+        ///
+        /// The view borrows directly from the buffer's data; the buffer is
+        /// retained inside the returned handle.
+        ///
+        /// # Errors
+        ///
+        /// Returns [`::buffa::DecodeError`] if the buffer contains invalid
+        /// protobuf data.
+        pub fn decode(
+            bytes: ::buffa::bytes::Bytes,
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            ::core::result::Result::Ok(
+                BlockFilterOwnedView(::buffa::OwnedView::decode(bytes)?),
+            )
+        }
+        /// Decode with custom [`::buffa::DecodeOptions`] (recursion limit,
+        /// max message size).
+        ///
+        /// # Errors
+        ///
+        /// Returns [`::buffa::DecodeError`] if the buffer is invalid or
+        /// exceeds the configured limits.
+        pub fn decode_with_options(
+            bytes: ::buffa::bytes::Bytes,
+            opts: &::buffa::DecodeOptions,
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            ::core::result::Result::Ok(
+                BlockFilterOwnedView(
+                    ::buffa::OwnedView::decode_with_options(bytes, opts)?,
+                ),
+            )
+        }
+        /// Build from an owned message via an encode → decode round-trip.
+        ///
+        /// # Errors
+        ///
+        /// Returns [`::buffa::DecodeError::MessageTooLarge`] if the
+        /// message's encoded size exceeds the 2 GiB protobuf limit, or
+        /// another [`::buffa::DecodeError`] if the re-encoded bytes are
+        /// somehow invalid (should not happen for well-formed messages).
+        pub fn from_owned(
+            msg: &super::super::super::module::BlockFilter,
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            ::core::result::Result::Ok(
+                BlockFilterOwnedView(::buffa::OwnedView::from_owned(msg)?),
+            )
+        }
+        /// Borrow the full [`BlockFilterView`] with its lifetime tied to `&self`.
+        #[must_use]
+        pub fn view(&self) -> &BlockFilterView<'_> {
+            self.0.reborrow()
+        }
+        /// Convert to the owned message type.
+        ///
+        /// Infallible: this type's constructors wire-decode their
+        /// buffer, and a view produced by wire decoding always
+        /// converts. Delegates to [`::buffa::OwnedView::to_owned_message`],
+        /// whose contract also governs handles converted from a raw
+        /// [`::buffa::OwnedView`].
+        #[must_use]
+        pub fn to_owned_message(&self) -> super::super::super::module::BlockFilter {
+            self.0.to_owned_message()
+        }
+        /// The underlying bytes buffer.
+        #[must_use]
+        pub fn bytes(&self) -> &::buffa::bytes::Bytes {
+            self.0.bytes()
+        }
+        /// Consume the handle, returning the underlying bytes buffer.
+        #[must_use]
+        pub fn into_bytes(self) -> ::buffa::bytes::Bytes {
+            self.0.into_bytes()
+        }
+        /// Field 1: `module`
+        #[must_use]
+        pub fn module(&self) -> &'_ str {
+            self.0.reborrow().module
+        }
+        /// Oneof `query`.
+        #[must_use]
+        pub fn query(
+            &self,
+        ) -> ::core::option::Option<
+            &super::super::super::__buffa::view::oneof::module::block_filter::Query<'_>,
+        > {
+            self.0.reborrow().query.as_ref()
+        }
+    }
+    impl ::core::convert::From<::buffa::OwnedView<BlockFilterView<'static>>>
+    for BlockFilterOwnedView {
+        fn from(inner: ::buffa::OwnedView<BlockFilterView<'static>>) -> Self {
+            BlockFilterOwnedView(inner)
+        }
+    }
+    impl ::core::convert::From<BlockFilterOwnedView>
+    for ::buffa::OwnedView<BlockFilterView<'static>> {
+        fn from(wrapper: BlockFilterOwnedView) -> Self {
+            wrapper.0
+        }
+    }
+    impl ::core::convert::AsRef<::buffa::OwnedView<BlockFilterView<'static>>>
+    for BlockFilterOwnedView {
+        fn as_ref(&self) -> &::buffa::OwnedView<BlockFilterView<'static>> {
+            &self.0
+        }
+    }
+    impl ::buffa::HasMessageView for super::super::super::module::BlockFilter {
+        type View<'a> = BlockFilterView<'a>;
+        type ViewHandle = BlockFilterOwnedView;
+    }
+    #[derive(Clone, Debug, Default)]
+    pub struct QueryFromParamsView<'a> {
+        #[doc(hidden)]
+        pub __buffa_phantom: ::core::marker::PhantomData<&'a ()>,
+    }
+    impl<'a> ::buffa::MessageView<'a> for QueryFromParamsView<'a> {
+        type Owned = super::super::super::module::QueryFromParams;
+        fn decode_view(
+            buf: &'a [u8],
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            let __limit = ::core::cell::Cell::new(::buffa::DEFAULT_UNKNOWN_FIELD_LIMIT);
+            let __elem = ::core::cell::Cell::new(::buffa::DEFAULT_ELEMENT_MEMORY_LIMIT);
+            <Self as ::buffa::MessageView>::decode_view_ctx(
+                buf,
+                ::buffa::DecodeContext::new(::buffa::RECURSION_LIMIT, &__limit)
+                    .with_element_memory(&__elem),
+            )
+        }
+        fn decode_view_with_ctx(
+            buf: &'a [u8],
+            ctx: ::buffa::DecodeContext<'_>,
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            <Self as ::buffa::MessageView>::decode_view_ctx(buf, ctx)
+        }
+        #[inline]
+        fn merge_view_field(
+            &mut self,
+            tag: ::buffa::encoding::Tag,
+            cur: &'a [u8],
+            _before_tag: &'a [u8],
+            ctx: ::buffa::DecodeContext<'_>,
+        ) -> ::core::result::Result<&'a [u8], ::buffa::DecodeError> {
+            let _ = ctx;
+            #[allow(unused_variables)]
+            let view = self;
+            let mut cur = cur;
+            match tag.field_number() {
+                _ => {
+                    ::buffa::encoding::skip_field_depth(tag, &mut cur, ctx.depth())?;
+                }
+            }
+            ::core::result::Result::Ok(cur)
+        }
+        fn to_owned_message(
+            &self,
+        ) -> ::core::result::Result<
+            super::super::super::module::QueryFromParams,
+            ::buffa::DecodeError,
+        > {
+            self.to_owned_from_source(None)
+        }
+        #[allow(clippy::useless_conversion, clippy::needless_update)]
+        fn to_owned_from_source(
+            &self,
+            __buffa_src: ::core::option::Option<&::buffa::bytes::Bytes>,
+        ) -> ::core::result::Result<
+            super::super::super::module::QueryFromParams,
+            ::buffa::DecodeError,
+        > {
+            #[allow(unused_imports)]
+            use ::buffa::alloc::string::ToString as _;
+            let _ = __buffa_src;
+            ::core::result::Result::Ok(super::super::super::module::QueryFromParams {
+                ..::core::default::Default::default()
+            })
+        }
+    }
+    impl<'a> ::buffa::ViewEncode<'a> for QueryFromParamsView<'a> {
+        #[allow(clippy::needless_borrow, clippy::let_and_return)]
+        fn compute_size(&self, _cache: &mut ::buffa::SizeCache) -> u32 {
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+            let size = 0u64;
+            ::buffa::saturate_size(size)
+        }
+        #[allow(clippy::needless_borrow)]
+        fn write_to(
+            &self,
+            _cache: &mut ::buffa::SizeCache,
+            _buf: &mut impl ::buffa::EncodeSink,
+        ) {
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+        }
+    }
+    impl<'a> ::buffa::MessageName for QueryFromParamsView<'a> {
+        const PACKAGE: &'static str = "sf.substreams.v1";
+        const NAME: &'static str = "Module.QueryFromParams";
+        const FULL_NAME: &'static str = "sf.substreams.v1.Module.QueryFromParams";
+        const TYPE_URL: &'static str = "type.googleapis.com/sf.substreams.v1.Module.QueryFromParams";
+    }
+    ::buffa::impl_default_view_instance!(QueryFromParamsView);
+    ::buffa::impl_view_reborrow!(QueryFromParamsView);
+    /** Self-contained, `'static` owned view of a `QueryFromParams` message.
+
+ Wraps [`::buffa::OwnedView`]`<`[`QueryFromParamsView`]`<'static>>`: the decoded view and the [`::buffa::bytes::Bytes`] buffer it borrows from travel together, so the handle is `'static` and `Send + Sync` — suitable for async handlers, spawned tasks, and anywhere a `'static` bound is required.
+
+ Field accessors return borrows tied to `&self`. Use [`Self::view`] to get the full [`QueryFromParamsView`] when you need struct patterns, iteration helpers, or to pass the view to lifetime-parameterised code.*/
+    #[derive(Clone, Debug)]
+    pub struct QueryFromParamsOwnedView(
+        ::buffa::OwnedView<QueryFromParamsView<'static>>,
+    );
+    impl QueryFromParamsOwnedView {
+        /// Decode an owned view from a [`::buffa::bytes::Bytes`] buffer.
+        ///
+        /// The view borrows directly from the buffer's data; the buffer is
+        /// retained inside the returned handle.
+        ///
+        /// # Errors
+        ///
+        /// Returns [`::buffa::DecodeError`] if the buffer contains invalid
+        /// protobuf data.
+        pub fn decode(
+            bytes: ::buffa::bytes::Bytes,
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            ::core::result::Result::Ok(
+                QueryFromParamsOwnedView(::buffa::OwnedView::decode(bytes)?),
+            )
+        }
+        /// Decode with custom [`::buffa::DecodeOptions`] (recursion limit,
+        /// max message size).
+        ///
+        /// # Errors
+        ///
+        /// Returns [`::buffa::DecodeError`] if the buffer is invalid or
+        /// exceeds the configured limits.
+        pub fn decode_with_options(
+            bytes: ::buffa::bytes::Bytes,
+            opts: &::buffa::DecodeOptions,
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            ::core::result::Result::Ok(
+                QueryFromParamsOwnedView(
+                    ::buffa::OwnedView::decode_with_options(bytes, opts)?,
+                ),
+            )
+        }
+        /// Build from an owned message via an encode → decode round-trip.
+        ///
+        /// # Errors
+        ///
+        /// Returns [`::buffa::DecodeError::MessageTooLarge`] if the
+        /// message's encoded size exceeds the 2 GiB protobuf limit, or
+        /// another [`::buffa::DecodeError`] if the re-encoded bytes are
+        /// somehow invalid (should not happen for well-formed messages).
+        pub fn from_owned(
+            msg: &super::super::super::module::QueryFromParams,
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            ::core::result::Result::Ok(
+                QueryFromParamsOwnedView(::buffa::OwnedView::from_owned(msg)?),
+            )
+        }
+        /// Borrow the full [`QueryFromParamsView`] with its lifetime tied to `&self`.
+        #[must_use]
+        pub fn view(&self) -> &QueryFromParamsView<'_> {
+            self.0.reborrow()
+        }
+        /// Convert to the owned message type.
+        ///
+        /// Infallible: this type's constructors wire-decode their
+        /// buffer, and a view produced by wire decoding always
+        /// converts. Delegates to [`::buffa::OwnedView::to_owned_message`],
+        /// whose contract also governs handles converted from a raw
+        /// [`::buffa::OwnedView`].
+        #[must_use]
+        pub fn to_owned_message(&self) -> super::super::super::module::QueryFromParams {
+            self.0.to_owned_message()
+        }
+        /// The underlying bytes buffer.
+        #[must_use]
+        pub fn bytes(&self) -> &::buffa::bytes::Bytes {
+            self.0.bytes()
+        }
+        /// Consume the handle, returning the underlying bytes buffer.
+        #[must_use]
+        pub fn into_bytes(self) -> ::buffa::bytes::Bytes {
+            self.0.into_bytes()
+        }
+    }
+    impl ::core::convert::From<::buffa::OwnedView<QueryFromParamsView<'static>>>
+    for QueryFromParamsOwnedView {
+        fn from(inner: ::buffa::OwnedView<QueryFromParamsView<'static>>) -> Self {
+            QueryFromParamsOwnedView(inner)
+        }
+    }
+    impl ::core::convert::From<QueryFromParamsOwnedView>
+    for ::buffa::OwnedView<QueryFromParamsView<'static>> {
+        fn from(wrapper: QueryFromParamsOwnedView) -> Self {
+            wrapper.0
+        }
+    }
+    impl ::core::convert::AsRef<::buffa::OwnedView<QueryFromParamsView<'static>>>
+    for QueryFromParamsOwnedView {
+        fn as_ref(&self) -> &::buffa::OwnedView<QueryFromParamsView<'static>> {
+            &self.0
+        }
+    }
+    impl ::buffa::HasMessageView for super::super::super::module::QueryFromParams {
+        type View<'a> = QueryFromParamsView<'a>;
+        type ViewHandle = QueryFromParamsOwnedView;
+    }
     #[derive(Clone, Debug, Default)]
     pub struct KindMapView<'a> {
         /// Field 1: `output_type`
@@ -1508,6 +2157,225 @@ pub mod module {
     impl ::buffa::HasMessageView for super::super::super::module::KindStore {
         type View<'a> = KindStoreView<'a>;
         type ViewHandle = KindStoreOwnedView;
+    }
+    #[derive(Clone, Debug, Default)]
+    pub struct KindBlockIndexView<'a> {
+        /// Field 1: `output_type`
+        pub output_type: &'a str,
+    }
+    impl<'a> ::buffa::MessageView<'a> for KindBlockIndexView<'a> {
+        type Owned = super::super::super::module::KindBlockIndex;
+        fn decode_view(
+            buf: &'a [u8],
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            let __limit = ::core::cell::Cell::new(::buffa::DEFAULT_UNKNOWN_FIELD_LIMIT);
+            let __elem = ::core::cell::Cell::new(::buffa::DEFAULT_ELEMENT_MEMORY_LIMIT);
+            <Self as ::buffa::MessageView>::decode_view_ctx(
+                buf,
+                ::buffa::DecodeContext::new(::buffa::RECURSION_LIMIT, &__limit)
+                    .with_element_memory(&__elem),
+            )
+        }
+        fn decode_view_with_ctx(
+            buf: &'a [u8],
+            ctx: ::buffa::DecodeContext<'_>,
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            <Self as ::buffa::MessageView>::decode_view_ctx(buf, ctx)
+        }
+        #[inline]
+        fn merge_view_field(
+            &mut self,
+            tag: ::buffa::encoding::Tag,
+            cur: &'a [u8],
+            _before_tag: &'a [u8],
+            ctx: ::buffa::DecodeContext<'_>,
+        ) -> ::core::result::Result<&'a [u8], ::buffa::DecodeError> {
+            let _ = ctx;
+            #[allow(unused_variables)]
+            let view = self;
+            let mut cur = cur;
+            match tag.field_number() {
+                1u32 => {
+                    ::buffa::encoding::check_wire_type(
+                        tag,
+                        ::buffa::encoding::WireType::LengthDelimited,
+                    )?;
+                    view.output_type = ::buffa::types::borrow_str(&mut cur)?;
+                }
+                _ => {
+                    ::buffa::encoding::skip_field_depth(tag, &mut cur, ctx.depth())?;
+                }
+            }
+            ::core::result::Result::Ok(cur)
+        }
+        fn to_owned_message(
+            &self,
+        ) -> ::core::result::Result<
+            super::super::super::module::KindBlockIndex,
+            ::buffa::DecodeError,
+        > {
+            self.to_owned_from_source(None)
+        }
+        #[allow(clippy::useless_conversion, clippy::needless_update)]
+        fn to_owned_from_source(
+            &self,
+            __buffa_src: ::core::option::Option<&::buffa::bytes::Bytes>,
+        ) -> ::core::result::Result<
+            super::super::super::module::KindBlockIndex,
+            ::buffa::DecodeError,
+        > {
+            #[allow(unused_imports)]
+            use ::buffa::alloc::string::ToString as _;
+            let _ = __buffa_src;
+            ::core::result::Result::Ok(super::super::super::module::KindBlockIndex {
+                output_type: self.output_type.to_string(),
+                ..::core::default::Default::default()
+            })
+        }
+    }
+    impl<'a> ::buffa::ViewEncode<'a> for KindBlockIndexView<'a> {
+        #[allow(clippy::needless_borrow, clippy::let_and_return)]
+        fn compute_size(&self, _cache: &mut ::buffa::SizeCache) -> u32 {
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+            let mut size = 0u64;
+            if !self.output_type.is_empty() {
+                size
+                    += 1u64
+                        + ::buffa::types::string_encoded_len(&self.output_type) as u64;
+            }
+            ::buffa::saturate_size(size)
+        }
+        #[allow(clippy::needless_borrow)]
+        fn write_to(
+            &self,
+            _cache: &mut ::buffa::SizeCache,
+            buf: &mut impl ::buffa::EncodeSink,
+        ) {
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+            if !self.output_type.is_empty() {
+                ::buffa::types::put_string_field(1u32, &self.output_type, buf);
+            }
+        }
+    }
+    impl<'a> ::buffa::MessageName for KindBlockIndexView<'a> {
+        const PACKAGE: &'static str = "sf.substreams.v1";
+        const NAME: &'static str = "Module.KindBlockIndex";
+        const FULL_NAME: &'static str = "sf.substreams.v1.Module.KindBlockIndex";
+        const TYPE_URL: &'static str = "type.googleapis.com/sf.substreams.v1.Module.KindBlockIndex";
+    }
+    ::buffa::impl_default_view_instance!(KindBlockIndexView);
+    ::buffa::impl_view_reborrow!(KindBlockIndexView);
+    /** Self-contained, `'static` owned view of a `KindBlockIndex` message.
+
+ Wraps [`::buffa::OwnedView`]`<`[`KindBlockIndexView`]`<'static>>`: the decoded view and the [`::buffa::bytes::Bytes`] buffer it borrows from travel together, so the handle is `'static` and `Send + Sync` — suitable for async handlers, spawned tasks, and anywhere a `'static` bound is required.
+
+ Field accessors return borrows tied to `&self`. Use [`Self::view`] to get the full [`KindBlockIndexView`] when you need struct patterns, iteration helpers, or to pass the view to lifetime-parameterised code.*/
+    #[derive(Clone, Debug)]
+    pub struct KindBlockIndexOwnedView(::buffa::OwnedView<KindBlockIndexView<'static>>);
+    impl KindBlockIndexOwnedView {
+        /// Decode an owned view from a [`::buffa::bytes::Bytes`] buffer.
+        ///
+        /// The view borrows directly from the buffer's data; the buffer is
+        /// retained inside the returned handle.
+        ///
+        /// # Errors
+        ///
+        /// Returns [`::buffa::DecodeError`] if the buffer contains invalid
+        /// protobuf data.
+        pub fn decode(
+            bytes: ::buffa::bytes::Bytes,
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            ::core::result::Result::Ok(
+                KindBlockIndexOwnedView(::buffa::OwnedView::decode(bytes)?),
+            )
+        }
+        /// Decode with custom [`::buffa::DecodeOptions`] (recursion limit,
+        /// max message size).
+        ///
+        /// # Errors
+        ///
+        /// Returns [`::buffa::DecodeError`] if the buffer is invalid or
+        /// exceeds the configured limits.
+        pub fn decode_with_options(
+            bytes: ::buffa::bytes::Bytes,
+            opts: &::buffa::DecodeOptions,
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            ::core::result::Result::Ok(
+                KindBlockIndexOwnedView(
+                    ::buffa::OwnedView::decode_with_options(bytes, opts)?,
+                ),
+            )
+        }
+        /// Build from an owned message via an encode → decode round-trip.
+        ///
+        /// # Errors
+        ///
+        /// Returns [`::buffa::DecodeError::MessageTooLarge`] if the
+        /// message's encoded size exceeds the 2 GiB protobuf limit, or
+        /// another [`::buffa::DecodeError`] if the re-encoded bytes are
+        /// somehow invalid (should not happen for well-formed messages).
+        pub fn from_owned(
+            msg: &super::super::super::module::KindBlockIndex,
+        ) -> ::core::result::Result<Self, ::buffa::DecodeError> {
+            ::core::result::Result::Ok(
+                KindBlockIndexOwnedView(::buffa::OwnedView::from_owned(msg)?),
+            )
+        }
+        /// Borrow the full [`KindBlockIndexView`] with its lifetime tied to `&self`.
+        #[must_use]
+        pub fn view(&self) -> &KindBlockIndexView<'_> {
+            self.0.reborrow()
+        }
+        /// Convert to the owned message type.
+        ///
+        /// Infallible: this type's constructors wire-decode their
+        /// buffer, and a view produced by wire decoding always
+        /// converts. Delegates to [`::buffa::OwnedView::to_owned_message`],
+        /// whose contract also governs handles converted from a raw
+        /// [`::buffa::OwnedView`].
+        #[must_use]
+        pub fn to_owned_message(&self) -> super::super::super::module::KindBlockIndex {
+            self.0.to_owned_message()
+        }
+        /// The underlying bytes buffer.
+        #[must_use]
+        pub fn bytes(&self) -> &::buffa::bytes::Bytes {
+            self.0.bytes()
+        }
+        /// Consume the handle, returning the underlying bytes buffer.
+        #[must_use]
+        pub fn into_bytes(self) -> ::buffa::bytes::Bytes {
+            self.0.into_bytes()
+        }
+        /// Field 1: `output_type`
+        #[must_use]
+        pub fn output_type(&self) -> &'_ str {
+            self.0.reborrow().output_type
+        }
+    }
+    impl ::core::convert::From<::buffa::OwnedView<KindBlockIndexView<'static>>>
+    for KindBlockIndexOwnedView {
+        fn from(inner: ::buffa::OwnedView<KindBlockIndexView<'static>>) -> Self {
+            KindBlockIndexOwnedView(inner)
+        }
+    }
+    impl ::core::convert::From<KindBlockIndexOwnedView>
+    for ::buffa::OwnedView<KindBlockIndexView<'static>> {
+        fn from(wrapper: KindBlockIndexOwnedView) -> Self {
+            wrapper.0
+        }
+    }
+    impl ::core::convert::AsRef<::buffa::OwnedView<KindBlockIndexView<'static>>>
+    for KindBlockIndexOwnedView {
+        fn as_ref(&self) -> &::buffa::OwnedView<KindBlockIndexView<'static>> {
+            &self.0
+        }
+    }
+    impl ::buffa::HasMessageView for super::super::super::module::KindBlockIndex {
+        type View<'a> = KindBlockIndexView<'a>;
+        type ViewHandle = KindBlockIndexOwnedView;
     }
     #[derive(Clone, Debug, Default)]
     pub struct InputView<'a> {

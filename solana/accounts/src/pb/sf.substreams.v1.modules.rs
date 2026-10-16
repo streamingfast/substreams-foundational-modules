@@ -246,6 +246,11 @@ pub struct Module {
     pub output: ::buffa::MessageField<module::Output, ::buffa::Inline<module::Output>>,
     /// Field 8: `initial_block`
     pub initial_block: u64,
+    /// Field 9: `block_filter`
+    pub block_filter: ::buffa::MessageField<
+        module::BlockFilter,
+        ::buffa::Inline<module::BlockFilter>,
+    >,
     pub kind: ::core::option::Option<__buffa::oneof::module::Kind>,
 }
 impl ::core::fmt::Debug for Module {
@@ -257,6 +262,7 @@ impl ::core::fmt::Debug for Module {
             .field("inputs", &self.inputs)
             .field("output", &self.output)
             .field("initial_block", &self.initial_block)
+            .field("block_filter", &self.block_filter)
             .field("kind", &self.kind)
             .finish()
     }
@@ -309,6 +315,14 @@ impl ::buffa::Message for Module {
                         += 1u64 + ::buffa::encoding::varint_len(inner as u64) as u64
                             + inner as u64;
                 }
+                __buffa::oneof::module::Kind::KindBlockIndex(x) => {
+                    let __slot = __cache.reserve();
+                    let inner = x.compute_size(__cache);
+                    __cache.set(__slot, inner);
+                    size
+                        += 1u64 + ::buffa::encoding::varint_len(inner as u64) as u64
+                            + inner as u64;
+                }
             }
         }
         if self.binary_index != 0u32 {
@@ -337,6 +351,14 @@ impl ::buffa::Message for Module {
         }
         if self.initial_block != 0u64 {
             size += 1u64 + ::buffa::types::uint64_encoded_len(self.initial_block) as u64;
+        }
+        if self.block_filter.is_set() {
+            let __slot = __cache.reserve();
+            let inner_size = self.block_filter.compute_size(__cache);
+            __cache.set(__slot, inner_size);
+            size
+                += 1u64 + ::buffa::encoding::varint_len(inner_size as u64) as u64
+                    + inner_size as u64;
         }
         ::buffa::saturate_size(size)
     }
@@ -368,6 +390,14 @@ impl ::buffa::Message for Module {
                     );
                     x.write_to(__cache, buf);
                 }
+                __buffa::oneof::module::Kind::KindBlockIndex(x) => {
+                    ::buffa::types::put_len_delimited_header(
+                        10u32,
+                        u64::from(__cache.consume_next()),
+                        buf,
+                    );
+                    x.write_to(__cache, buf);
+                }
             }
         }
         if self.binary_index != 0u32 {
@@ -394,6 +424,14 @@ impl ::buffa::Message for Module {
         }
         if self.initial_block != 0u64 {
             ::buffa::types::put_uint64_field(8u32, self.initial_block, buf);
+        }
+        if self.block_filter.is_set() {
+            ::buffa::types::put_len_delimited_header(
+                9u32,
+                u64::from(__cache.consume_next()),
+                buf,
+            );
+            self.block_filter.write_to(__cache, buf);
         }
     }
     fn merge_field(
@@ -454,6 +492,26 @@ impl ::buffa::Message for Module {
                     );
                 }
             }
+            10u32 => {
+                ::buffa::encoding::check_wire_type(
+                    tag,
+                    ::buffa::encoding::WireType::LengthDelimited,
+                )?;
+                if let ::core::option::Option::Some(
+                    __buffa::oneof::module::Kind::KindBlockIndex(ref mut existing),
+                ) = self.kind
+                {
+                    ::buffa::Message::merge_length_delimited(&mut **existing, buf, ctx)?;
+                } else {
+                    let mut val = ::core::default::Default::default();
+                    ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
+                    self.kind = ::core::option::Option::Some(
+                        __buffa::oneof::module::Kind::KindBlockIndex(
+                            ::buffa::alloc::boxed::Box::new(val),
+                        ),
+                    );
+                }
+            }
             4u32 => {
                 ::buffa::encoding::check_wire_type(
                     tag,
@@ -498,6 +556,17 @@ impl ::buffa::Message for Module {
                 )?;
                 self.initial_block = ::buffa::types::decode_uint64(buf)?;
             }
+            9u32 => {
+                ::buffa::encoding::check_wire_type(
+                    tag,
+                    ::buffa::encoding::WireType::LengthDelimited,
+                )?;
+                ::buffa::Message::merge_length_delimited(
+                    self.block_filter.get_or_insert_default(),
+                    buf,
+                    ctx,
+                )?;
+            }
             _ => {
                 ::buffa::encoding::skip_field_depth(tag, buf, ctx.depth())?;
             }
@@ -512,11 +581,246 @@ impl ::buffa::Message for Module {
         self.inputs.clear();
         self.output = ::buffa::MessageField::none();
         self.initial_block = 0u64;
+        self.block_filter = ::buffa::MessageField::none();
     }
 }
 pub mod module {
     #[allow(unused_imports)]
     use super::*;
+    #[derive(Clone, PartialEq, Default)]
+    pub struct BlockFilter {
+        /// Field 1: `module`
+        pub module: ::buffa::alloc::string::String,
+        pub query: ::core::option::Option<
+            super::__buffa::oneof::module::block_filter::Query,
+        >,
+    }
+    impl ::core::fmt::Debug for BlockFilter {
+        fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+            f.debug_struct("BlockFilter")
+                .field("module", &self.module)
+                .field("query", &self.query)
+                .finish()
+        }
+    }
+    impl BlockFilter {
+        /// Protobuf type URL for this message, for use with `Any::pack` and
+        /// `Any::unpack_if`.
+        ///
+        /// Format: `type.googleapis.com/<fully.qualified.TypeName>`
+        pub const TYPE_URL: &'static str = "type.googleapis.com/sf.substreams.v1.Module.BlockFilter";
+    }
+    ::buffa::impl_default_instance!(BlockFilter);
+    impl ::buffa::MessageName for BlockFilter {
+        const PACKAGE: &'static str = "sf.substreams.v1";
+        const NAME: &'static str = "Module.BlockFilter";
+        const FULL_NAME: &'static str = "sf.substreams.v1.Module.BlockFilter";
+        const TYPE_URL: &'static str = "type.googleapis.com/sf.substreams.v1.Module.BlockFilter";
+    }
+    impl ::buffa::Message for BlockFilter {
+        /// Returns the total encoded size in bytes.
+        ///
+        /// Accumulates in `u64` (which cannot overflow for in-memory
+        /// data) and saturates to `u32` at return, so a message whose
+        /// encoded size exceeds the 2 GiB protobuf limit yields a value
+        /// above [`::buffa::MAX_MESSAGE_BYTES`] that the encode entry
+        /// points reject, never a silently wrapped size.
+        #[allow(clippy::let_and_return)]
+        fn compute_size(&self, __cache: &mut ::buffa::SizeCache) -> u32 {
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+            let mut size = 0u64;
+            if !self.module.is_empty() {
+                size += 1u64 + ::buffa::types::string_encoded_len(&self.module) as u64;
+            }
+            if let ::core::option::Option::Some(ref v) = self.query {
+                match v {
+                    super::__buffa::oneof::module::block_filter::Query::QueryString(
+                        x,
+                    ) => {
+                        size += 1u64 + ::buffa::types::string_encoded_len(x) as u64;
+                    }
+                    super::__buffa::oneof::module::block_filter::Query::QueryFromParams(
+                        x,
+                    ) => {
+                        let __slot = __cache.reserve();
+                        let inner = x.compute_size(__cache);
+                        __cache.set(__slot, inner);
+                        size
+                            += 1u64 + ::buffa::encoding::varint_len(inner as u64) as u64
+                                + inner as u64;
+                    }
+                }
+            }
+            ::buffa::saturate_size(size)
+        }
+        fn write_to(
+            &self,
+            __cache: &mut ::buffa::SizeCache,
+            buf: &mut impl ::buffa::EncodeSink,
+        ) {
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+            if !self.module.is_empty() {
+                ::buffa::types::put_string_field(1u32, &self.module, buf);
+            }
+            if let ::core::option::Option::Some(ref v) = self.query {
+                match v {
+                    super::__buffa::oneof::module::block_filter::Query::QueryString(
+                        x,
+                    ) => {
+                        ::buffa::types::put_string_field(2u32, x, buf);
+                    }
+                    super::__buffa::oneof::module::block_filter::Query::QueryFromParams(
+                        x,
+                    ) => {
+                        ::buffa::types::put_len_delimited_header(
+                            3u32,
+                            u64::from(__cache.consume_next()),
+                            buf,
+                        );
+                        x.write_to(__cache, buf);
+                    }
+                }
+            }
+        }
+        fn merge_field(
+            &mut self,
+            tag: ::buffa::encoding::Tag,
+            buf: &mut impl ::buffa::bytes::Buf,
+            ctx: ::buffa::DecodeContext<'_>,
+        ) -> ::core::result::Result<(), ::buffa::DecodeError> {
+            #[allow(unused_imports)]
+            use ::buffa::bytes::Buf as _;
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+            match tag.field_number() {
+                1u32 => {
+                    ::buffa::encoding::check_wire_type(
+                        tag,
+                        ::buffa::encoding::WireType::LengthDelimited,
+                    )?;
+                    ::buffa::types::merge_string(&mut self.module, buf)?;
+                }
+                2u32 => {
+                    ::buffa::encoding::check_wire_type(
+                        tag,
+                        ::buffa::encoding::WireType::LengthDelimited,
+                    )?;
+                    self.query = ::core::option::Option::Some(
+                        super::__buffa::oneof::module::block_filter::Query::QueryString(
+                            ::buffa::types::decode_string(buf)?,
+                        ),
+                    );
+                }
+                3u32 => {
+                    ::buffa::encoding::check_wire_type(
+                        tag,
+                        ::buffa::encoding::WireType::LengthDelimited,
+                    )?;
+                    if let ::core::option::Option::Some(
+                        super::__buffa::oneof::module::block_filter::Query::QueryFromParams(
+                            ref mut existing,
+                        ),
+                    ) = self.query
+                    {
+                        ::buffa::Message::merge_length_delimited(
+                            &mut **existing,
+                            buf,
+                            ctx,
+                        )?;
+                    } else {
+                        let mut val = ::core::default::Default::default();
+                        ::buffa::Message::merge_length_delimited(&mut val, buf, ctx)?;
+                        self.query = ::core::option::Option::Some(
+                            super::__buffa::oneof::module::block_filter::Query::QueryFromParams(
+                                ::buffa::alloc::boxed::Box::new(val),
+                            ),
+                        );
+                    }
+                }
+                _ => {
+                    ::buffa::encoding::skip_field_depth(tag, buf, ctx.depth())?;
+                }
+            }
+            ::core::result::Result::Ok(())
+        }
+        fn clear(&mut self) {
+            self.module.clear();
+            self.query = ::core::option::Option::None;
+        }
+    }
+    pub mod block_filter {
+        #[allow(unused_imports)]
+        use super::*;
+        #[doc(inline)]
+        pub use super::super::__buffa::oneof::module::block_filter::Query;
+        #[doc(inline)]
+        pub use super::super::__buffa::view::oneof::module::block_filter::Query as QueryView;
+    }
+    #[derive(Clone, PartialEq, Default)]
+    pub struct QueryFromParams {}
+    impl ::core::fmt::Debug for QueryFromParams {
+        fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+            f.debug_struct("QueryFromParams").finish()
+        }
+    }
+    impl QueryFromParams {
+        /// Protobuf type URL for this message, for use with `Any::pack` and
+        /// `Any::unpack_if`.
+        ///
+        /// Format: `type.googleapis.com/<fully.qualified.TypeName>`
+        pub const TYPE_URL: &'static str = "type.googleapis.com/sf.substreams.v1.Module.QueryFromParams";
+    }
+    ::buffa::impl_default_instance!(QueryFromParams);
+    impl ::buffa::MessageName for QueryFromParams {
+        const PACKAGE: &'static str = "sf.substreams.v1";
+        const NAME: &'static str = "Module.QueryFromParams";
+        const FULL_NAME: &'static str = "sf.substreams.v1.Module.QueryFromParams";
+        const TYPE_URL: &'static str = "type.googleapis.com/sf.substreams.v1.Module.QueryFromParams";
+    }
+    impl ::buffa::Message for QueryFromParams {
+        /// Returns the total encoded size in bytes.
+        ///
+        /// Accumulates in `u64` (which cannot overflow for in-memory
+        /// data) and saturates to `u32` at return, so a message whose
+        /// encoded size exceeds the 2 GiB protobuf limit yields a value
+        /// above [`::buffa::MAX_MESSAGE_BYTES`] that the encode entry
+        /// points reject, never a silently wrapped size.
+        #[allow(clippy::let_and_return)]
+        fn compute_size(&self, _cache: &mut ::buffa::SizeCache) -> u32 {
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+            let size = 0u64;
+            ::buffa::saturate_size(size)
+        }
+        fn write_to(
+            &self,
+            _cache: &mut ::buffa::SizeCache,
+            _buf: &mut impl ::buffa::EncodeSink,
+        ) {
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+        }
+        fn merge_field(
+            &mut self,
+            tag: ::buffa::encoding::Tag,
+            buf: &mut impl ::buffa::bytes::Buf,
+            ctx: ::buffa::DecodeContext<'_>,
+        ) -> ::core::result::Result<(), ::buffa::DecodeError> {
+            #[allow(unused_imports)]
+            use ::buffa::bytes::Buf as _;
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+            match tag.field_number() {
+                _ => {
+                    ::buffa::encoding::skip_field_depth(tag, buf, ctx.depth())?;
+                }
+            }
+            ::core::result::Result::Ok(())
+        }
+        fn clear(&mut self) {}
+    }
     #[derive(Clone, PartialEq, Default)]
     pub struct KindMap {
         /// Field 1: `output_type`
@@ -739,6 +1043,8 @@ pub mod module {
             UPDATE_POLICY_MAX = 5i32,
             /// Provides a store where you can `append()` keys, where two stores merge by concatenating the bytes in order.
             UPDATE_POLICY_APPEND = 6i32,
+            /// Provides a store with both `set()` and `sum()` functions.
+            UPDATE_POLICY_SET_SUM = 7i32,
         }
         impl UpdatePolicy {
             ///Idiomatic alias for [`Self::UPDATE_POLICY_UNSET`]; `Debug` prints the variant name.
@@ -762,6 +1068,9 @@ pub mod module {
             ///Idiomatic alias for [`Self::UPDATE_POLICY_APPEND`]; `Debug` prints the variant name.
             #[allow(non_upper_case_globals)]
             pub const Append: Self = Self::UPDATE_POLICY_APPEND;
+            ///Idiomatic alias for [`Self::UPDATE_POLICY_SET_SUM`]; `Debug` prints the variant name.
+            #[allow(non_upper_case_globals)]
+            pub const SetSum: Self = Self::UPDATE_POLICY_SET_SUM;
         }
         impl ::core::default::Default for UpdatePolicy {
             fn default() -> Self {
@@ -782,6 +1091,7 @@ pub mod module {
                     4i32 => ::core::option::Option::Some(Self::UPDATE_POLICY_MIN),
                     5i32 => ::core::option::Option::Some(Self::UPDATE_POLICY_MAX),
                     6i32 => ::core::option::Option::Some(Self::UPDATE_POLICY_APPEND),
+                    7i32 => ::core::option::Option::Some(Self::UPDATE_POLICY_SET_SUM),
                     _ => ::core::option::Option::None,
                 }
             }
@@ -799,6 +1109,7 @@ pub mod module {
                     Self::UPDATE_POLICY_MIN => "UPDATE_POLICY_MIN",
                     Self::UPDATE_POLICY_MAX => "UPDATE_POLICY_MAX",
                     Self::UPDATE_POLICY_APPEND => "UPDATE_POLICY_APPEND",
+                    Self::UPDATE_POLICY_SET_SUM => "UPDATE_POLICY_SET_SUM",
                 }
             }
             fn from_proto_name(name: &str) -> ::core::option::Option<Self> {
@@ -826,6 +1137,9 @@ pub mod module {
                     "UPDATE_POLICY_APPEND" => {
                         ::core::option::Option::Some(Self::UPDATE_POLICY_APPEND)
                     }
+                    "UPDATE_POLICY_SET_SUM" => {
+                        ::core::option::Option::Some(Self::UPDATE_POLICY_SET_SUM)
+                    }
                     _ => ::core::option::Option::None,
                 }
             }
@@ -838,8 +1152,94 @@ pub mod module {
                     Self::UPDATE_POLICY_MIN,
                     Self::UPDATE_POLICY_MAX,
                     Self::UPDATE_POLICY_APPEND,
+                    Self::UPDATE_POLICY_SET_SUM,
                 ]
             }
+        }
+    }
+    #[derive(Clone, PartialEq, Default)]
+    pub struct KindBlockIndex {
+        /// Field 1: `output_type`
+        pub output_type: ::buffa::alloc::string::String,
+    }
+    impl ::core::fmt::Debug for KindBlockIndex {
+        fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+            f.debug_struct("KindBlockIndex")
+                .field("output_type", &self.output_type)
+                .finish()
+        }
+    }
+    impl KindBlockIndex {
+        /// Protobuf type URL for this message, for use with `Any::pack` and
+        /// `Any::unpack_if`.
+        ///
+        /// Format: `type.googleapis.com/<fully.qualified.TypeName>`
+        pub const TYPE_URL: &'static str = "type.googleapis.com/sf.substreams.v1.Module.KindBlockIndex";
+    }
+    ::buffa::impl_default_instance!(KindBlockIndex);
+    impl ::buffa::MessageName for KindBlockIndex {
+        const PACKAGE: &'static str = "sf.substreams.v1";
+        const NAME: &'static str = "Module.KindBlockIndex";
+        const FULL_NAME: &'static str = "sf.substreams.v1.Module.KindBlockIndex";
+        const TYPE_URL: &'static str = "type.googleapis.com/sf.substreams.v1.Module.KindBlockIndex";
+    }
+    impl ::buffa::Message for KindBlockIndex {
+        /// Returns the total encoded size in bytes.
+        ///
+        /// Accumulates in `u64` (which cannot overflow for in-memory
+        /// data) and saturates to `u32` at return, so a message whose
+        /// encoded size exceeds the 2 GiB protobuf limit yields a value
+        /// above [`::buffa::MAX_MESSAGE_BYTES`] that the encode entry
+        /// points reject, never a silently wrapped size.
+        #[allow(clippy::let_and_return)]
+        fn compute_size(&self, _cache: &mut ::buffa::SizeCache) -> u32 {
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+            let mut size = 0u64;
+            if !self.output_type.is_empty() {
+                size
+                    += 1u64
+                        + ::buffa::types::string_encoded_len(&self.output_type) as u64;
+            }
+            ::buffa::saturate_size(size)
+        }
+        fn write_to(
+            &self,
+            _cache: &mut ::buffa::SizeCache,
+            buf: &mut impl ::buffa::EncodeSink,
+        ) {
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+            if !self.output_type.is_empty() {
+                ::buffa::types::put_string_field(1u32, &self.output_type, buf);
+            }
+        }
+        fn merge_field(
+            &mut self,
+            tag: ::buffa::encoding::Tag,
+            buf: &mut impl ::buffa::bytes::Buf,
+            ctx: ::buffa::DecodeContext<'_>,
+        ) -> ::core::result::Result<(), ::buffa::DecodeError> {
+            #[allow(unused_imports)]
+            use ::buffa::bytes::Buf as _;
+            #[allow(unused_imports)]
+            use ::buffa::Enumeration as _;
+            match tag.field_number() {
+                1u32 => {
+                    ::buffa::encoding::check_wire_type(
+                        tag,
+                        ::buffa::encoding::WireType::LengthDelimited,
+                    )?;
+                    ::buffa::types::merge_string(&mut self.output_type, buf)?;
+                }
+                _ => {
+                    ::buffa::encoding::skip_field_depth(tag, buf, ctx.depth())?;
+                }
+            }
+            ::core::result::Result::Ok(())
+        }
+        fn clear(&mut self) {
+            self.output_type.clear();
         }
     }
     #[derive(Clone, PartialEq, Default)]
@@ -1624,6 +2024,18 @@ pub mod module {
     #[doc(inline)]
     pub use super::__buffa::oneof::module::Kind;
     #[doc(inline)]
+    pub use super::__buffa::view::module::BlockFilterView;
+    #[doc(inline)]
+    pub use super::__buffa::view::module::BlockFilterOwnedView;
+    #[doc(inline)]
+    pub use super::__buffa::lazy_view::module::BlockFilterLazyView;
+    #[doc(inline)]
+    pub use super::__buffa::view::module::QueryFromParamsView;
+    #[doc(inline)]
+    pub use super::__buffa::view::module::QueryFromParamsOwnedView;
+    #[doc(inline)]
+    pub use super::__buffa::lazy_view::module::QueryFromParamsLazyView;
+    #[doc(inline)]
     pub use super::__buffa::view::module::KindMapView;
     #[doc(inline)]
     pub use super::__buffa::view::module::KindMapOwnedView;
@@ -1635,6 +2047,12 @@ pub mod module {
     pub use super::__buffa::view::module::KindStoreOwnedView;
     #[doc(inline)]
     pub use super::__buffa::lazy_view::module::KindStoreLazyView;
+    #[doc(inline)]
+    pub use super::__buffa::view::module::KindBlockIndexView;
+    #[doc(inline)]
+    pub use super::__buffa::view::module::KindBlockIndexOwnedView;
+    #[doc(inline)]
+    pub use super::__buffa::lazy_view::module::KindBlockIndexLazyView;
     #[doc(inline)]
     pub use super::__buffa::view::module::InputView;
     #[doc(inline)]

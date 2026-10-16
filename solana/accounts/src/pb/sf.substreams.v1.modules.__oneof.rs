@@ -8,6 +8,9 @@ pub mod module {
     pub enum Kind {
         KindMap(::buffa::alloc::boxed::Box<super::super::super::module::KindMap>),
         KindStore(::buffa::alloc::boxed::Box<super::super::super::module::KindStore>),
+        KindBlockIndex(
+            ::buffa::alloc::boxed::Box<super::super::super::module::KindBlockIndex>,
+        ),
     }
     impl ::buffa::Oneof for Kind {}
     impl From<super::super::super::module::KindMap> for Kind {
@@ -28,6 +31,42 @@ pub mod module {
     impl From<super::super::super::module::KindStore> for ::core::option::Option<Kind> {
         fn from(v: super::super::super::module::KindStore) -> Self {
             Self::Some(Kind::from(v))
+        }
+    }
+    impl From<super::super::super::module::KindBlockIndex> for Kind {
+        fn from(v: super::super::super::module::KindBlockIndex) -> Self {
+            Self::KindBlockIndex(::buffa::alloc::boxed::Box::new(v))
+        }
+    }
+    impl From<super::super::super::module::KindBlockIndex>
+    for ::core::option::Option<Kind> {
+        fn from(v: super::super::super::module::KindBlockIndex) -> Self {
+            Self::Some(Kind::from(v))
+        }
+    }
+    pub mod block_filter {
+        #[allow(unused_imports)]
+        use super::*;
+        #[derive(Clone, PartialEq, Debug)]
+        pub enum Query {
+            QueryString(::buffa::alloc::string::String),
+            QueryFromParams(
+                ::buffa::alloc::boxed::Box<
+                    super::super::super::super::module::QueryFromParams,
+                >,
+            ),
+        }
+        impl ::buffa::Oneof for Query {}
+        impl From<super::super::super::super::module::QueryFromParams> for Query {
+            fn from(v: super::super::super::super::module::QueryFromParams) -> Self {
+                Self::QueryFromParams(::buffa::alloc::boxed::Box::new(v))
+            }
+        }
+        impl From<super::super::super::super::module::QueryFromParams>
+        for ::core::option::Option<Query> {
+            fn from(v: super::super::super::super::module::QueryFromParams) -> Self {
+                Self::Some(Query::from(v))
+            }
         }
     }
     pub mod input {
